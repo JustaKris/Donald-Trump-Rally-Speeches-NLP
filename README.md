@@ -1,83 +1,240 @@
-# Donald Trump Rally Speeches — NLP Exercises
+# Donald Trump Rally Speeches — NLP Portfolio Project
 
-This repository is a small portfolio project intended to showcase practical Natural Language Processing (NLP) skills through exploratory analysis and modeling on a corpus of Donald Trump rally speeches. The goal is to provide clear, reproducible notebooks that demonstrate techniques useful to employers: data loading/cleaning, visualization, sentiment analysis, and masked language modeling.
+A professional data science portfolio project demonstrating advanced Natural Language Processing (NLP) techniques through comprehensive analysis of Donald Trump's 2019-2020 rally speeches. This project showcases production-ready code, interactive visualizations, and actionable insights that would be valuable to employers seeking NLP and data analysis expertise.
 
-## What you'll find here
+## 🎯 Project Highlights
 
-- `data/Donald Trump Rally Speeches/` — plain text transcripts of rally speeches (source files used by the notebooks).
-- `notebooks/` — three focused Jupyter notebooks:
-  - `Word Clouds.ipynb` — EDA and word cloud visualizations to surface frequent words and themes.
-  - `Sentiment Analysis.ipynb` — simple sentiment analysis experiments and visualizations.
-  - `Masked Language Modeling.ipynb` — demonstration of masked language modeling using Hugging Face transformers.
+- **35 rally speeches** (2019-2020) totaling 300,000+ words analyzed
+- **Interactive Plotly dashboards** for exploratory data analysis
+- **Deep learning sentiment analysis** using FinBERT (BERT-based transformer model)
+- **Temporal trend analysis** revealing sentiment patterns over time
+- **Clean, documented, reusable code** following best practices
+- **Reproducible environment** managed with Poetry
 
-## Quick project contract
+## 📊 What's Inside
 
-- Inputs: plain text files (one rally transcript per file) under `data/Donald Trump Rally Speeches/`.
-- Outputs: notebooks with plots, word clouds, and model outputs; helper artifacts produced while running notebooks (plots, cached models).
-- Success criteria: notebooks run end-to-end in a reproducible Poetry environment and produce the visualizations and model outputs shown in the notebooks.
+### `data/Donald Trump Rally Speeches/`
 
-## Dependencies (Poetry)
+Plain text transcripts of 35 rally speeches from July 2019 to September 2020, providing rich corpus for NLP analysis.
 
-The notebooks rely on a standard NLP / data-science stack plus Hugging Face Transformers and PyTorch for the modeling notebook. From PowerShell in the project root you can add the core packages with:
+### `notebooks/` — Three Production-Ready Jupyter Notebooks
 
-```powershell
-poetry add numpy pandas matplotlib seaborn wordcloud scikit-learn transformers torch nltk tqdm jupyterlab notebook ipykernel
-```
+#### 1. **Word Clouds.ipynb** — Exploratory Text Analysis
 
-Notes:
+- Interactive word frequency visualizations with Plotly
+- N-gram analysis (unigrams, bigrams, trigrams)
+- Temporal word usage patterns comparing 2019 vs 2020
+- Topic identification and frequency tracking
+- Comprehensive statistical summaries
 
-- `torch` will install a CPU-only build by default unless you configure a CUDA-enabled wheel for your platform. If you have an NVIDIA GPU and want GPU support, follow PyTorch's official install selector and install the appropriate package before or after adding the other packages.
-- `transformers` may download pretrained model weights the first time you run the masked LM notebook; ensure you have enough disk space (a few hundred MB to multiple GB depending on model choice).
+**Key Technologies:** pandas, NLTK, WordCloud, Plotly, tqdm
 
-After adding dependencies, either use `poetry shell` to enter the venv or run commands with `poetry run`.
+#### 2. **Sentiment Analysis.ipynb** — Deep Learning NLP
 
-Activate the venv from PowerShell if you prefer to use the created `.venv` directly:
+- FinBERT-based sentiment classification (positive/negative/neutral)
+- Chunked processing for long documents
+- Speech-by-speech sentiment scoring with chunk-level granularity
+- Interactive dashboards: heatmaps, timelines, distributions
+- Year-over-year statistical comparison
+- Moving average trend analysis
+- Results exported for downstream use
 
-```powershell
-& ".venv\Scripts\Activate.ps1"
-```
+**Key Technologies:** TensorFlow, Transformers (Hugging Face), FinBERT, Plotly
 
-Start Jupyter Lab (recommended) inside the poetry environment:
+#### 3. **Masked Language Modeling.ipynb** — Advanced Transformer Fine-tuning
 
-```powershell
-poetry run jupyter lab
-```
+- Custom DistilBERT fine-tuning on domain-specific corpus
+- Whole-word masking implementation
+- Model evaluation with perplexity metrics
+- Comparative analysis: base model vs fine-tuned model
+- Demonstrates understanding of transfer learning and model training
 
-Or use the classic notebook UI:
+**Key Technologies:** TensorFlow, Transformers, Datasets (Hugging Face), DistilBERT
 
-```powershell
-poetry run jupyter notebook
-```
+## 🚀 Key Skills Demonstrated
 
-## How to run the notebooks
+### Data Science & Analysis
+- **Data wrangling**: Loading, parsing, and structuring unstructured text data
+- **Exploratory Data Analysis**: Statistical summaries, distributions, temporal patterns
+- **Feature engineering**: N-gram extraction, stopword filtering, custom metrics
 
-1. Install dependencies (see above).
-2. Start Jupyter Lab or Notebook in the project root so relative paths to `data/` work.
-3. Open one of the notebooks under `notebooks/` and run cells in order. The notebooks include small preprocessing steps and inline notes about model sizes and runtime.
+### NLP & Machine Learning
+- **Text preprocessing**: Tokenization, chunking, stopword removal
+- **Sentiment analysis**: Deep learning classification with pre-trained transformers
+- **Language modeling**: Fine-tuning BERT-based models on domain-specific data
+- **Model evaluation**: Perplexity, accuracy metrics, comparative analysis
 
-## Short guidance / edge cases
+### Visualization & Communication
+- **Interactive dashboards**: Plotly-based multi-panel visualizations
+- **Time series analysis**: Trend lines, moving averages, year-over-year comparisons
+- **Clear documentation**: Markdown cells, docstrings, and inline comments
+- **Storytelling with data**: Extracting actionable insights from raw text
 
-- If a notebook fails due to missing NLTK data (tokenizers/stopwords), run the following inside a Python cell or a short script once:
+### Software Engineering
+- **Production-ready code**: Modular functions, type hints, error handling
+- **Environment management**: Poetry for dependency management
+- **Best practices**: Progress bars, logging, reproducible workflows
+- **Clean code principles**: DRY, separation of concerns, readability
+
+## 📈 Sample Insights from the Analysis
+
+- **Sentiment patterns**: Identified temporal shifts in speech sentiment between 2019 and 2020
+- **Vocabulary evolution**: Tracked how language usage changed over the campaign period
+- **Topic prevalence**: Quantified mentions of key themes (economy, immigration, media)
+- **Speech characteristics**: Average speech length of 8,500+ words with consistent patterns
+
+## 🎯 Quick Start
+
+### Prerequisites
+
+- Python 3.12+
+- Poetry for dependency management
+- 2GB+ disk space for model weights
+
+### Installation
+
+1. **Clone the repository**
+   ```powershell
+   git clone https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP.git
+   cd Donald-Trump-Rally-Speeches-NLP
+   ```
+
+2. **Install dependencies with Poetry**
+   ```powershell
+   poetry install
+   ```
+
+3. **Activate the virtual environment**
+   ```powershell
+   poetry shell
+   ```
+   
+   Or use the .venv directly:
+   ```powershell
+   & ".venv\Scripts\Activate.ps1"
+   ```
+
+4. **Launch Jupyter Lab**
+   ```powershell
+   poetry run jupyter lab
+   ```
+
+5. **Run notebooks in order**
+   - Start with `1. Word Clouds.ipynb` (creates shared dataset)
+   - Then `2. Sentiment Analysis.ipynb` (adds sentiment features)
+   - Finally `3. Masked Language Modeling.ipynb` (optional deep dive)
+
+### First-Time Setup
+
+Some notebooks require NLTK data. Run once in a notebook cell:
 
 ```python
 import nltk
 nltk.download('punkt')
+nltk.download('punkt_tab')
 nltk.download('stopwords')
 ```
 
-- Large transformer models may run slowly or exhaust memory on CPU-only machines. For faster iteration use smaller models (e.g., `distilbert-base-uncased`) or a machine with a GPU.
-- The dataset is plain text; if you add more files, the notebooks will pick them up if they follow the same filename conventions.
+## 📦 Core Dependencies
 
-## Suggested next steps (for the portfolio)
+```toml
+python = "^3.12"
+numpy = "^2.1.3"
+pandas = "^2.2.3"
+matplotlib = "^3.9.2"
+seaborn = "^0.13.2"
+wordcloud = "^1.9.4"
+nltk = "^3.9.1"
+plotly = "^5.24.1"
+transformers = "^4.46.3"
+tensorflow = "^2.18.0"
+tqdm = "^4.67.0"
+datasets = "^3.1.0"
+```
 
-- Add a short `requirements` section to the notebooks summarizing the exact package versions used for reproducibility.
-- Add a small script in `scripts/` that pulls basic metrics (word counts, top n-grams) from `data/` as a programmatic demo.
-- Add a short rendered HTML or exported PDF of a selected notebook to showcase the results to non-technical reviewers.
+**Note**: TensorFlow installs CPU-only by default. For GPU support, follow [PyTorch's official guide](https://pytorch.org/get-started/locally/) to install the appropriate CUDA-enabled version.
 
-## License & attribution
+## 💡 Project Structure
 
-This repository is for learning and portfolio purposes. Add a license if you plan to publish or share the repo widely.
+```
+Donald-Trump-Rally-Speeches-NLP/
+│
+├── data/
+│   └── Donald Trump Rally Speeches/    # 35 .txt files (one per speech)
+│
+├── notebooks/
+│   ├── 1. Word Clouds.ipynb            # Text analysis & visualization
+│   ├── 2. Sentiment Analysis.ipynb     # Deep learning sentiment
+│   └── 3. Masked Language Modeling.ipynb  # Transformer fine-tuning
+│
+├── pyproject.toml                      # Poetry dependencies
+├── poetry.lock                         # Locked dependency versions
+└── README.md                           # This file
+```
+
+## 🎓 Learning Outcomes & Portfolio Value
+
+This project demonstrates capabilities that are directly applicable to industry roles:
+
+### For Data Science Roles
+- End-to-end analysis from raw text to insights
+- Statistical rigor and proper evaluation methods
+- Clear communication of findings
+
+### For ML Engineering Roles
+- Working with state-of-the-art transformer models
+- Efficient data processing pipelines
+- Model fine-tuning and deployment considerations
+
+### For Analytics Roles
+- Interactive visualization best practices
+- Temporal trend analysis
+- Stakeholder-ready reporting
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**SSL Certificate Errors (Hugging Face downloads)**
+```python
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+```
+
+**Out of Memory (TensorFlow/Sentiment Analysis)**
+- Reduce batch size in sentiment analysis
+- Use smaller models (e.g., `distilbert-base-uncased`)
+- Close other memory-intensive applications
+
+**Slow Performance**
+- MLM training: Use GPU if available, or reduce epochs
+- Sentiment analysis: Already optimized with chunking and progress bars
+
+## 📝 Next Steps & Enhancements
+
+**Potential additions to strengthen the portfolio:**
+
+1. **Export visualizations**: Add HTML exports of key charts for non-technical viewers
+2. **API deployment**: Wrap sentiment model in FastAPI for production demo
+3. **Testing suite**: Add pytest tests for data processing functions
+4. **CI/CD**: GitHub Actions for automated notebook execution
+5. **Docker container**: Containerize for easy deployment
+6. **Dashboard**: Streamlit/Dash app for interactive exploration
+
+## 📄 License & Attribution
+
+This repository is for educational and portfolio purposes. The speech transcripts are publicly available data used for demonstrative NLP analysis.
+
+**Technologies Used:**
+- [Hugging Face Transformers](https://huggingface.co/docs/transformers/)
+- [FinBERT](https://huggingface.co/ProsusAI/finbert) for sentiment analysis
+- [Plotly](https://plotly.com/python/) for interactive visualizations
+- [Poetry](https://python-poetry.org/) for dependency management
 
 ---
 
-If you'd like, I can also pin exact package versions in `pyproject.toml`, add `ipynb`->`html` export steps, or create a `scripts/` helper to run the notebooks programmatically.
+## 📫 Contact
+
+**Kristiyan Bonev** | [GitHub](https://github.com/JustaKris)
+
+*This project showcases practical NLP skills and modern data science workflows. Feel free to explore the notebooks and reach out with questions!*
