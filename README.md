@@ -54,23 +54,27 @@ Plain text transcripts of 35 rally speeches from July 2019 to September 2020, pr
 ## 🚀 Key Skills Demonstrated
 
 ### Data Science & Analysis
+
 - **Data wrangling**: Loading, parsing, and structuring unstructured text data
 - **Exploratory Data Analysis**: Statistical summaries, distributions, temporal patterns
 - **Feature engineering**: N-gram extraction, stopword filtering, custom metrics
 
 ### NLP & Machine Learning
+
 - **Text preprocessing**: Tokenization, chunking, stopword removal
 - **Sentiment analysis**: Deep learning classification with pre-trained transformers
 - **Language modeling**: Fine-tuning BERT-based models on domain-specific data
 - **Model evaluation**: Perplexity, accuracy metrics, comparative analysis
 
 ### Visualization & Communication
+
 - **Interactive dashboards**: Plotly-based multi-panel visualizations
 - **Time series analysis**: Trend lines, moving averages, year-over-year comparisons
 - **Clear documentation**: Markdown cells, docstrings, and inline comments
 - **Storytelling with data**: Extracting actionable insights from raw text
 
 ### Software Engineering
+
 - **Production-ready code**: Modular functions, type hints, error handling
 - **Environment management**: Poetry for dependency management
 - **Best practices**: Progress bars, logging, reproducible workflows
@@ -94,27 +98,32 @@ Plain text transcripts of 35 rally speeches from July 2019 to September 2020, pr
 ### Installation
 
 1. **Clone the repository**
+
    ```powershell
    git clone https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP.git
    cd Donald-Trump-Rally-Speeches-NLP
    ```
 
 2. **Install dependencies with Poetry**
+
    ```powershell
    poetry install
    ```
 
 3. **Activate the virtual environment**
+
    ```powershell
    poetry shell
    ```
-   
+
    Or use the .venv directly:
+
    ```powershell
    & ".venv\Scripts\Activate.ps1"
    ```
 
 4. **Launch Jupyter Lab**
+
    ```powershell
    poetry run jupyter lab
    ```
@@ -156,7 +165,6 @@ datasets = "^3.1.0"
 
 ## 💡 Project Structure
 
-```
 Donald-Trump-Rally-Speeches-NLP/
 │
 ├── data/
@@ -170,23 +178,25 @@ Donald-Trump-Rally-Speeches-NLP/
 ├── pyproject.toml                      # Poetry dependencies
 ├── poetry.lock                         # Locked dependency versions
 └── README.md                           # This file
-```
 
 ## 🎓 Learning Outcomes & Portfolio Value
 
 This project demonstrates capabilities that are directly applicable to industry roles:
 
 ### For Data Science Roles
+
 - End-to-end analysis from raw text to insights
 - Statistical rigor and proper evaluation methods
 - Clear communication of findings
 
 ### For ML Engineering Roles
+
 - Working with state-of-the-art transformer models
 - Efficient data processing pipelines
 - Model fine-tuning and deployment considerations
 
 ### For Analytics Roles
+
 - Interactive visualization best practices
 - Temporal trend analysis
 - Stakeholder-ready reporting
@@ -195,18 +205,21 @@ This project demonstrates capabilities that are directly applicable to industry 
 
 ### Common Issues
 
-**SSL Certificate Errors (Hugging Face downloads)**
+#### SSL Certificate Errors (Hugging Face downloads)
+
 ```python
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 ```
 
-**Out of Memory (TensorFlow/Sentiment Analysis)**
+#### Out of Memory (TensorFlow/Sentiment Analysis)
+
 - Reduce batch size in sentiment analysis
 - Use smaller models (e.g., `distilbert-base-uncased`)
 - Close other memory-intensive applications
 
-**Slow Performance**
+#### Slow Performance
+
 - MLM training: Use GPU if available, or reduce epochs
 - Sentiment analysis: Already optimized with chunking and progress bars
 
@@ -226,6 +239,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 This repository is for educational and portfolio purposes. The speech transcripts are publicly available data used for demonstrative NLP analysis.
 
 **Technologies Used:**
+
 - [Hugging Face Transformers](https://huggingface.co/docs/transformers/)
 - [FinBERT](https://huggingface.co/ProsusAI/finbert) for sentiment analysis
 - [Plotly](https://plotly.com/python/) for interactive visualizations
