@@ -1,0 +1,117 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+.venv
+env/
+ENV/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Local development settings
+.env
+.env.local
+.env.*
+
+# Data files
+./data/input/*
+./data/output/
+!data/input/.gitkeep
+!data/output/.gitkeep
+!data/onliner_counts.txt
+Archive
+
+# Logs
+*.log
+
+# Test cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Input files
+*\data/input
+*\data/transformed
+!\src\data
+
+# Terraform
+*.tfstate
+*.tfstate.*
+crash.log
+.terraform/
+.terraform.lock.hcl
+
+# Ignore override files as they are usually local and not shared
+*.tfvars
+*.tfvars.json
+
+# Ignore plan output files
+*.tfplan
+tfplan*
+
+# mypy
+.mypy_cache/
+
+# JupyterLab
+.jupyterlab/
+
+# Workfolders
+/2025
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Backup files
+*~
+*.bak
+
+# Archive files
+*.zip
+*.tar
+*.gz
+*.tgz
+*.rar
+*.7z
+*.bz2
+*.xz
+
+# Office documents
+*.xlsx
+*.xls
+*.docx
+*.pptx
+
+# Keeping the original documentation file for this project for refference
+!legacy/docs/TV HML Process Documentation.docx
+
+# Database dumps
+# *.sql
+
+# Miscellaneous
+*.tmp
+*.cache
+
+# Docker
+*.pid
+*.db
+docker-compose.override.yml
