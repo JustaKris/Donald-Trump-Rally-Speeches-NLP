@@ -12,12 +12,14 @@ import warnings
 from typing import Any, Dict, List, Tuple
 
 import numpy as np
+import tensorflow as tf
+from transformers import AutoTokenizer, TFBertForSequenceClassification
+
+from .preprocessing import chunk_text_for_bert
 
 # Suppress TensorFlow warnings and info messages
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # Only show errors
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"  # Disable oneDNN custom ops messages
-
-import tensorflow as tf
 
 # Set TensorFlow logging level
 tf.get_logger().setLevel("ERROR")
@@ -26,8 +28,6 @@ tf.get_logger().setLevel("ERROR")
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", message=".*tf.losses.sparse_softmax_cross_entropy.*")
 warnings.filterwarnings("ignore", message=".*tf.get_default_graph.*")
-
-from transformers import AutoTokenizer, TFBertForSequenceClassification
 
 # Suppress transformers warnings about model initialization
 logging.getLogger("transformers").setLevel(logging.ERROR)
@@ -38,8 +38,6 @@ logging.basicConfig(
     format="INFO:     %(message)s",
 )
 logger = logging.getLogger(__name__)
-
-from .preprocessing import chunk_text_for_bert
 
 # Handle SSL certificate issues when downloading models
 ssl._create_default_https_context = ssl._create_unverified_context  # type: ignore[assignment]
@@ -68,15 +66,17 @@ class SentimentAnalyzer:
     def _load_model(self):
         """Load the tokenizer and model from HuggingFace."""
         logger.info(f"Loading {self.model_name}...")
-        
+
         # Suppress specific model loading warnings
         with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", message=".*not initialized from the model checkpoint.*")
+            warnings.filterwarnings(
+                "ignore", message=".*not initialized from the model checkpoint.*"
+            )
             warnings.filterwarnings("ignore", message=".*TRAIN this model.*")
-            
+
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
             self.model = TFBertForSequenceClassification.from_pretrained(self.model_name)
-        
+
         logger.info("Model loaded successfully!")
 
     def analyze_sentiment(self, text: str, return_all_scores: bool = False) -> Dict[str, Any]:
