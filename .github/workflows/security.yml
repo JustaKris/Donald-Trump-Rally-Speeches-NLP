@@ -43,8 +43,10 @@ jobs:
     
     - name: Run bandit security scan (code vulnerabilities)
       run: |
-        poetry run bandit -r src/ -f json -o bandit-report.json || true
-        poetry run bandit -r src/ --skip B101
+        # Skip B104 (hardcoded 0.0.0.0 - intentional for containers)
+        # Skip B615 (HuggingFace model pinning)
+        poetry run bandit -r src/ -f json -o bandit-report.json --skip B104,B615 || true
+        poetry run bandit -r src/ --skip B104,B615
       continue-on-error: true
     
     - name: Check for known vulnerabilities with pip-audit
