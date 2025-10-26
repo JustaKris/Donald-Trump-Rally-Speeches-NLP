@@ -71,17 +71,28 @@ nltk.download('stopwords')
 
 ## Testing & code quality
 
-Run tests (if/when you add them):
+Run tests:
 
 ```powershell
 poetry run pytest
 ```
 
-Format and lint:
+Format code:
 
 ```powershell
-poetry run black .
-poetry run flake8
+poetry run black src/ && poetry run isort src/
+```
+
+Check code quality (linting and type checking):
+
+```powershell
+poetry run flake8 src/ && poetry run mypy src/
+```
+
+All-in-one quality check:
+
+```powershell
+poetry run black src/ && poetry run isort src/ && poetry run flake8 src/ && poetry run mypy src/ && poetry run pytest
 ```
 
 ## Common Git workflows
@@ -116,6 +127,7 @@ git reset HEAD <path/to/file>
 - Install deps: `poetry install`
 - Start Jupyter Lab: `poetry run jupyter lab`
 - Run tests: `poetry run pytest`
-- Format code: `poetry run black .`
+- Format code: `poetry run black src/ && poetry run isort src/`
+- Check quality: `poetry run flake8 src/ && poetry run mypy src/`
 
 ---
