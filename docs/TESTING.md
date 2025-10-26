@@ -176,7 +176,7 @@ def test_health_check():
 ### NLTK Data Missing
 
 ```powershell
-poetry run python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords')"
+poetry run python -c "import nltk; nltk.download('punkt', quiet=True); nltk.download('stopwords', quiet=True); nltk.download('punkt_tab', quiet=True)"
 ```
 
 ### Import Errors
