@@ -1,0 +1,114 @@
+name: CI - Tests & Linting
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12', '3.13']
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: 1.8.0
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+    
+    - name: Cache Poetry dependencies
+      uses: actions/cache@v4
+      with:
+        path: .venv
+        key: ${{ runner.os }}-poetry-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-${{ matrix.python-version }}-
+    
+    - name: Install dependencies
+      run: |
+        poetry install --with dev
+    
+    - name: Download NLTK data
+      run: |
+        poetry run python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords')"
+    
+    - name: Run unit tests
+      run: |
+        poetry run pytest tests/ -m "unit" -v --cov=src --cov-report=xml --cov-report=term-missing
+    
+    - name: Run integration tests (without model loading)
+      run: |
+        poetry run pytest tests/test_api.py -m "integration and not requires_model" -v
+    
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  lint:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: 1.8.0
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+    
+    - name: Cache Poetry dependencies
+      uses: actions/cache@v4
+      with:
+        path: .venv
+        key: ${{ runner.os }}-poetry-lint-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-lint-
+    
+    - name: Install linting tools
+      run: |
+        poetry install --with dev
+    
+    - name: Run flake8
+      run: |
+        poetry run flake8 src/ --count --statistics --show-source
+    
+    - name: Check code formatting with Black
+      run: |
+        poetry run black --check src/
+    
+    - name: Check import sorting with isort
+      run: |
+        poetry run isort --check-only src/
+    
+    - name: Type checking with mypy
+      run: |
+        poetry run mypy src/ --ignore-missing-imports
+      continue-on-error: true
