@@ -1,5 +1,6 @@
-# Trump Rally Speeches NLP API - Dockerfile
+# NLP Text Analysis API - Dockerfile
 # Multi-stage build for optimal image size
+# Production-ready container for general-purpose NLP text analysis
 
 FROM python:3.12-slim AS builder
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trump Rally Speeches NLP API - Interactive Demo</title>
+    <title>NLP Text Analysis API - Interactive Demo</title>
     <link rel="icon" type="image/jpeg" href="/static/images/favicon.jpg">
     <style>
         * {
@@ -419,8 +419,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>🎤 Trump Rally Speeches NLP API</h1>
-            <p class="subtitle">Advanced Natural Language Processing Analysis</p>
+            <h1>📊 NLP Text Analysis API</h1>
+            <p class="subtitle">Professional Natural Language Processing • Sentiment Analysis • Topic Extraction</p>
         </header>
         
         <div class="content">
@@ -428,14 +428,14 @@
                 <button class="tab active" data-tab="sentiment">Sentiment Analysis</button>
                 <button class="tab" data-tab="words">Word Frequency</button>
                 <button class="tab" data-tab="topics">Topic Extraction</button>
-                <button class="tab" data-tab="stats">Dataset Stats</button>
+                <button class="tab" data-tab="stats">Demo Dataset</button>
             </div>
             
             <!-- Sentiment Analysis Tab -->
             <div class="tab-content active" id="sentiment">
                 <h2>Sentiment Analysis</h2>
-                <p style="margin: 15px 0; color: #666;">Analyze the emotional tone of your text using FinBERT, a BERT model fine-tuned for sentiment classification.</p>
-                <textarea id="sentimentText" placeholder="Enter text to analyze... (e.g., 'We're going to make America great again. Our economy is stronger than ever!')"></textarea>
+                <p style="margin: 15px 0; color: #666;">Analyze the emotional tone of any text using FinBERT, a state-of-the-art transformer model. Works with social media posts, product reviews, news articles, and more.</p>
+                <textarea id="sentimentText" placeholder="Enter any text to analyze... (e.g., 'This product exceeded my expectations! The quality is amazing and delivery was fast.')"></textarea>
                 <button class="analyze" onclick="analyzeSentiment()">Analyze Sentiment</button>
                 
                 <div class="loading" id="sentimentLoading">
@@ -509,9 +509,12 @@
             
             <!-- Stats Tab -->
             <div class="tab-content" id="stats">
-                <h2>Dataset Statistics</h2>
-                <p style="margin: 15px 0; color: #666;">Aggregate statistics from the Trump rally speeches dataset (2019-2020).</p>
-                <button class="analyze" onclick="loadStats()">Load Statistics</button>
+                <h2>Demo Dataset Statistics</h2>
+                <p style="margin: 15px 0; color: #666;">
+                    This API includes a demo dataset of 35+ political rally speeches (2019-2020) to showcase its analytical capabilities.
+                    The API works with any text data - this dataset serves as a real-world example.
+                </p>
+                <button class="analyze" onclick="loadStats()">Load Demo Dataset Stats</button>
                 
                 <div class="loading" id="statsLoading">
                     <div class="spinner"></div>

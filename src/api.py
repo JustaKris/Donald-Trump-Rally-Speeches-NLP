@@ -1,8 +1,9 @@
 """
-FastAPI Application for Trump Rally Speeches NLP Analysis.
+FastAPI Application for General-Purpose NLP Text Analysis.
 
 This API provides endpoints for sentiment analysis, word frequency analysis,
-and topic extraction using state-of-the-art NLP models.
+topic extraction, and n-gram analysis using state-of-the-art NLP models.
+Includes a demo dataset of political speeches for showcase purposes.
 
 Run with: uvicorn src.api:app --reload
 """
@@ -36,8 +37,8 @@ logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="Trump Rally Speeches NLP API",
-    description="Advanced NLP analysis of political speeches using transformer models and statistical methods",
+    title="NLP Text Analysis API",
+    description="Production-ready API for natural language processing: sentiment analysis, word frequency, topic extraction, and n-gram analysis. Powered by transformer models and statistical NLP methods.",
     version="0.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
@@ -154,10 +155,10 @@ async def root():
         return FileResponse(html_file)
     return """
     <html>
-        <head><title>Trump Rally Speeches NLP API</title></head>
+        <head><title>NLP Text Analysis API</title></head>
         <body>
-            <h1>🎤 Trump Rally Speeches NLP API</h1>
-            <p>Welcome to the NLP analysis API!</p>
+            <h1>📊 NLP Text Analysis API</h1>
+            <p>Professional natural language processing API for text analysis</p>
             <ul>
                 <li><a href="/docs">📚 Interactive API Documentation</a></li>
                 <li><a href="/redoc">📖 ReDoc Documentation</a></li>
@@ -177,10 +178,13 @@ async def health_check():
 @app.post("/analyze/sentiment", response_model=SentimentResponse)
 async def analyze_sentiment(input: TextInput):
     """
-    Analyze sentiment of input text using FinBERT.
+    Analyze sentiment of any input text using FinBERT transformer model.
 
-    Returns the dominant sentiment (positive/negative/neutral) with confidence score.
-    For longer texts, automatically chunks and averages predictions.
+    This endpoint uses a pre-trained BERT-based model fine-tuned for sentiment analysis.
+    Works with any type of text: social media posts, product reviews, news articles, etc.
+
+    Returns the dominant sentiment (positive/negative/neutral) with confidence scores.
+    For longer texts, automatically chunks and averages predictions for accuracy.
     """
     if sentiment_analyzer is None:
         raise HTTPException(
@@ -281,7 +285,10 @@ async def extract_ngrams_endpoint(input: NGramRequest):
 @app.get("/speeches/stats", response_model=StatsResponse)
 async def get_speech_statistics():
     """
-    Get aggregate statistics about the Trump rally speeches dataset.
+    Get statistics about the demo dataset (political rally speeches, 2019-2020).
+
+    This endpoint demonstrates the API's analytical capabilities using a real-world
+    dataset of 35+ political speeches. The dataset serves as a showcase example.
 
     Returns total speeches, word counts, date range, and locations.
     """
@@ -299,7 +306,10 @@ async def get_speech_statistics():
 @app.get("/speeches/list")
 async def list_speeches():
     """
-    List all available speeches with metadata.
+    List all speeches in the demo dataset with metadata.
+
+    The demo dataset contains 35+ political rally speeches from 2019-2020,
+    showcasing the API's ability to process and analyze real-world text data.
 
     Returns a list of all speeches with location, date, and word count.
     """
