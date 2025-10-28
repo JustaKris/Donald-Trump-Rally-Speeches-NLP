@@ -1,13 +1,40 @@
 [project]
 name = "dt-rally-speeches-nlp"
 version = "0.1.0"
-description = "NLP exercise on a dataset of rally speeches from Donald Trump's first presidential campaign."
-authors = [
-    {name = "Kristiyan Bonev"}
-]
+description = "Production-ready NLP API for sentiment analysis, topic extraction, and text analysis. Includes demo dataset of political speeches."
+license = { text = "MIT" }
 readme = "README.md"
-package-mode = false
 requires-python = ">=3.11,<3.15"
+keywords = [
+    "nlp",
+    "natural-language-processing",
+    "sentiment-analysis",
+    "text-analysis",
+    "fastapi",
+    "transformers",
+    "bert",
+    "machine-learning",
+    "data-science",
+    "rest-api"
+]
+authors = [
+    {name = "Kristiyan Bonev", email = "k.s.bonev@gmail.com"}
+]
+maintainers = [
+    {name = "Kristiyan Bonev", email = "k.s.bonev@gmail.com"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Framework :: FastAPI",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing :: Linguistic",
+    "Operating System :: OS Independent",
+]
 dependencies = [
     "numpy (>=2.3.4,<3.0.0)",
     "pandas (>=2.3.3,<3.0.0)",
@@ -34,21 +61,28 @@ dependencies = [
     "httpx (>=0.28.0,<0.29.0)"
 ]
 
+# Poetry configurations
+[tool.poetry]
+"package-mode" = false
+
+# Poetry version specification
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires = ["poetry-core>=2.2.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-# Development dependencies
-[tool.poetry.group.dev.dependencies]
-pytest = ">=8.3.0,<9.0.0"
-pytest-cov = ">=6.0.0,<7.0.0"
-pytest-asyncio = ">=0.24.0,<0.25.0"
-flake8 = ">=7.1.0,<8.0.0"
-flake8-pyproject = ">=1.2.3,<2.0.0"
-black = ">=24.0.0,<25.0.0"
-mypy = ">=1.13.0,<2.0.0"
-isort = ">=5.13.0,<6.0.0"
-pip-audit = ">=2.9.0,<3.0.0"
+# Development dependencies (Poetry 2.2+ syntax)
+[dependency-groups]
+dev = [
+    "pytest (>=8.3.0,<9.0.0)",
+    "pytest-cov (>=6.0.0,<7.0.0)",
+    "pytest-asyncio (>=0.24.0,<0.25.0)",
+    "flake8 (>=7.1.0,<8.0.0)",
+    "flake8-pyproject (>=1.2.3,<2.0.0)",
+    "black (>=24.0.0,<25.0.0)",
+    "mypy (>=1.13.0,<2.0.0)",
+    "isort (>=5.13.0,<6.0.0)",
+    "pip-audit (>=2.9.0,<3.0.0)"
+]
 
 # Black configuration
 [tool.black]
