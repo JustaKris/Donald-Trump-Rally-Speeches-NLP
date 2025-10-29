@@ -6,26 +6,25 @@ using ChromaDB for vector storage, sentence-transformers for embeddings,
 Gemini for answer generation, and hybrid search for improved retrieval.
 """
 
+import logging
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, cast
 
-import logging
-
 import chromadb
 from chromadb.api.types import IncludeEnum
 from chromadb.config import Settings
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from rank_bm25 import BM25Okapi
+from sentence_transformers import CrossEncoder, SentenceTransformer
+
+from .llm_service import GeminiLLM
 
 # Disable ChromaDB telemetry to avoid annoying warnings
 os.environ["ANONYMIZED_TELEMETRY"] = "False"
 
 # Suppress ChromaDB telemetry error messages (these are harmless bugs in ChromaDB)
 logging.getLogger("chromadb.telemetry.product.posthog").setLevel(logging.ERROR)
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from rank_bm25 import BM25Okapi
-from sentence_transformers import CrossEncoder, SentenceTransformer
-
-from .llm_service import GeminiLLM
 
 
 class RAGService:
