@@ -277,7 +277,8 @@ class RAGService:
                         {
                             "document": all_docs["documents"][idx],
                             "metadata": all_docs["metadatas"][idx] if all_docs["metadatas"] else {},
-                            "distance": 1.0 - (bm25_scores[idx] / max(bm25_scores + [1])),  # Normalize
+                            "distance": 1.0
+                            - (bm25_scores[idx] / max(bm25_scores + [1])),  # Normalize
                             "id": all_docs["ids"][idx],
                             "source": "bm25",
                         }

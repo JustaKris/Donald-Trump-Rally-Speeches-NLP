@@ -81,6 +81,7 @@ mypy src/
 ```powershell
 # Run everything at once
 poetry run black src/ && poetry run isort src/ && poetry run flake8 src/ && poetry run mypy src/ && poetry run pytest
+poetry run black src/ ; poetry run isort src/ ; poetry run flake8 src/ ; poetry run mypy src/ ; poetry run pytest
 ```
 
 ## Pre-commit Setup (Optional)
