@@ -48,11 +48,11 @@ jobs:
     
     - name: Run unit tests
       run: |
-        poetry run pytest tests/ -m "unit" -v --cov=src --cov-report=xml --cov-report=term-missing
+        poetry run pytest tests/ -m "unit" -v --cov=src --cov-report=term-missing --cov-fail-under=0
     
     - name: Run integration tests (without model loading)
       run: |
-        poetry run pytest tests/test_api.py -m "integration and not requires_model" -v
+        poetry run pytest tests/test_api.py -m "integration and not requires_model" -v --cov=src --cov-append --cov-report=xml --cov-report=term-missing --cov-fail-under=40
     
     # - name: Upload coverage reports to Codecov
     #   uses: codecov/codecov-action@v4

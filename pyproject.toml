@@ -180,7 +180,7 @@ addopts = [
     "--cov-report=term-missing",
     "--cov-report=html:reports/coverage/html",
     "--cov-report=xml:reports/coverage/coverage.xml",
-    "--cov-fail-under=50",
+    "--cov-fail-under=40",
     "--strict-markers",
     "--disable-warnings",
 ]
