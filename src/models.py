@@ -12,22 +12,19 @@ import warnings
 from typing import Any, Dict, List, Tuple
 
 import numpy as np
-import tensorflow as tf
-from transformers import AutoTokenizer, TFBertForSequenceClassification
+import torch
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from .preprocessing import chunk_text_for_bert
 
-# Suppress TensorFlow warnings and info messages
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # Only show errors
-os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"  # Disable oneDNN custom ops messages
-
-# Set TensorFlow logging level
-tf.get_logger().setLevel("ERROR")
+# Force transformers to use PyTorch backend (not TensorFlow)
+os.environ["TRANSFORMERS_BACKEND"] = "pytorch"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"  # Avoid tokenizer warnings
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # Suppress TensorFlow warnings if accidentally loaded
 
 # Suppress specific warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
-warnings.filterwarnings("ignore", message=".*tf.losses.sparse_softmax_cross_entropy.*")
-warnings.filterwarnings("ignore", message=".*tf.get_default_graph.*")
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 # Suppress transformers warnings about model initialization
 logging.getLogger("transformers").setLevel(logging.ERROR)
@@ -60,7 +57,7 @@ class SentimentAnalyzer:
         """
         self.model_name = model_name
         self.tokenizer: AutoTokenizer
-        self.model: TFBertForSequenceClassification
+        self.model: AutoModelForSequenceClassification
         self._load_model()
 
     def _load_model(self):
@@ -75,7 +72,10 @@ class SentimentAnalyzer:
             warnings.filterwarnings("ignore", message=".*TRAIN this model.*")
 
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-            self.model = TFBertForSequenceClassification.from_pretrained(self.model_name)
+            self.model = AutoModelForSequenceClassification.from_pretrained(self.model_name)
+
+            # Set model to evaluation mode
+            self.model.eval()  # type: ignore[attr-defined]
 
         logger.info("Model loaded successfully!")
 
@@ -99,16 +99,17 @@ class SentimentAnalyzer:
         # Analyze each chunk
         all_predictions: List[np.ndarray] = []
         for chunk in chunks:
-            outputs = self.model(chunk)
-            probs = tf.nn.softmax(outputs.logits, axis=-1)
-            all_predictions.append(probs.numpy())  # type: ignore[attr-defined]
+            with torch.no_grad():  # Disable gradient computation for inference
+                outputs = self.model(**chunk)  # type: ignore[operator]
+                probs = torch.nn.functional.softmax(outputs.logits, dim=-1)
+                all_predictions.append(probs.cpu().numpy())
 
         # Average predictions across chunks
         predictions_array = np.vstack(all_predictions)
         mean_sentiment = np.mean(predictions_array, axis=0)
 
         # Get label names
-        labels = self.model.config.id2label
+        labels = self.model.config.id2label  # type: ignore[attr-defined]
 
         # Prepare result
         dominant_idx = int(np.argmax(mean_sentiment))

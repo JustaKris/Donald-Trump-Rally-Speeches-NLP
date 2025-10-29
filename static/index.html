@@ -428,6 +428,7 @@
                 <button class="tab active" data-tab="sentiment">Sentiment Analysis</button>
                 <button class="tab" data-tab="words">Word Frequency</button>
                 <button class="tab" data-tab="topics">Topic Extraction</button>
+                <button class="tab" data-tab="rag">Ask Questions (RAG)</button>
                 <button class="tab" data-tab="stats">Demo Dataset</button>
             </div>
             
@@ -503,6 +504,42 @@
                     <div class="result-card">
                         <div class="result-title">Key Topics</div>
                         <div id="topicsList"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- RAG (Ask Questions) Tab -->
+            <div class="tab-content" id="rag">
+                <h2>Ask Questions (RAG)</h2>
+                <p style="margin: 15px 0; color: #666;">
+                    Ask questions about the indexed documents using Retrieval-Augmented Generation. 
+                    The system finds relevant context and provides answers based on the content.
+                </p>
+                <textarea id="ragQuestion" placeholder="Ask a question about the documents... (e.g., 'What economic policies are discussed?')"></textarea>
+                <button class="analyze" onclick="askRAG()">Ask Question</button>
+                
+                <div class="loading" id="ragLoading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 15px; color: #666;">Searching and generating answer...</p>
+                </div>
+                
+                <div class="error" id="ragError"></div>
+                
+                <div class="results" id="ragResults">
+                    <div class="result-card">
+                        <div class="result-title">Answer</div>
+                        <div id="ragAnswer" style="padding: 15px; background: #f8f9fa; border-radius: 8px; line-height: 1.6;"></div>
+                        <div id="ragConfidence" style="margin-top: 10px;"></div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <div class="result-title">Supporting Context</div>
+                        <div id="ragContext"></div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <div class="result-title">Source Documents</div>
+                        <div id="ragSources"></div>
                     </div>
                 </div>
             </div>
@@ -767,6 +804,78 @@
             `;
             
             showResults('statsResults');
+        }
+        
+        // RAG - Ask Questions
+        async function askRAG() {
+            const question = document.getElementById('ragQuestion').value.trim();
+            if (!question) {
+                showError('ragError', 'Please enter a question');
+                return;
+            }
+            
+            hideError('ragError');
+            hideResults('ragResults');
+            showLoading('ragLoading');
+            
+            try {
+                const response = await fetch('/rag/ask', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({question, top_k: 3})
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                displayRAGResults(data);
+            } catch (error) {
+                showError('ragError', error.message);
+            } finally {
+                hideLoading('ragLoading');
+            }
+        }
+        
+        function displayRAGResults(data) {
+            // Display answer
+            const answerEl = document.getElementById('ragAnswer');
+            answerEl.textContent = data.answer;
+            
+            // Display confidence
+            const confidenceColors = {
+                high: '#28a745',
+                medium: '#ffc107',
+                low: '#dc3545'
+            };
+            const confidenceEl = document.getElementById('ragConfidence');
+            confidenceEl.innerHTML = `
+                <span style="color: ${confidenceColors[data.confidence]}; font-weight: bold;">
+                    ● Confidence: ${data.confidence.toUpperCase()}
+                </span>
+            `;
+            
+            // Display context chunks
+            const contextEl = document.getElementById('ragContext');
+            contextEl.innerHTML = data.context.map((ctx, i) => `
+                <div style="padding: 12px; background: #f8f9fa; border-left: 3px solid #667eea; margin-bottom: 10px; border-radius: 4px;">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">
+                        <strong>Source:</strong> ${ctx.source} (Chunk ${ctx.chunk_index + 1})
+                    </div>
+                    <div style="line-height: 1.6;">${ctx.text}</div>
+                </div>
+            `).join('');
+            
+            // Display sources
+            const sourcesEl = document.getElementById('ragSources');
+            sourcesEl.innerHTML = data.sources.map(source => `
+                <span style="display: inline-block; padding: 6px 12px; background: #667eea; color: white; border-radius: 20px; margin: 4px; font-size: 0.9em;">
+                    ${source}
+                </span>
+            `).join('');
+            
+            showResults('ragResults');
         }
         
         // Utility functions

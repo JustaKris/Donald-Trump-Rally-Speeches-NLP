@@ -129,7 +129,7 @@ def chunk_text_for_bert(text: str, tokenizer, max_length: int = 510) -> List[dic
             max_length=max_length + 2,  # +2 for [CLS] and [SEP]
             padding="max_length",
             truncation=True,
-            return_tensors="tf",
+            return_tensors="pt",
         )
         chunks.append(encoding)
 

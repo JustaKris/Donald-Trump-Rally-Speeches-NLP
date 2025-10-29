@@ -20,6 +20,7 @@ from pydantic import BaseModel, Field
 
 from .models import SentimentAnalyzer
 from .preprocessing import clean_text, extract_ngrams, tokenize_text
+from .rag_service import RAGService
 from .utils import (
     extract_topics,
     get_dataset_statistics,
@@ -33,6 +34,17 @@ logging.basicConfig(
     format="INFO:     %(message)s",  # Match Uvicorn's format
 )
 logger = logging.getLogger(__name__)
+
+
+# Custom filter to suppress ChromaDB telemetry warnings (harmless bugs in ChromaDB)
+class SuppressChromaDBTelemetryFilter(logging.Filter):
+    def filter(self, record):
+        return "Failed to send telemetry event" not in record.getMessage()
+
+
+# Apply filter to uvicorn logger
+uvicorn_logger = logging.getLogger("uvicorn")
+uvicorn_logger.addFilter(SuppressChromaDBTelemetryFilter())
 
 
 # Initialize FastAPI app
@@ -63,12 +75,13 @@ if static_path.exists():
 
 # Global model instance (loaded on startup)
 sentiment_analyzer: Optional[SentimentAnalyzer] = None
+rag_service: Optional[RAGService] = None
 
 
 @app.on_event("startup")
 async def startup_event():
     """Load models on application startup."""
-    global sentiment_analyzer
+    global sentiment_analyzer, rag_service
     logger.info("Loading sentiment analysis model...")
     try:
         sentiment_analyzer = SentimentAnalyzer()
@@ -76,6 +89,20 @@ async def startup_event():
     except Exception as e:
         logger.error(f"Failed to load model: {e}")
         # Continue without model - endpoints will return errors
+
+    logger.info("Initializing RAG service...")
+    try:
+        rag_service = RAGService()
+        # Check if collection is empty and load documents if needed
+        if rag_service.collection.count() == 0:
+            logger.info("Loading documents into RAG service...")
+            docs_loaded = rag_service.load_documents()
+            logger.info(f"Loaded {docs_loaded} documents into RAG service!")
+        else:
+            logger.info(f"RAG service initialized with {rag_service.collection.count()} chunks")
+    except Exception as e:
+        logger.error(f"Failed to initialize RAG service: {e}")
+        # Continue without RAG - endpoints will return errors
 
 
 @app.on_event("shutdown")
@@ -140,6 +167,49 @@ class NGramRequest(BaseModel):
     text: str = Field(..., min_length=1)
     n: int = Field(2, ge=2, le=5, description="N-gram size (2-5)")
     top_n: int = Field(20, ge=1, le=100, description="Number of top n-grams to return")
+
+
+class RAGQueryRequest(BaseModel):
+    """Request model for RAG queries."""
+
+    question: str = Field(..., min_length=1, description="Question to ask about the documents")
+    top_k: int = Field(3, ge=1, le=10, description="Number of context chunks to retrieve")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "question": "What are the main economic policies discussed?",
+                "top_k": 3,
+            }
+        }
+
+
+class RAGSearchRequest(BaseModel):
+    """Request model for semantic search."""
+
+    query: str = Field(..., min_length=1, description="Search query")
+    top_k: int = Field(5, ge=1, le=20, description="Number of results to return")
+
+
+class RAGAnswerResponse(BaseModel):
+    """Response model for RAG answers."""
+
+    answer: str = Field(..., description="Generated answer")
+    context: List[Dict[str, Any]] = Field(..., description="Context chunks used")
+    confidence: str = Field(..., description="Confidence level (high/medium/low)")
+    sources: List[str] = Field(..., description="Source documents")
+
+
+class RAGStatsResponse(BaseModel):
+    """Response model for RAG statistics."""
+
+    collection_name: str
+    total_chunks: int
+    unique_sources: int
+    sources: List[str]
+    embedding_model: int
+    chunk_size: int
+    chunk_overlap: int
 
 
 # ============================================================================
@@ -343,6 +413,127 @@ async def clean_text_endpoint(input: TextInput, remove_stopwords: bool = True):
         logger.error(f"Text cleaning error: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Cleaning failed: {str(e)}"
+        )
+
+
+# ============================================================================
+# RAG (Retrieval-Augmented Generation) Endpoints
+# ============================================================================
+
+
+@app.post("/rag/ask", response_model=RAGAnswerResponse)
+async def rag_ask_question(query: RAGQueryRequest):
+    """
+    Ask a question about the indexed documents using RAG.
+
+    Uses semantic search to retrieve relevant context and generates an answer
+    based on the retrieved information. Works with any text corpus that has been indexed.
+
+    Returns an answer with supporting context, confidence level, and source documents.
+    """
+    if rag_service is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="RAG service not initialized. Please try again later.",
+        )
+
+    try:
+        result = rag_service.ask(query.question, top_k=query.top_k)
+        return RAGAnswerResponse(**result)
+    except Exception as e:
+        logger.error(f"RAG question error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to answer question: {str(e)}",
+        )
+
+
+@app.post("/rag/search")
+async def rag_semantic_search(query: RAGSearchRequest):
+    """
+    Perform semantic search over indexed documents.
+
+    Searches for text chunks similar to the query using semantic embeddings.
+    Returns the most relevant chunks with metadata and similarity scores.
+    """
+    if rag_service is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="RAG service not initialized. Please try again later.",
+        )
+
+    try:
+        results = rag_service.search(query.query, top_k=query.top_k)
+        return {"query": query.query, "results": results}
+    except Exception as e:
+        logger.error(f"RAG search error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Search failed: {str(e)}",
+        )
+
+
+@app.get("/rag/stats", response_model=RAGStatsResponse)
+async def get_rag_statistics():
+    """
+    Get statistics about the RAG collection.
+
+    Returns information about indexed documents, chunk counts, sources,
+    and embedding configuration.
+    """
+    if rag_service is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="RAG service not initialized. Please try again later.",
+        )
+
+    try:
+        stats = rag_service.get_stats()
+        return RAGStatsResponse(**stats)
+    except Exception as e:
+        logger.error(f"RAG stats error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get statistics: {str(e)}",
+        )
+
+
+@app.post("/rag/index")
+async def index_documents(data_dir: str = "data/Donald Trump Rally Speeches"):
+    """
+    Index or re-index documents from a directory.
+
+    Loads text files, chunks them, generates embeddings, and stores them
+    in the vector database for semantic search and retrieval.
+
+    Use this to update the RAG knowledge base with new documents.
+    """
+    if rag_service is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="RAG service not initialized. Please try again later.",
+        )
+
+    try:
+        # Clear existing collection
+        rag_service.clear_collection()
+        # Load new documents
+        docs_loaded = rag_service.load_documents(data_dir)
+        stats = rag_service.get_stats()
+
+        return {
+            "status": "success",
+            "documents_loaded": docs_loaded,
+            "total_chunks": stats["total_chunks"],
+            "sources": stats["sources"],
+        }
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        logger.error(f"RAG indexing error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Indexing failed: {str(e)}",
         )
 
 

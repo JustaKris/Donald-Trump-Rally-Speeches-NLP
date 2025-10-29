@@ -1,22 +1,25 @@
-# Donald Trump Rally Speeches — NLP Portfolio Project
+# NLP Text Analysis API — Production-Ready Portfolio Project
 
 [![CI/CD Pipeline](https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP/actions/workflows/ci.yml/badge.svg)](https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A professional data science portfolio project demonstrating advanced Natural Language Processing (NLP) techniques through comprehensive analysis of Donald Trump's 2019-2020 rally speeches. This project showcases production-ready code, interactive visualizations, REST API deployment, and actionable insights that would be valuable to employers seeking NLP and data analysis expertise.
+A professional, production-ready NLP API showcasing advanced natural language processing capabilities. This portfolio project demonstrates expertise in machine learning, REST API development, cloud deployment, and software engineering best practices. Features a complete analysis of political rally speeches as a real-world demonstration dataset.
 
 ## 🎯 Project Highlights
 
-- **35 rally speeches** (2019-2020) totaling 300,000+ words analyzed
-- **Interactive Plotly dashboards** for exploratory data analysis
-- **Production FastAPI application** with sentiment analysis endpoints
-- **Deep learning sentiment analysis** using FinBERT (BERT-based transformer model)
-- **Temporal trend analysis** revealing sentiment patterns over time
-- **Docker containerization** for easy deployment to any cloud platform
-- **Clean, documented, reusable code** following best practices
-- **Reproducible environment** managed with Poetry
+- **Production-ready FastAPI application** with 12+ RESTful endpoints
+- **Transformer-based sentiment analysis** using FinBERT (BERT fine-tuned model)
+- **RAG (Retrieval-Augmented Generation)** with ChromaDB for semantic search & Q&A
+- **Semantic embeddings** using sentence-transformers for vector similarity
+- **Statistical NLP methods**: word frequency, n-grams, topic extraction
+- **Real-world demo dataset**: 35 political rally speeches (300,000+ words, 2019-2020)
+- **Interactive web interface** with real-time analysis visualization
+- **Docker containerization** for cloud deployment (Render, Azure, AWS)
+- **Comprehensive testing** with pytest (50%+ code coverage)
+- **CI/CD pipelines** with GitHub Actions (testing, linting, security scans)
+- **Clean, documented code** following industry best practices
 
 ## 🚀 Live Demo
 
@@ -26,79 +29,84 @@ A professional data science portfolio project demonstrating advanced Natural Lan
 
 📖 **[ReDoc Documentation](http://localhost:8000/redoc)** - Alternative API docs
 
+🏗️ **[System Architecture](docs/ARCHITECTURE.md)** - Detailed technical documentation with diagrams
+
 ## 📊 What's Inside
 
 ### `src/` — Production API Code
 
-The project includes a production-ready FastAPI application for real-time NLP analysis:
+Professional FastAPI application for general-purpose text analysis:
 
-- **`api.py`** — FastAPI application with RESTful endpoints
-- **`models.py`** — Sentiment analysis model loading and inference
-- **`preprocessing.py`** — Text cleaning, tokenization, and n-gram extraction
-- **`utils.py`** — Data loading and statistical utilities
+- **`api.py`** — RESTful API with 12+ endpoints for NLP analysis
+- **`models.py`** — ML model loading and inference (FinBERT sentiment analysis)
+- **`rag_service.py`** — RAG implementation with ChromaDB and semantic search
+- **`preprocessing.py`** — Text cleaning, tokenization, n-gram extraction
+- **`utils.py`** — Data loading, statistics, and helper functions
 
-**API Endpoints:**
-- `POST /analyze/sentiment` — Analyze sentiment of input text (FinBERT)
-- `POST /analyze/words` — Word frequency analysis
+**Core API Endpoints:**
+- `POST /analyze/sentiment` — Sentiment analysis (positive/negative/neutral)
+- `POST /analyze/words` — Word frequency distribution
 - `POST /analyze/topics` — Topic/theme extraction
-- `POST /analyze/ngrams` — N-gram extraction (bigrams, trigrams, etc.)
-- `GET /speeches/stats` — Dataset statistics
-- `GET /speeches/list` — List all speeches with metadata
+- `POST /analyze/ngrams` — N-gram analysis (bigrams, trigrams, etc.)
+- `POST /text/clean` — Text normalization and cleaning
+- `POST /rag/ask` — **NEW!** Ask questions about indexed documents (RAG)
+- `POST /rag/search` — **NEW!** Semantic search over documents
+- `GET /rag/stats` — **NEW!** Vector database statistics
+- `POST /rag/index` — **NEW!** Index/re-index documents
+- `GET /speeches/stats` — Demo dataset statistics
+- `GET /speeches/list` — List demo dataset contents
 
 ### `static/` — Interactive Web Frontend
 
-A beautiful, responsive web interface for interacting with the API without coding.
+Beautiful, responsive single-page application for testing the API without coding. Features tabbed interface, real-time analysis, and visualizations.
 
-### `data/Donald Trump Rally Speeches/`
+### `data/Donald Trump Rally Speeches/` — Demo Dataset
 
-Plain text transcripts of 35 rally speeches from July 2019 to September 2020, providing rich corpus for NLP analysis.
+35 political rally speech transcripts (2019-2020) serving as a real-world demonstration of NLP analysis capabilities. Total corpus: 300,000+ words across diverse locations and time periods.
 
-### `notebooks/` — Three Production-Ready Jupyter Notebooks
+### `notebooks/` — Deep-Dive Analysis Notebooks
 
-#### 1. **Word Clouds.ipynb** — Exploratory Text Analysis
+Three comprehensive Jupyter notebooks demonstrating advanced NLP techniques applied to the demo dataset:
 
-- Interactive word frequency visualizations with Plotly
+#### 1. **Word Frequency & Topics Analysis.ipynb**
+
+- Interactive word clouds and frequency visualizations
 - N-gram analysis (unigrams, bigrams, trigrams)
-- Temporal word usage patterns comparing 2019 vs 2020
-- Topic identification and frequency tracking
-- Comprehensive statistical summaries
+- Temporal patterns (2019 vs 2020 comparison)
+- Topic identification and tracking
 
-**Key Technologies:** pandas, NLTK, WordCloud, Plotly, tqdm
+**Technologies:** pandas, NLTK, WordCloud, Plotly, tqdm
 
-#### 2. **Sentiment Analysis.ipynb** — Deep Learning NLP
+#### 2. **Sentiment Analysis.ipynb**
 
-- FinBERT-based sentiment classification (positive/negative/neutral)
+- FinBERT transformer model for sentiment classification
 - Chunked processing for long documents
-- Speech-by-speech sentiment scoring with chunk-level granularity
-- Interactive dashboards: heatmaps, timelines, distributions
-- Year-over-year statistical comparison
-- Moving average trend analysis
-- Results exported for downstream use
+- Time-series sentiment analysis
+- Interactive dashboards and heatmaps
 
-**Key Technologies:** TensorFlow, Transformers (Hugging Face), FinBERT, Plotly
-
-#### 3. **Masked Language Modeling.ipynb** — Advanced Transformer Fine-tuning
-
-- Custom DistilBERT fine-tuning on domain-specific corpus
-- Whole-word masking implementation
-- Model evaluation with perplexity metrics
-- Comparative analysis: base model vs fine-tuned model
-- Demonstrates understanding of transfer learning and model training
-
-**Key Technologies:** TensorFlow, Transformers, Datasets (Hugging Face), DistilBERT
+**Technologies:** TensorFlow, Transformers (Hugging Face), Plotly
 
 ## 🚀 Key Skills Demonstrated
 
-### Data Science & Analysis
+### Software Engineering
 
-- **Data wrangling**: Loading, parsing, and structuring unstructured text data
-- **Exploratory Data Analysis**: Statistical summaries, distributions, temporal patterns
-- **Feature engineering**: N-gram extraction, stopword filtering, custom metrics
+- **API Development**: RESTful design with FastAPI, Pydantic validation
+- **Containerization**: Docker multi-stage builds for production deployment
+- **CI/CD**: Automated testing, linting, security scans via GitHub Actions
+- **Code Quality**: Black formatting, flake8 linting, type hints with mypy
+- **Testing**: Unit and integration tests with pytest
+- **Documentation**: Comprehensive API docs, README, deployment guides
 
-### NLP & Machine Learning
+### Data Science & NLP
 
-- **Text preprocessing**: Tokenization, chunking, stopword removal
-- **Sentiment analysis**: Deep learning classification with pre-trained transformers
+- **Text preprocessing**: Tokenization, stopword removal, normalization
+- **Statistical NLP**: Word frequency, n-grams, topic extraction
+- **Deep Learning**: Transformer models (BERT) for sentiment analysis
+- **RAG (Retrieval-Augmented Generation)**: Semantic search and question answering
+- **Vector databases**: ChromaDB for persistent embeddings storage
+- **Semantic embeddings**: sentence-transformers for text similarity
+- **Data visualization**: Interactive Plotly dashboards
+- **Exploratory analysis**: Temporal patterns, distributions, aggregations
 - **Language modeling**: Fine-tuning BERT-based models on domain-specific data
 - **Model evaluation**: Perplexity, accuracy metrics, comparative analysis
 
