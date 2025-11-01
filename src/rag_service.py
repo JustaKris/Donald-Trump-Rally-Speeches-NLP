@@ -39,10 +39,10 @@ class RAGService:
         self,
         collection_name: str = "speeches",
         persist_directory: str = "./data/chromadb",
-        embedding_model: str = "all-MiniLM-L6-v2",
+        embedding_model: str = "all-mpnet-base-v2",
         reranker_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2",
-        chunk_size: int = 500,
-        chunk_overlap: int = 50,
+        chunk_size: int = 2048,
+        chunk_overlap: int = 150,
         use_llm: bool = True,
         use_reranking: bool = True,
         use_hybrid_search: bool = True,
@@ -53,10 +53,10 @@ class RAGService:
         Args:
             collection_name: Name of the ChromaDB collection
             persist_directory: Directory for ChromaDB persistence
-            embedding_model: HuggingFace model for embeddings
+            embedding_model: HuggingFace model for embeddings (default: all-mpnet-base-v2)
             reranker_model: Cross-encoder model for re-ranking
-            chunk_size: Maximum size of text chunks
-            chunk_overlap: Overlap between chunks
+            chunk_size: Maximum size of text chunks in characters (~512-768 tokens)
+            chunk_overlap: Overlap between chunks in characters (~100-150 tokens)
             use_llm: Use Gemini LLM for answer generation
             use_reranking: Use cross-encoder for re-ranking results
             use_hybrid_search: Combine semantic and keyword search
@@ -389,7 +389,7 @@ class RAGService:
 
         return formatted_results
 
-    def ask(self, question: str, top_k: int = 3) -> Dict[str, Any]:
+    def ask(self, question: str, top_k: int = 5) -> Dict[str, Any]:
         """
         Answer a question using RAG with optional LLM-powered generation.
 
@@ -398,11 +398,14 @@ class RAGService:
 
         Args:
             question: Question to answer
-            top_k: Number of context chunks to retrieve
+            top_k: Number of context chunks to retrieve (default: 5 for better evidence)
 
         Returns:
             Answer with sources and metadata matching API format
         """
+        # Detect entities in question for entity-aware retrieval
+        entities = self._extract_entities(question)
+        
         # Retrieve relevant context
         search_results = self.search(question, top_k=top_k)
 
@@ -411,6 +414,7 @@ class RAGService:
                 "answer": "I couldn't find relevant information to answer this question.",
                 "context": [],
                 "confidence": "low",
+                "confidence_score": 0.0,
                 "sources": [],
             }
 
@@ -444,27 +448,34 @@ class RAGService:
                     for result in search_results
                 ]
 
-                # Generate answer using Gemini
-                llm_response = self.llm.generate_answer(question, context_chunks)
+                # Generate answer using Gemini with entity awareness
+                llm_response = self.llm.generate_answer(question, context_chunks, entities=entities)
                 answer_text = llm_response.get("answer", "Unable to generate answer.")
 
-                # Calculate numeric confidence from scores
-                avg_score = sum(c["score"] for c in context_chunks) / len(context_chunks)
+                # Calculate enhanced confidence with multiple factors
+                confidence_data = self._calculate_confidence(
+                    question, context_chunks, search_results
+                )
 
-                # Convert to string confidence level
-                if avg_score > 0.7:
-                    confidence = "high"
-                elif avg_score > 0.4:
-                    confidence = "medium"
-                else:
-                    confidence = "low"
+                # Get entity statistics if entities were detected
+                entity_stats = None
+                if entities:
+                    entity_stats = self._get_entity_statistics(entities)
 
-                return {
+                response = {
                     "answer": answer_text,
                     "context": context_items,
-                    "confidence": confidence,
+                    "confidence": confidence_data["level"],
+                    "confidence_score": confidence_data["score"],
+                    "confidence_factors": confidence_data["factors"],
                     "sources": sources,
                 }
+                
+                # Add entity statistics if available
+                if entity_stats:
+                    response["entity_statistics"] = entity_stats
+
+                return response
 
             except Exception as e:
                 # Fall back to extraction if LLM fails
@@ -477,6 +488,169 @@ class RAGService:
             return self._extraction_based_answer_formatted(
                 question, search_results, context_items, sources
             )
+
+    def _extract_entities(self, text: str) -> List[str]:
+        """
+        Extract potential named entities from text using simple heuristics.
+        
+        Uses capitalized words as entity candidates. For production,
+        consider using a proper NER model.
+        
+        Args:
+            text: Text to extract entities from
+            
+        Returns:
+            List of potential entity names
+        """
+        words = text.split()
+        # Find capitalized words that aren't at sentence start
+        entities = []
+        for i, word in enumerate(words):
+            # Remove punctuation
+            clean_word = word.strip('.,!?;:"\'')
+            # Check if capitalized and not first word, and longer than 2 chars
+            if clean_word and clean_word[0].isupper() and len(clean_word) > 2:
+                # Skip common question words
+                if clean_word.lower() not in ['what', 'when', 'where', 'who', 'why', 'how', 'which']:
+                    entities.append(clean_word)
+        
+        return list(set(entities))  # Remove duplicates
+
+    def _get_entity_statistics(self, entities: List[str]) -> Dict[str, Any]:
+        """
+        Get statistics about entity mentions across the corpus.
+        
+        Args:
+            entities: List of entity names to analyze
+            
+        Returns:
+            Dict with entity statistics including frequency, speech count, etc.
+        """
+        if not entities:
+            return {}
+        
+        stats = {}
+        all_docs = self.collection.get(include=[IncludeEnum.documents, IncludeEnum.metadatas])
+        
+        if not all_docs["documents"]:
+            return {}
+        
+        for entity in entities:
+            entity_lower = entity.lower()
+            mentions = 0
+            speeches_with_entity = set()
+            total_chars = 0
+            
+            for i, doc in enumerate(all_docs["documents"]):
+                doc_lower = doc.lower()
+                count = doc_lower.count(entity_lower)
+                if count > 0:
+                    mentions += count
+                    total_chars += len(doc)
+                    if all_docs["metadatas"] and i < len(all_docs["metadatas"]):
+                        source = all_docs["metadatas"][i].get("source", "unknown")
+                        speeches_with_entity.add(source)
+            
+            if mentions > 0:
+                # Calculate percentage of corpus
+                total_corpus_chars = sum(len(doc) for doc in all_docs["documents"])
+                percentage = (total_chars / total_corpus_chars * 100) if total_corpus_chars > 0 else 0
+                
+                stats[entity] = {
+                    "mention_count": mentions,
+                    "speech_count": len(speeches_with_entity),
+                    "corpus_percentage": round(percentage, 2),
+                    "speeches": sorted(list(speeches_with_entity))[:10],  # Limit to first 10
+                }
+        
+        return stats
+
+    def _calculate_confidence(
+        self,
+        question: str,
+        context_chunks: List[Dict[str, Any]],
+        search_results: List[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        """
+        Calculate confidence using multiple factors for more accurate assessment.
+
+        Factors considered:
+        1. Average retrieval score (semantic similarity)
+        2. Score consistency (low variance = more confident)
+        3. Number of supporting chunks
+        4. Entity mention frequency (if applicable)
+
+        Args:
+            question: Original question
+            context_chunks: Retrieved context with scores
+            search_results: Raw search results
+
+        Returns:
+            Dict with 'score' (0-1), 'level' (high/medium/low), and 'factors'
+        """
+        if not context_chunks:
+            return {
+                "score": 0.0,
+                "level": "low",
+                "factors": {"reason": "No relevant context found"},
+            }
+
+        # Factor 1: Average retrieval score (40% weight)
+        scores = [c.get("score", 0.0) for c in context_chunks]
+        avg_score = sum(scores) / len(scores)
+        score_factor = avg_score * 0.4
+
+        # Factor 2: Score consistency - low variance is good (25% weight)
+        if len(scores) > 1:
+            variance = sum((s - avg_score) ** 2 for s in scores) / len(scores)
+            consistency = max(0, 1 - variance)  # Convert variance to consistency score
+        else:
+            consistency = 1.0
+        consistency_factor = consistency * 0.25
+
+        # Factor 3: Number of supporting chunks (20% weight)
+        # More chunks with good scores = higher confidence
+        chunk_count_score = min(len(context_chunks) / 10.0, 1.0)  # Normalize to max 10 chunks
+        chunk_factor = chunk_count_score * 0.2
+
+        # Factor 4: Entity mention frequency (15% weight)
+        # Extract potential entities from question (simple heuristic: capitalized words)
+        question_words = question.split()
+        entities = [w for w in question_words if w[0].isupper() and len(w) > 2]
+        
+        if entities:
+            # Count how many chunks mention the entity
+            entity_mentions = 0
+            for chunk in context_chunks:
+                text = chunk.get("text", "").lower()
+                if any(entity.lower() in text for entity in entities):
+                    entity_mentions += 1
+            entity_coverage = entity_mentions / len(context_chunks) if context_chunks else 0
+        else:
+            entity_coverage = 0.5  # Neutral if no entities detected
+        entity_factor = entity_coverage * 0.15
+
+        # Combine all factors
+        final_score = score_factor + consistency_factor + chunk_factor + entity_factor
+
+        # Determine confidence level
+        if final_score >= 0.7:
+            level = "high"
+        elif final_score >= 0.4:
+            level = "medium"
+        else:
+            level = "low"
+
+        return {
+            "score": round(final_score, 3),
+            "level": level,
+            "factors": {
+                "retrieval_score": round(avg_score, 3),
+                "consistency": round(consistency, 3),
+                "chunk_coverage": len(context_chunks),
+                "entity_coverage": round(entity_coverage, 3) if entities else None,
+            },
+        }
 
     def _extraction_based_answer_formatted(
         self,
@@ -517,20 +691,25 @@ class RAGService:
             else "Based on the documents: " + search_results[0]["document"][:300] + "..."
         )
 
-        # Calculate confidence based on distance
-        avg_distance = sum(r.get("distance", 1.0) for r in search_results) / len(search_results)
-
-        if avg_distance < 0.5:
-            confidence = "high"
-        elif avg_distance < 0.8:
-            confidence = "medium"
-        else:
-            confidence = "low"
+        # Calculate enhanced confidence
+        context_chunks = [
+            {
+                "text": result["document"],
+                "score": result.get(
+                    "rerank_score",
+                    result.get("combined_score", 1.0 - result.get("distance", 0.0)),
+                ),
+            }
+            for result in search_results
+        ]
+        confidence_data = self._calculate_confidence(question, context_chunks, search_results)
 
         return {
             "answer": answer,
             "context": context_items,
-            "confidence": confidence,
+            "confidence": confidence_data["level"],
+            "confidence_score": confidence_data["score"],
+            "confidence_factors": confidence_data["factors"],
             "sources": sources,
         }
 

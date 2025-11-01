@@ -74,6 +74,7 @@ class GeminiLLM:
         question: str,
         context_chunks: List[Dict[str, Any]],
         max_context_length: int = 4000,
+        entities: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """
         Generate an answer to a question using provided context.
@@ -82,6 +83,7 @@ class GeminiLLM:
             question: User's question
             context_chunks: List of context dicts with 'text', 'source', 'chunk_index'
             max_context_length: Maximum characters to include in context
+            entities: Optional list of detected entities for entity-focused prompting
 
         Returns:
             Dict with 'answer', 'reasoning', and 'sources_used'
@@ -113,8 +115,8 @@ class GeminiLLM:
 
         context_text = "\n\n".join(context_parts)
 
-        # Build prompt
-        prompt = self._build_prompt(question, context_text, list(sources_used))
+        # Build prompt with entity awareness
+        prompt = self._build_prompt(question, context_text, list(sources_used), entities)
 
         try:
             # Generate answer
@@ -137,18 +139,22 @@ class GeminiLLM:
                 "sources_used": list(sources_used),
             }
 
-    def _build_prompt(self, question: str, context: str, sources: List[str]) -> str:
+    def _build_prompt(
+        self, question: str, context: str, sources: List[str], entities: Optional[List[str]] = None
+    ) -> str:
         """
-        Build the prompt for Gemini.
+        Build the prompt for Gemini with optional entity-focused instructions.
 
         Args:
             question: User's question
             context: Retrieved context with source attribution
             sources: List of source document names
+            entities: Optional list of entities to focus on
 
         Returns:
             Formatted prompt string
         """
+        # Base prompt
         prompt = f"""You are an expert research assistant analyzing political speech documents.
 
 CONTEXT from {len(sources)} document(s): {', '.join(sources)}
@@ -163,9 +169,15 @@ INSTRUCTIONS:
 3. If the context doesn't contain the information, clearly state: "The available documents don't contain information about this topic"
 4. Cite sources naturally (e.g., "In the rally speech from [location/date]...")
 5. Don't repeat the same information multiple times
-6. Focus on answering the specific question asked
+6. Focus on answering the specific question asked"""
 
-Your answer:"""
+        # Add entity-specific instructions if entities detected
+        if entities:
+            entity_instruction = f"""
+7. IMPORTANT: The question is about {', '.join(entities)}. Focus specifically on direct mentions, quotes, and references to these entities. Prioritize exact quotes and specific statements."""
+            prompt += entity_instruction
+
+        prompt += "\n\nYour answer:"
 
         return prompt
 

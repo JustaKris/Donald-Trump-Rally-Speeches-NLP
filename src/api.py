@@ -173,13 +173,13 @@ class RAGQueryRequest(BaseModel):
     """Request model for RAG queries."""
 
     question: str = Field(..., min_length=1, description="Question to ask about the documents")
-    top_k: int = Field(3, ge=1, le=10, description="Number of context chunks to retrieve")
+    top_k: int = Field(5, ge=1, le=15, description="Number of context chunks to retrieve")
 
     class Config:
         json_schema_extra = {
             "example": {
                 "question": "What are the main economic policies discussed?",
-                "top_k": 3,
+                "top_k": 5,
             }
         }
 
@@ -197,7 +197,12 @@ class RAGAnswerResponse(BaseModel):
     answer: str = Field(..., description="Generated answer")
     context: List[Dict[str, Any]] = Field(..., description="Context chunks used")
     confidence: str = Field(..., description="Confidence level (high/medium/low)")
+    confidence_score: float = Field(..., description="Numeric confidence score (0-1)")
+    confidence_factors: Dict[str, Any] = Field(..., description="Breakdown of confidence factors")
     sources: List[str] = Field(..., description="Source documents")
+    entity_statistics: Optional[Dict[str, Any]] = Field(
+        None, description="Statistics about entities mentioned in the question"
+    )
 
 
 class RAGStatsResponse(BaseModel):
