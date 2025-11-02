@@ -1770,12 +1770,12 @@
 <ol>
 <li><strong>Build the Docker image:</strong></li>
 </ol>
-<div class="language-powershell highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">docker</span> <span class="n">build</span> <span class="n">-t</span> <span class="n">nlp-text-analysis-api</span> <span class="p">.</span>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">docker</span> <span class="n">build</span> <span class="n">-t</span> <span class="n">trump-speeches-nlp-api</span> <span class="p">.</span>
 </span></code></pre></div>
 <ol>
 <li><strong>Run the container:</strong></li>
 </ol>
-<div class="language-powershell highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">docker</span> <span class="n">run</span> <span class="p">-</span><span class="n">-rm</span> <span class="n">-it</span> <span class="n">-p</span> <span class="n">8000</span><span class="p">:</span><span class="n">8000</span> <span class="p">-</span><span class="n">-name</span> <span class="n">nlp-api</span> <span class="n">nlp-text-analysis-api</span>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">docker</span> <span class="n">run</span> <span class="p">-</span><span class="n">-rm</span> <span class="n">-it</span> <span class="n">-p</span> <span class="n">8000</span><span class="p">:</span><span class="n">8000</span> <span class="p">-</span><span class="n">-env</span><span class="o">-file</span> <span class="p">.</span><span class="n">env</span> <span class="p">-</span><span class="n">-name</span> <span class="n">nlp-api</span> <span class="n">trump-speeches-nlp-api</span>
 </span></code></pre></div>
 <ol>
 <li><strong>View logs:</strong></li>
