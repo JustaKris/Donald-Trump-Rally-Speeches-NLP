@@ -45,6 +45,15 @@ Archive
 .pytest_cache/
 .coverage
 htmlcov/
+coverage.xml
+.tox/
+
+# Test reports (new location)
+reports/
+
+# Linting & formatting
+.mypy_cache/
+.ruff_cache/
 
 # Input files
 *\data/input
@@ -115,3 +124,33 @@ Thumbs.db
 *.pid
 *.db
 docker-compose.override.yml
+
+# FastAPI cache
+.cache/
+*.pyc
+
+# Model cache (HuggingFace)
+.transformers_cache/
+models/
+
+# API logs
+api_logs/
+*.log
+
+# Environment-specific configs
+config.local.yml
+secrets.yml
+
+# Copilot/AI artifacts (summaries, not actual documentation)
+.copilot-artifacts/
+
+# ChromaDB persistence
+data/chromadb/
+chroma/
+*.chroma
+*.sqlite3
+index/
+manifest.json
+
+# MkDocs build output
+site/

@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: trump-speeches-nlp-api
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Mount data directory for development (optional)
+      - ./data:/app/data:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# For development with hot reload
+  api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: trump-speeches-nlp-api-dev
+    ports:
+      - "8001:8000"
+    environment:
+      - PORT=8000
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./src:/app/src
+      - ./static:/app/static
+      - ./data:/app/data:ro
+    command: uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
+    restart: unless-stopped
+    profiles:
+      - dev
