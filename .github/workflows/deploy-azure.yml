@@ -2,7 +2,9 @@ name: Deploy to Azure
 
 on:
   # push:
-  #   branches: [ main ]
+  #   branches: [ main, develop, feature/* ]
+  # pull_request:
+  #   branches: [ main, develop ]
   workflow_dispatch:  # Allow manual triggering
     inputs:
       environment:

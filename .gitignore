@@ -151,3 +151,6 @@ chroma/
 *.sqlite3
 index/
 manifest.json
+
+# MkDocs build output
+site/

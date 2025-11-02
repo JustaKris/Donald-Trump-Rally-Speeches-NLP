@@ -1,0 +1,138 @@
+# MkDocs Configuration for Trump Rally Speeches NLP Project
+# This file controls the documentation site structure, theme, and features
+
+# Site metadata
+site_name: Trump Rally Speeches NLP
+site_description: Production-ready NLP API with RAG, semantic search, and sentiment analysis
+site_author: Kristiyan Bonev
+site_url: https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP
+
+# Repository information (adds "Edit on GitHub" links)
+repo_name: JustaKris/Donald-Trump-Rally-Speeches-NLP
+repo_url: https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP
+edit_uri: edit/main/docs/
+
+# Theme configuration - Material for MkDocs is the most popular and feature-rich theme
+theme:
+  name: material
+  
+  # Color scheme
+  palette:
+    # Light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    
+    # Dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  
+  # Material theme features
+  features:
+    - navigation.instant       # Instant loading (no page reload)
+    - navigation.tracking      # URL updates as you scroll
+    - navigation.tabs          # Top-level sections in tabs
+    - navigation.sections      # Sections in sidebar
+    - navigation.expand        # Expand all sections by default
+    - navigation.top           # "Back to top" button
+    - search.suggest           # Search suggestions as you type
+    - search.highlight         # Highlight search terms in results
+    - content.code.copy        # Copy button on code blocks
+    - content.code.annotate    # Annotations in code blocks
+  
+  # Icons
+  icon:
+    repo: fontawesome/brands/github
+
+# Navigation structure - this defines the sidebar menu
+# The order here determines the order in the docs site
+nav:
+  - Home: index.md
+  
+  - Getting Started:
+      - Quickstart: guides/quickstart.md
+      - Deployment: guides/deployment.md
+  
+  - How-To Guides:
+      - Testing: howto/testing.md
+      - Entity Analytics: howto/entity-analytics.md
+      - Documentation: howto/documentation.md
+  
+  - Reference:
+      - Architecture: reference/architecture.md
+      - RAG Features: reference/rag-features.md
+
+# Markdown extensions - adds powerful features to your markdown
+markdown_extensions:
+  # Python Markdown extensions
+  - abbr                        # Abbreviations
+  - admonition                  # Call-out blocks (notes, warnings, etc.)
+  - attr_list                   # Add HTML/CSS attributes to elements
+  - def_list                    # Definition lists
+  - footnotes                   # Footnotes
+  - md_in_html                  # Markdown inside HTML
+  - toc:                        # Table of contents
+      permalink: true           # Add permanent links to headings
+      toc_depth: 3              # Show h1-h3 in TOC
+  
+  # PyMdown Extensions (advanced features)
+  - pymdownx.arithmatex:        # Math equations
+      generic: true
+  - pymdownx.betterem:          # Better emphasis (bold/italic)
+      smart_enable: all
+  - pymdownx.caret              # Superscript and insert
+  - pymdownx.mark               # Highlighting text
+  - pymdownx.tilde              # Subscript and delete
+  - pymdownx.details            # Collapsible blocks
+  - pymdownx.emoji:             # Emoji support
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:         # Code highlighting
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite       # Inline code highlighting
+  - pymdownx.keys               # Keyboard keys
+  - pymdownx.magiclink:         # Auto-link URLs
+      repo_url_shorthand: true
+      user: JustaKris
+      repo: Donald-Trump-Rally-Speeches-NLP
+  - pymdownx.smartsymbols       # Smart symbols (arrows, etc.)
+  - pymdownx.superfences:       # Code blocks with features
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:            # Tabbed content
+      alternate_style: true
+  - pymdownx.tasklist:          # Task lists
+      custom_checkbox: true
+
+# Plugins
+plugins:
+  - search:                     # Built-in search plugin
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
+      lang: en
+
+# Extra CSS/JS (optional - for future customization)
+# extra_css:
+#   - stylesheets/extra.css
+
+# extra_javascript:
+#   - javascripts/extra.js
+
+# Copyright notice
+copyright: Copyright &copy; 2025 Kristiyan Bonev
+
+# Social links (optional)
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/JustaKris

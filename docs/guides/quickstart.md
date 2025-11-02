@@ -1,5 +1,7 @@
 # Quick Start Guide
 
+This guide gets you up and running with the NLP API in minutes. For comprehensive documentation, visit the [full documentation site](https://justakris.github.io/Donald-Trump-Rally-Speeches-NLP/).
+
 ## Running the RAG-Powered NLP API
 
 ### Prerequisites

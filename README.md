@@ -1,6 +1,7 @@
 # NLP Text Analysis API — Production-Ready Portfolio Project
 
 [![CI/CD Pipeline](https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP/actions/workflows/ci.yml/badge.svg)](https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP/actions/workflows/ci.yml)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://justakris.github.io/Donald-Trump-Rally-Speeches-NLP/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -34,7 +35,9 @@ A production-ready NLP API showcasing natural language processing and retrieval-
 
 📖 **[ReDoc Documentation](http://localhost:8000/redoc)** - Alternative API docs
 
-🏗️ **[System Architecture](docs/ARCHITECTURE.md)** - Detailed technical documentation with diagrams
+📘 **[Documentation Site](https://justakris.github.io/Donald-Trump-Rally-Speeches-NLP/)** - Complete project documentation with guides and references
+
+🏗️ **[System Architecture](https://justakris.github.io/Donald-Trump-Rally-Speeches-NLP/reference/architecture/)** - Detailed technical documentation with diagrams
 
 ## 📊 What's Inside
 
@@ -206,6 +209,27 @@ print(response.json()["answer"])
    docker-compose up -d
    ```
 
+### View Documentation Site (Optional)
+
+The project includes comprehensive documentation built with MkDocs:
+
+```powershell
+# Install documentation dependencies
+uv sync --group docs
+
+# Serve documentation site locally (with live reload)
+uv run mkdocs serve
+```
+
+Then open <http://localhost:8001> to browse the documentation with search and navigation.
+
+**Build static site:**
+```powershell
+uv run mkdocs build
+```
+
+This generates a `site/` folder with the complete static documentation website.
+
 ### Explore Analysis Notebooks (Optional)
 
 ```powershell
@@ -268,7 +292,7 @@ The project uses GitHub Actions for continuous integration:
 
 See [`.github/workflows/ci.yml`](.github/workflows/ci.yml) for the full pipeline configuration.
 
-For detailed testing documentation, see [`docs/TESTING.md`](docs/TESTING.md).
+For detailed testing documentation, see [`docs/howto/testing.md`](docs/howto/testing.md).
 
 ## 📦 Dependencies
 
@@ -315,11 +339,34 @@ Donald-Trump-Rally-Speeches-NLP/
 │
 ├── notebooks/                   # Exploratory analysis
 ├── tests/                       # pytest test suite
-├── docs/                        # Documentation
+├── docs/                        # Documentation (MkDocs site)
+│   ├── index.md                # Docs homepage
+│   ├── guides/                 # Getting started guides
+│   ├── howto/                  # Task-oriented guides
+│   └── reference/              # Technical reference
+├── mkdocs.yml                   # Documentation site config
 └── pyproject.toml               # Dependencies
 ```
 
-## 📄 License & Attribution
+## � Documentation
+
+**📘 [Full Documentation Site](https://justakris.github.io/Donald-Trump-Rally-Speeches-NLP/)** — Complete guides, tutorials, and API reference
+
+### View Documentation Locally (Optional)
+
+```powershell
+# Install docs dependencies
+uv sync --group docs
+
+# Serve docs with live reload (use port 8001 to avoid API conflict)
+uv run mkdocs serve --dev-addr localhost:8001
+```
+
+Then open <http://localhost:8001> in your browser.
+
+For more information on working with the documentation, see the [Documentation Guide](https://justakris.github.io/Donald-Trump-Rally-Speeches-NLP/howto/documentation/).
+
+## �📄 License & Attribution
 
 This repository is for educational and portfolio purposes. The speech transcripts are publicly available data used for demonstrative NLP analysis.
 
