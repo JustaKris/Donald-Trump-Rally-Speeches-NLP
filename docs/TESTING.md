@@ -2,10 +2,25 @@
 
 ## Running Tests
 
-### Install Development Dependencies
+### Using uv (recommended)
+
+This repository uses uv to manage virtual environments and run commands in a reproducible project environment. If you've already been using `uv` in this project, the examples below will work as-is.
 
 ```powershell
-# With Poetry (recommended)
+# Install project dependencies (including dev groups defined in pyproject)
+uv sync            # sync all default groups
+uv sync --group dev  # sync only dev dependencies (if grouped)
+
+# Run a command inside the project's environment
+uv run <command>   # e.g. `uv run pytest` or `uv run black src/`
+```
+
+If you prefer to use Poetry directly, the original Poetry commands are still valid and left as alternatives in this document.
+
+### Install Development Dependencies (alternative: Poetry)
+
+```powershell
+# With Poetry (alternative)
 poetry install --with dev
 
 # Or activate Poetry shell and run commands directly
@@ -16,26 +31,26 @@ poetry shell
 
 ```powershell
 # Run all tests with coverage
-poetry run pytest
+uv run pytest
 
 # Run only unit tests
-poetry run pytest -m unit
+uv run pytest -m unit
 
 # Run only integration tests
-poetry run pytest -m integration
+uv run pytest -m integration
 
 # Run with verbose output
-poetry run pytest -v
+uv run pytest -v
 
 # Run specific test file
-poetry run pytest tests/test_preprocessing.py
+uv run pytest tests/test_preprocessing.py
 ```
 
 ### Code Coverage
 
 ```powershell
 # Generate coverage report
-pytest --cov=src --cov-report=html
+uv run pytest --cov=src --cov-report=html
 
 # Open coverage report
 start htmlcov/index.html  # Windows
@@ -46,47 +61,57 @@ start htmlcov/index.html  # Windows
 ### Formatting
 
 ```powershell
-# Format code with Black
-black src/
+# Format code with Black (via uv)
+uv run black src/
 
 # Check formatting without changes
-black --check src/
+uv run black --check src/
 
 # Sort imports with isort
-isort src/
+uv run isort src/
 
 # Check imports without changes
-isort --check-only src/
+uv run isort --check-only src/
 ```
 
 ### Linting
 
 ```powershell
 # Run flake8
-flake8 src/
+uv run flake8 src/
 
 # Show detailed statistics
-flake8 src/ --count --statistics --show-source
+uv run flake8 src/ --count --statistics --show-source
 ```
 
 ### Type Checking
 
 ```powershell
 # Run mypy type checker
-mypy src/
+uv run mypy src/
 ```
 
 ### Run All Quality Checks
 
 ```powershell
-# Run everything at once
-poetry run black src/ && poetry run isort src/ && poetry run flake8 src/ && poetry run mypy src/ && poetry run pytest
-poetry run black src/ ; poetry run isort src/ ; poetry run flake8 src/ ; poetry run mypy src/ ; poetry run pytest
+# Run everything at once (uv wrapper)
+uv run black src/ && uv run isort src/ && uv run flake8 src/ && uv run mypy src/ && uv run pytest
+uv run black src/ ; uv run isort src/ ; uv run flake8 src/ ; uv run mypy src/ ; uv run pytest
 ```
 
 ## Pre-commit Setup (Optional)
 
-Install pre-commit hooks to automatically run checks before commits:
+Install pre-commit hooks to automatically run checks before commits. If you manage dev dependencies with `uv`, use `uv sync --group dev` to install dev deps (including `pre-commit`) if listed in `pyproject.toml`. Otherwise install pre-commit directly:
+
+```powershell
+# Ensure pre-commit is installed in the project environment
+uv run pip install pre-commit
+
+# Install the git hook
+uv run pre-commit install
+```
+
+If you prefer Poetry:
 
 ```powershell
 poetry add --group dev pre-commit
@@ -177,13 +202,16 @@ def test_health_check():
 ### NLTK Data Missing
 
 ```powershell
-poetry run python -c "import nltk; nltk.download('punkt', quiet=True); nltk.download('stopwords', quiet=True); nltk.download('punkt_tab', quiet=True)"
+uv run python -c "import nltk; nltk.download('punkt', quiet=True); nltk.download('stopwords', quiet=True); nltk.download('punkt_tab', quiet=True)"
 ```
 
 ### Import Errors
 
 ```powershell
-# Reinstall dependencies
+# Reinstall dependencies (uv)
+uv sync --group dev
+
+# Or with Poetry
 poetry install --with dev
 ```
 
@@ -191,8 +219,8 @@ poetry install --with dev
 
 ```powershell
 # Skip slow tests
-poetry run pytest -m "not slow"
+uv run pytest -m "not slow"
 
 # Skip model-dependent tests
-poetry run pytest -m "not requires_model"
+uv run pytest -m "not requires_model"
 ```

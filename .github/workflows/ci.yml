@@ -5,6 +5,7 @@ on:
     branches: [ main, develop, feature/* ]
   pull_request:
     branches: [ main, develop ]
+  workflow_dispatch:  # Allow manual triggering
 
 jobs:
   test:
@@ -23,36 +24,36 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
       with:
-        version: 2.2.1
-        virtualenvs-create: true
-        virtualenvs-in-project: true
+        version: "0.4.x"
     
-    - name: Cache Poetry dependencies
+    - name: Cache uv dependencies
       uses: actions/cache@v4
       with:
-        path: .venv
-        key: ${{ runner.os }}-poetry-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+        path: |
+          ~/.cache/uv
+          .venv
+        key: ${{ runner.os }}-uv-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
         restore-keys: |
-          ${{ runner.os }}-poetry-${{ matrix.python-version }}-
+          ${{ runner.os }}-uv-${{ matrix.python-version }}-
     
     - name: Install dependencies
       run: |
-        poetry install --with dev
+        uv sync --group dev
     
     - name: Download NLTK data
       run: |
-        poetry run python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords'); nltk.download('punkt_tab')"
+        uv run python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords'); nltk.download('punkt_tab')"
     
     - name: Run unit tests
       run: |
-        poetry run pytest tests/ -m "unit" -v --cov=src --cov-report=term-missing --cov-fail-under=0
+        uv run pytest tests/ -m "unit" -v --cov=src --cov-report=term-missing --cov-fail-under=0
     
     - name: Run integration tests (without model loading)
       run: |
-        poetry run pytest tests/test_api.py -m "integration and not requires_model" -v --cov=src --cov-append --cov-report=xml --cov-report=term-missing --cov-fail-under=40
+        uv run pytest tests/test_api.py -m "integration and not requires_model" -v --cov=src --cov-append --cov-report=xml --cov-report=term-missing --cov-fail-under=40
     
     # - name: Upload coverage reports to Codecov
     #   uses: codecov/codecov-action@v4
@@ -77,38 +78,38 @@ jobs:
       with:
         python-version: '3.12'
     
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
       with:
-        version: 2.2.1
-        virtualenvs-create: true
-        virtualenvs-in-project: true
+        version: "0.4.x"
     
-    - name: Cache Poetry dependencies
+    - name: Cache uv dependencies
       uses: actions/cache@v4
       with:
-        path: .venv
-        key: ${{ runner.os }}-poetry-lint-${{ hashFiles('**/poetry.lock') }}
+        path: |
+          ~/.cache/uv
+          .venv
+        key: ${{ runner.os }}-uv-lint-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
         restore-keys: |
-          ${{ runner.os }}-poetry-lint-
+          ${{ runner.os }}-uv-lint-
     
     - name: Install linting tools
       run: |
-        poetry install --with dev
+        uv sync --group dev
     
     - name: Run flake8
       run: |
-        poetry run flake8 src/ --count --statistics --show-source
+        uv run flake8 src/ --count --statistics --show-source
     
     - name: Check code formatting with Black
       run: |
-        poetry run black --check src/
+        uv run black --check src/
     
     - name: Check import sorting with isort
       run: |
-        poetry run isort --check-only src/
+        uv run isort --check-only src/
     
     - name: Type checking with mypy
       run: |
-        poetry run mypy src/ --ignore-missing-imports
+        uv run mypy src/ --ignore-missing-imports
       continue-on-error: true

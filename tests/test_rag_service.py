@@ -89,8 +89,8 @@ class TestRAGServiceInitialization:
             service = RAGService(persist_directory=persist_dir)
             assert service is not None
             assert service.collection_name == "speeches"
-            assert service.chunk_size == 500
-            assert service.chunk_overlap == 50
+            assert service.chunk_size == 2048
+            assert service.chunk_overlap == 150
         finally:
             cleanup_chromadb(persist_dir, service)
 

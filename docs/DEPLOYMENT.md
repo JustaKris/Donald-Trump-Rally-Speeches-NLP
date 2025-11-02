@@ -516,8 +516,8 @@ All workflows are located in `.github/workflows/`:
 |----------|-------------|---------|
 | `CHROMADB_PERSIST_DIR` | Directory for ChromaDB persistence | `./data/chromadb` |
 | `RAG_COLLECTION_NAME` | Name of the vector collection | `speeches` |
-| `RAG_CHUNK_SIZE` | Text chunk size for embeddings | `500` |
-| `RAG_CHUNK_OVERLAP` | Overlap between chunks | `50` |
+| `RAG_CHUNK_SIZE` | Text chunk size for embeddings | `2048` |
+| `RAG_CHUNK_OVERLAP` | Overlap between chunks | `150` |
 | `EMBEDDING_MODEL` | sentence-transformers model | `all-MiniLM-L6-v2` |
 
 **Note:** ChromaDB data is persisted to disk. Ensure the persist directory is included in volume mounts for Docker deployments to maintain indexed documents across restarts.
