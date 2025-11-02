@@ -1,0 +1,2451 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Production-ready NLP API with RAG, semantic search, and sentiment analysis">
+      
+      
+        <meta name="author" content="Kristiyan Bonev">
+      
+      
+        <link rel="canonical" href="https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP/guides/deployment/">
+      
+      
+        <link rel="prev" href="../quickstart/">
+      
+      
+        <link rel="next" href="../../howto/testing/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.23">
+    
+    
+      
+        <title>Deployment - Trump Rally Speeches NLP</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.84d31ad4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#fastapi-deployment-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Trump Rally Speeches NLP" class="md-header__button md-logo" aria-label="Trump Rally Speeches NLP" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Trump Rally Speeches NLP
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Deployment
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    JustaKris/Donald-Trump-Rally-Speeches-NLP
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../quickstart/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../howto/testing/" class="md-tabs__link">
+          
+  
+  
+  How-To Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/architecture/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Trump Rally Speeches NLP" class="md-nav__button md-logo" aria-label="Trump Rally Speeches NLP" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Trump Rally Speeches NLP
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    JustaKris/Donald-Trump-Rally-Speeches-NLP
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quickstart
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Deployment
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Deployment
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      Table of Contents
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#local-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local Development
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Local Development">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-without-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running Without Docker
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Docker Deployment
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Docker Deployment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-and-run-with-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      Build and Run with Docker
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-docker-compose" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using Docker Compose
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#render-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Render Deployment
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Render Deployment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deployment-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deployment Strategy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-1-configure-github-secrets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1: Configure GitHub Secrets
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-update-renderyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2: Update render.yaml
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-deploy-to-render" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3: Deploy to Render
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-trigger-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4: Trigger Deployment
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accessing-your-render-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      Accessing Your Render App
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Monitoring &amp; Logs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upgrading-from-free-tier" class="md-nav__link">
+    <span class="md-ellipsis">
+      Upgrading from Free Tier
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#azure-app-service-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Azure App Service Deployment
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Azure App Service Deployment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deployment-strategy_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deployment Strategy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-1-deploy-with-azure-container-registry-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      Option 1: Deploy with Azure Container Registry (Recommended)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-deploy-with-docker-hub" class="md-nav__link">
+    <span class="md-ellipsis">
+      Option 2: Deploy with Docker Hub
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accessing-your-azure-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      Accessing Your Azure App
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-and-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Monitoring and Logs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updating-the-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Updating the Deployment
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cicd-with-github-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      CI/CD with GitHub Actions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CI/CD with GitHub Actions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workflow-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      Workflow Files
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deployment-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deployment Architecture
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setting-up-github-secrets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setting Up GitHub Secrets
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-triggers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Workflow Triggers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manual-deployment-triggers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Manual Deployment Triggers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#viewing-workflow-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Viewing Workflow Results
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment Variables
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environment Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#required-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Required Variables
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Optional Variables
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rag-specific-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      RAG-Specific Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Tips
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#for-free-tiers" class="md-nav__link">
+    <span class="md-ellipsis">
+      For Free Tiers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optimizing-docker-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      Optimizing Docker Image
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rag-performance-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      RAG Performance Considerations
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#docker-build-fails" class="md-nav__link">
+    <span class="md-ellipsis">
+      Docker Build Fails
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-returns-503" class="md-nav__link">
+    <span class="md-ellipsis">
+      API Returns 503
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#azure-deployment-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Azure Deployment Issues
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#render-deployment-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Render Deployment Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cost-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cost Comparison
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#support" class="md-nav__link">
+    <span class="md-ellipsis">
+      Support
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    How-To Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            How-To Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../howto/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../howto/entity-analytics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Entity Analytics
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/rag-features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RAG Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      Table of Contents
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#local-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local Development
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Local Development">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-without-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running Without Docker
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Docker Deployment
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Docker Deployment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-and-run-with-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      Build and Run with Docker
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-docker-compose" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using Docker Compose
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#render-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Render Deployment
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Render Deployment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deployment-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deployment Strategy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-1-configure-github-secrets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1: Configure GitHub Secrets
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-update-renderyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2: Update render.yaml
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-deploy-to-render" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3: Deploy to Render
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-trigger-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4: Trigger Deployment
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accessing-your-render-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      Accessing Your Render App
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Monitoring &amp; Logs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upgrading-from-free-tier" class="md-nav__link">
+    <span class="md-ellipsis">
+      Upgrading from Free Tier
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#azure-app-service-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Azure App Service Deployment
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Azure App Service Deployment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deployment-strategy_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deployment Strategy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prerequisites
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-1-deploy-with-azure-container-registry-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      Option 1: Deploy with Azure Container Registry (Recommended)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-deploy-with-docker-hub" class="md-nav__link">
+    <span class="md-ellipsis">
+      Option 2: Deploy with Docker Hub
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accessing-your-azure-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      Accessing Your Azure App
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-and-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Monitoring and Logs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updating-the-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Updating the Deployment
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cicd-with-github-actions" class="md-nav__link">
+    <span class="md-ellipsis">
+      CI/CD with GitHub Actions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CI/CD with GitHub Actions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workflow-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      Workflow Files
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deployment-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deployment Architecture
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setting-up-github-secrets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setting Up GitHub Secrets
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-triggers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Workflow Triggers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manual-deployment-triggers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Manual Deployment Triggers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#viewing-workflow-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Viewing Workflow Results
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment Variables
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Environment Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#required-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Required Variables
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Optional Variables
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rag-specific-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      RAG-Specific Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Tips
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#for-free-tiers" class="md-nav__link">
+    <span class="md-ellipsis">
+      For Free Tiers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optimizing-docker-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      Optimizing Docker Image
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rag-performance-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      RAG Performance Considerations
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#docker-build-fails" class="md-nav__link">
+    <span class="md-ellipsis">
+      Docker Build Fails
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-returns-503" class="md-nav__link">
+    <span class="md-ellipsis">
+      API Returns 503
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#azure-deployment-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Azure Deployment Issues
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#render-deployment-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Render Deployment Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cost-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cost Comparison
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#support" class="md-nav__link">
+    <span class="md-ellipsis">
+      Support
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="fastapi-deployment-guide">FastAPI Deployment Guide<a class="headerlink" href="#fastapi-deployment-guide" title="Permanent link">&para;</a></h1>
+<p>This guide covers deploying the Trump Rally Speeches NLP API to various platforms.</p>
+<h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="#local-development">Local Development</a></li>
+<li><a href="#docker-deployment">Docker Deployment</a></li>
+<li><a href="#render-deployment">Render Deployment</a></li>
+<li><a href="#azure-app-service-deployment">Azure App Service Deployment</a></li>
+<li><a href="#cicd-with-github-actions">CI/CD with GitHub Actions</a></li>
+<li><a href="#environment-variables">Environment Variables</a></li>
+</ul>
+<hr />
+<h2 id="local-development">Local Development<a class="headerlink" href="#local-development" title="Permanent link">&para;</a></h2>
+<h3 id="running-without-docker">Running Without Docker<a class="headerlink" href="#running-without-docker" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Install dependencies:</strong></li>
+</ol>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">uv</span> <span class="n">sync</span>
+</span></code></pre></div>
+<ol>
+<li><strong>Run the API:</strong></li>
+</ol>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">uv</span> <span class="n">run</span> <span class="n">uvicorn</span> <span class="n">src</span><span class="p">.</span><span class="n">api</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-reload</span>
+</span></code></pre></div>
+<ol>
+<li><strong>Access the application:</strong></li>
+<li>Frontend: <a href="http://localhost:8000">http://localhost:8000</a></li>
+<li>API Docs: <a href="http://localhost:8000/docs">http://localhost:8000/docs</a></li>
+<li>ReDoc: <a href="http://localhost:8000/redoc">http://localhost:8000/redoc</a></li>
+</ol>
+<hr />
+<h2 id="docker-deployment">Docker Deployment<a class="headerlink" href="#docker-deployment" title="Permanent link">&para;</a></h2>
+<h3 id="build-and-run-with-docker">Build and Run with Docker<a class="headerlink" href="#build-and-run-with-docker" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Build the Docker image:</strong></li>
+</ol>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">docker</span> <span class="n">build</span> <span class="n">-t</span> <span class="n">nlp-text-analysis-api</span> <span class="p">.</span>
+</span></code></pre></div>
+<ol>
+<li><strong>Run the container:</strong></li>
+</ol>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">docker</span> <span class="n">run</span> <span class="p">-</span><span class="n">-rm</span> <span class="n">-it</span> <span class="n">-p</span> <span class="n">8000</span><span class="p">:</span><span class="n">8000</span> <span class="p">-</span><span class="n">-name</span> <span class="n">nlp-api</span> <span class="n">nlp-text-analysis-api</span>
+</span></code></pre></div>
+<ol>
+<li><strong>View logs:</strong></li>
+</ol>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">docker</span> <span class="n">logs</span> <span class="o">-f</span> <span class="n">nlp-api</span>
+</span></code></pre></div>
+<h3 id="using-docker-compose">Using Docker Compose<a class="headerlink" href="#using-docker-compose" title="Permanent link">&para;</a></h3>
+<p><strong>Production mode:</strong></p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">docker-compose</span> <span class="n">up</span> <span class="n">-d</span>
+</span></code></pre></div>
+<p><strong>Development mode (with hot reload):</strong></p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">+</span>
+</span></code></pre></div>
+<p><strong>Stop services:</strong></p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">docker-compose</span> <span class="n">down</span>
+</span></code></pre></div>
+<hr />
+<h2 id="render-deployment">Render Deployment<a class="headerlink" href="#render-deployment" title="Permanent link">&para;</a></h2>
+<p><a href="https://render.com">Render</a> offers free hosting with automatic deployments using Docker images.</p>
+<h3 id="deployment-strategy">Deployment Strategy<a class="headerlink" href="#deployment-strategy" title="Permanent link">&para;</a></h3>
+<p>This project uses a <strong>Docker-based deployment</strong> approach for Render:</p>
+<ol>
+<li>GitHub Actions builds and pushes Docker images to Docker Hub</li>
+<li>Render pulls and deploys the pre-built images</li>
+<li>Benefits: Faster deployments, consistent environments, easier rollbacks</li>
+</ol>
+<h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Docker Hub Account</strong> (free)</li>
+<li>Sign up at <a href="https://hub.docker.com">https://hub.docker.com</a></li>
+<li>
+<p>Create a repository named <code>trump-speeches-nlp-api</code></p>
+</li>
+<li>
+<p><strong>Render Account</strong> (free)</p>
+</li>
+<li>
+<p>Sign up at <a href="https://render.com">https://render.com</a></p>
+</li>
+<li>
+<p><strong>GitHub Repository</strong> connected to your account</p>
+</li>
+</ol>
+<h3 id="step-1-configure-github-secrets">Step 1: Configure GitHub Secrets<a class="headerlink" href="#step-1-configure-github-secrets" title="Permanent link">&para;</a></h3>
+<p>Add these secrets to your GitHub repository (Settings → Secrets and variables → Actions):</p>
+<ol>
+<li><strong><code>DOCKERHUB_USERNAME</code></strong> - Your Docker Hub username</li>
+<li><strong><code>DOCKERHUB_TOKEN</code></strong> - Docker Hub access token</li>
+<li>Go to Docker Hub → Account Settings → Security → New Access Token</li>
+<li>Copy the token and save it as a GitHub secret</li>
+</ol>
+<h3 id="step-2-update-renderyaml">Step 2: Update render.yaml<a class="headerlink" href="#step-2-update-renderyaml" title="Permanent link">&para;</a></h3>
+<p>Edit <code>.render/render.yaml</code> and replace <code>&lt;your-dockerhub-username&gt;</code> with your actual Docker Hub username:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">image</span><span class="p">:</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker.io/your-username/trump-speeches-nlp-api:latest</span>
+</span></code></pre></div>
+<h3 id="step-3-deploy-to-render">Step 3: Deploy to Render<a class="headerlink" href="#step-3-deploy-to-render" title="Permanent link">&para;</a></h3>
+<p><strong>Option A: Using Blueprint (Recommended)</strong></p>
+<ol>
+<li>Go to Render Dashboard → "Blueprints"</li>
+<li>Click "New Blueprint Instance"</li>
+<li>Connect your GitHub repository</li>
+<li>Render will detect <code>.render/render.yaml</code> and configure everything automatically</li>
+<li>Click "Apply" to create the service</li>
+</ol>
+<p><strong>Option B: Manual Configuration</strong></p>
+<ol>
+<li>Go to Render Dashboard → "New +" → "Web Service"</li>
+<li>Choose "Deploy an existing image from a registry"</li>
+<li>Configure:</li>
+<li><strong>Image URL:</strong> <code>docker.io/your-username/trump-speeches-nlp-api:latest</code></li>
+<li><strong>Name:</strong> <code>trump-speeches-nlp-api</code></li>
+<li><strong>Plan:</strong> Free</li>
+<li>Add environment variable:</li>
+<li><code>PORT</code> = <code>8000</code></li>
+<li>Set Health Check Path: <code>/health</code></li>
+<li>Click "Create Web Service"</li>
+</ol>
+<h3 id="step-4-trigger-deployment">Step 4: Trigger Deployment<a class="headerlink" href="#step-4-trigger-deployment" title="Permanent link">&para;</a></h3>
+<p>Push to <code>main</code> branch or manually trigger the workflow:</p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">git</span> <span class="n">push</span> <span class="n">origin</span> <span class="n">main</span>
+</span></code></pre></div>
+<p>This will:
+1. Build the Docker image
+2. Push it to Docker Hub
+3. Render automatically detects the new image and deploys it</p>
+<h3 id="accessing-your-render-app">Accessing Your Render App<a class="headerlink" href="#accessing-your-render-app" title="Permanent link">&para;</a></h3>
+<p>Your API will be available at: <code>https://trump-speeches-nlp-api.onrender.com</code></p>
+<p><strong>Note:</strong> Free tier apps spin down after 15 minutes of inactivity. First request may take 30-60 seconds to wake the service.</p>
+<h3 id="monitoring-logs">Monitoring &amp; Logs<a class="headerlink" href="#monitoring-logs" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Logs:</strong> Render Dashboard → Your Service → Logs tab</li>
+<li><strong>Metrics:</strong> Render Dashboard → Your Service → Metrics tab</li>
+<li><strong>Manual Deploy:</strong> Render Dashboard → Your Service → Manual Deploy button</li>
+</ul>
+<h3 id="upgrading-from-free-tier">Upgrading from Free Tier<a class="headerlink" href="#upgrading-from-free-tier" title="Permanent link">&para;</a></h3>
+<p>For better performance:
+- <strong>Starter Plan:</strong> $7/month (512 MB RAM, 0.5 CPU)
+- No cold starts
+- Faster response times
+- Better for production use</p>
+<hr />
+<h2 id="azure-app-service-deployment">Azure App Service Deployment<a class="headerlink" href="#azure-app-service-deployment" title="Permanent link">&para;</a></h2>
+<h3 id="deployment-strategy_1">Deployment Strategy<a class="headerlink" href="#deployment-strategy_1" title="Permanent link">&para;</a></h3>
+<p>This project supports two Azure deployment approaches:</p>
+<ol>
+<li><strong>Azure Container Registry (ACR)</strong> - Recommended for enterprise/production (default)</li>
+<li><strong>Docker Hub</strong> - Alternative for simpler setups or cross-platform deployments</li>
+</ol>
+<p>Both use the same GitHub Actions workflow with conditional logic.</p>
+<h3 id="prerequisites_1">Prerequisites<a class="headerlink" href="#prerequisites_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Azure account (free tier available)</li>
+<li>Azure CLI installed: <a href="https://docs.microsoft.com/en-us/cli/azure/install-azure-cli">https://docs.microsoft.com/en-us/cli/azure/install-azure-cli</a></li>
+<li>Docker Hub account (if using Docker Hub approach)</li>
+</ul>
+<h3 id="option-1-deploy-with-azure-container-registry-recommended">Option 1: Deploy with Azure Container Registry (Recommended)<a class="headerlink" href="#option-1-deploy-with-azure-container-registry-recommended" title="Permanent link">&para;</a></h3>
+<h4 id="step-1-create-azure-resources">Step 1: Create Azure Resources<a class="headerlink" href="#step-1-create-azure-resources" title="Permanent link">&para;</a></h4>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c"># Login to Azure</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">az</span> <span class="n">login</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c"># Create a resource group</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="n">az</span> <span class="nb">group </span><span class="n">create</span> <span class="p">-</span><span class="n">-name</span> <span class="n">trump-nlp-rg</span> <span class="p">-</span><span class="n">-location</span> <span class="n">eastus</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c"># Create Azure Container Registry</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="n">az</span> <span class="n">acr</span> <span class="n">create</span> <span class="p">`</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>  <span class="p">-</span><span class="n">-resource-group</span> <span class="n">trump-nlp-rg</span> <span class="p">`</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>  <span class="p">-</span><span class="n">-name</span> <span class="n">trumpnlpacr</span> <span class="p">`</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>  <span class="p">-</span><span class="n">-sku</span> <span class="n">Basic</span> <span class="p">`</span>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>  <span class="p">-</span><span class="n">-admin-enabled</span> <span class="n">true</span>
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="c"># Create an App Service plan (B1 or F1 tier)</span>
+</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="n">az</span> <span class="n">appservice</span> <span class="n">plan</span> <span class="n">create</span> <span class="p">`</span>
+</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>  <span class="p">-</span><span class="n">-name</span> <span class="n">trump-nlp-plan</span> <span class="p">`</span>
+</span><span id="__span-10-17"><a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>  <span class="p">-</span><span class="n">-resource-group</span> <span class="n">trump-nlp-rg</span> <span class="p">`</span>
+</span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>  <span class="p">-</span><span class="n">-sku</span> <span class="n">B1</span> <span class="p">`</span>
+</span><span id="__span-10-19"><a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>  <span class="p">-</span><span class="o">-is</span><span class="n">-linux</span>
+</span><span id="__span-10-20"><a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>
+</span><span id="__span-10-21"><a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="c"># Create a web app for containers</span>
+</span><span id="__span-10-22"><a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="n">az</span> <span class="n">webapp</span> <span class="n">create</span> <span class="p">`</span>
+</span><span id="__span-10-23"><a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a>  <span class="p">-</span><span class="n">-resource-group</span> <span class="n">trump-nlp-rg</span> <span class="p">`</span>
+</span><span id="__span-10-24"><a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a>  <span class="p">-</span><span class="n">-plan</span> <span class="n">trump-nlp-plan</span> <span class="p">`</span>
+</span><span id="__span-10-25"><a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a>  <span class="p">-</span><span class="n">-name</span> <span class="n">trump-speeches-nlp</span> <span class="p">`</span>
+</span><span id="__span-10-26"><a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a>  <span class="p">-</span><span class="n">-deployment-container-image-name</span> <span class="n">trumpnlpacr</span><span class="p">.</span><span class="n">azurecr</span><span class="p">.</span><span class="n">io</span><span class="p">/</span><span class="n">trump-speeches-nlp-api</span><span class="p">:</span><span class="n">latest</span>
+</span><span id="__span-10-27"><a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a>
+</span><span id="__span-10-28"><a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a><span class="c"># Configure port</span>
+</span><span id="__span-10-29"><a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a><span class="n">az</span> <span class="n">webapp</span> <span class="n">config</span> <span class="n">appsettings</span> <span class="nb">set </span><span class="p">`</span>
+</span><span id="__span-10-30"><a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a>  <span class="p">-</span><span class="n">-resource-group</span> <span class="n">trump-nlp-rg</span> <span class="p">`</span>
+</span><span id="__span-10-31"><a id="__codelineno-10-31" name="__codelineno-10-31" href="#__codelineno-10-31"></a>  <span class="p">-</span><span class="n">-name</span> <span class="n">trump-speeches-nlp</span> <span class="p">`</span>
+</span><span id="__span-10-32"><a id="__codelineno-10-32" name="__codelineno-10-32" href="#__codelineno-10-32"></a>  <span class="p">-</span><span class="n">-settings</span> <span class="n">WEBSITES_PORT</span><span class="p">=</span><span class="n">8000</span>
+</span><span id="__span-10-33"><a id="__codelineno-10-33" name="__codelineno-10-33" href="#__codelineno-10-33"></a>
+</span><span id="__span-10-34"><a id="__codelineno-10-34" name="__codelineno-10-34" href="#__codelineno-10-34"></a><span class="c"># Enable ACR integration</span>
+</span><span id="__span-10-35"><a id="__codelineno-10-35" name="__codelineno-10-35" href="#__codelineno-10-35"></a><span class="n">az</span> <span class="n">webapp</span> <span class="n">config</span> <span class="n">container</span> <span class="nb">set </span><span class="p">`</span>
+</span><span id="__span-10-36"><a id="__codelineno-10-36" name="__codelineno-10-36" href="#__codelineno-10-36"></a>  <span class="p">-</span><span class="n">-resource-group</span> <span class="n">trump-nlp-rg</span> <span class="p">`</span>
+</span><span id="__span-10-37"><a id="__codelineno-10-37" name="__codelineno-10-37" href="#__codelineno-10-37"></a>  <span class="p">-</span><span class="n">-name</span> <span class="n">trump-speeches-nlp</span> <span class="p">`</span>
+</span><span id="__span-10-38"><a id="__codelineno-10-38" name="__codelineno-10-38" href="#__codelineno-10-38"></a>  <span class="p">-</span><span class="n">-docker-custom-image-name</span> <span class="n">trumpnlpacr</span><span class="p">.</span><span class="n">azurecr</span><span class="p">.</span><span class="n">io</span><span class="p">/</span><span class="n">trump-speeches-nlp-api</span><span class="p">:</span><span class="n">latest</span> <span class="p">`</span>
+</span><span id="__span-10-39"><a id="__codelineno-10-39" name="__codelineno-10-39" href="#__codelineno-10-39"></a>  <span class="p">-</span><span class="n">-docker-registry-server-url</span> <span class="n">https</span><span class="p">://</span><span class="n">trumpnlpacr</span><span class="p">.</span><span class="n">azurecr</span><span class="p">.</span><span class="n">io</span>
+</span></code></pre></div>
+<h4 id="step-2-configure-github-secrets-for-acr">Step 2: Configure GitHub Secrets for ACR<a class="headerlink" href="#step-2-configure-github-secrets-for-acr" title="Permanent link">&para;</a></h4>
+<p>Add these secrets to your GitHub repository:</p>
+<ol>
+<li><strong><code>AZURE_CREDENTIALS</code></strong> - Service principal credentials</li>
+</ol>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">az</span> <span class="n">ad</span> <span class="nb">sp </span><span class="n">create-for-rbac</span> <span class="p">-</span><span class="n">-name</span> <span class="s2">&quot;github-actions-trump-nlp&quot;</span> <span class="p">-</span><span class="n">-sdk-auth</span> <span class="p">-</span><span class="n">-role</span> <span class="n">contributor</span> <span class="p">-</span><span class="n">-scopes</span> <span class="p">/</span><span class="n">subscriptions</span><span class="p">/{</span><span class="n">subscription-id</span><span class="p">}/</span><span class="n">resourceGroups</span><span class="p">/</span><span class="n">trump-nlp-rg</span>
+</span></code></pre></div>
+<p>Copy the entire JSON output and save as secret.</p>
+<ol>
+<li>
+<p><strong><code>AZURE_REGISTRY_LOGIN_SERVER</code></strong> - e.g., <code>trumpnlpacr.azurecr.io</code></p>
+</li>
+<li>
+<p><strong><code>AZURE_REGISTRY_USERNAME</code></strong> and <strong><code>AZURE_REGISTRY_PASSWORD</code></strong></p>
+</li>
+</ol>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">az</span> <span class="n">acr</span> <span class="n">credential</span> <span class="n">show</span> <span class="p">-</span><span class="n">-name</span> <span class="n">trumpnlpacr</span>
+</span></code></pre></div>
+<ol>
+<li><strong><code>AZURE_WEBAPP_NAME</code></strong> - e.g., <code>trump-speeches-nlp</code></li>
+</ol>
+<h4 id="step-3-deploy">Step 3: Deploy<a class="headerlink" href="#step-3-deploy" title="Permanent link">&para;</a></h4>
+<p>Push to <code>main</code> branch:</p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">git</span> <span class="n">push</span> <span class="n">origin</span> <span class="n">main</span>
+</span></code></pre></div>
+<p>GitHub Actions will automatically:
+1. Build Docker image
+2. Push to Azure Container Registry
+3. Deploy to Azure Web App
+4. Run health checks</p>
+<hr />
+<h3 id="option-2-deploy-with-docker-hub">Option 2: Deploy with Docker Hub<a class="headerlink" href="#option-2-deploy-with-docker-hub" title="Permanent link">&para;</a></h3>
+<p>This approach shares the same Docker images used for Render deployment.</p>
+<h4 id="step-1-create-azure-resources_1">Step 1: Create Azure Resources<a class="headerlink" href="#step-1-create-azure-resources_1" title="Permanent link">&para;</a></h4>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c"># Login to Azure</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">az</span> <span class="n">login</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c"># Create a resource group</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="n">az</span> <span class="nb">group </span><span class="n">create</span> <span class="p">-</span><span class="n">-name</span> <span class="n">trump-nlp-rg</span> <span class="p">-</span><span class="n">-location</span> <span class="n">eastus</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="c"># Create an App Service plan</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="n">az</span> <span class="n">appservice</span> <span class="n">plan</span> <span class="n">create</span> <span class="p">`</span>
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>  <span class="p">-</span><span class="n">-name</span> <span class="n">trump-nlp-plan</span> <span class="p">`</span>
+</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>  <span class="p">-</span><span class="n">-resource-group</span> <span class="n">trump-nlp-rg</span> <span class="p">`</span>
+</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>  <span class="p">-</span><span class="n">-sku</span> <span class="n">B1</span> <span class="p">`</span>
+</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>  <span class="p">-</span><span class="o">-is</span><span class="n">-linux</span>
+</span><span id="__span-14-13"><a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>
+</span><span id="__span-14-14"><a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="c"># Create a web app using Docker Hub image</span>
+</span><span id="__span-14-15"><a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="n">az</span> <span class="n">webapp</span> <span class="n">create</span> <span class="p">`</span>
+</span><span id="__span-14-16"><a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a>  <span class="p">-</span><span class="n">-resource-group</span> <span class="n">trump-nlp-rg</span> <span class="p">`</span>
+</span><span id="__span-14-17"><a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a>  <span class="p">-</span><span class="n">-plan</span> <span class="n">trump-nlp-plan</span> <span class="p">`</span>
+</span><span id="__span-14-18"><a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a>  <span class="p">-</span><span class="n">-name</span> <span class="n">trump-speeches-nlp</span> <span class="p">`</span>
+</span><span id="__span-14-19"><a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a>  <span class="p">-</span><span class="n">-deployment-container-image-name</span> <span class="n">docker</span><span class="p">.</span><span class="n">io</span><span class="p">/</span><span class="n">your-username</span><span class="p">/</span><span class="n">trump-speeches-nlp-api</span><span class="p">:</span><span class="n">latest</span>
+</span><span id="__span-14-20"><a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a>
+</span><span id="__span-14-21"><a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a><span class="c"># Configure port</span>
+</span><span id="__span-14-22"><a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a><span class="n">az</span> <span class="n">webapp</span> <span class="n">config</span> <span class="n">appsettings</span> <span class="nb">set </span><span class="p">`</span>
+</span><span id="__span-14-23"><a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a>  <span class="p">-</span><span class="n">-resource-group</span> <span class="n">trump-nlp-rg</span> <span class="p">`</span>
+</span><span id="__span-14-24"><a id="__codelineno-14-24" name="__codelineno-14-24" href="#__codelineno-14-24"></a>  <span class="p">-</span><span class="n">-name</span> <span class="n">trump-speeches-nlp</span> <span class="p">`</span>
+</span><span id="__span-14-25"><a id="__codelineno-14-25" name="__codelineno-14-25" href="#__codelineno-14-25"></a>  <span class="p">-</span><span class="n">-settings</span> <span class="n">WEBSITES_PORT</span><span class="p">=</span><span class="n">8000</span>
+</span></code></pre></div>
+<h4 id="step-2-configure-github-secrets-for-docker-hub">Step 2: Configure GitHub Secrets for Docker Hub<a class="headerlink" href="#step-2-configure-github-secrets-for-docker-hub" title="Permanent link">&para;</a></h4>
+<p>You'll need the same Docker Hub secrets as for Render:</p>
+<ol>
+<li><strong><code>DOCKERHUB_USERNAME</code></strong></li>
+<li><strong><code>DOCKERHUB_TOKEN</code></strong></li>
+<li><strong><code>AZURE_CREDENTIALS</code></strong> (same as Option 1)</li>
+<li><strong><code>AZURE_WEBAPP_NAME</code></strong></li>
+</ol>
+<h4 id="step-3-deploy-with-docker-hub">Step 3: Deploy with Docker Hub<a class="headerlink" href="#step-3-deploy-with-docker-hub" title="Permanent link">&para;</a></h4>
+<p>Manually trigger the workflow:</p>
+<ol>
+<li>Go to GitHub → Actions → "Deploy to Azure"</li>
+<li>Click "Run workflow"</li>
+<li>Check "Use Docker Hub instead of ACR"</li>
+<li>Click "Run workflow"</li>
+</ol>
+<hr />
+<h3 id="accessing-your-azure-app">Accessing Your Azure App<a class="headerlink" href="#accessing-your-azure-app" title="Permanent link">&para;</a></h3>
+<p>Your API will be available at: <code>https://trump-speeches-nlp.azurewebsites.net</code></p>
+<h3 id="monitoring-and-logs">Monitoring and Logs<a class="headerlink" href="#monitoring-and-logs" title="Permanent link">&para;</a></h3>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c"># Stream logs</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">az</span> <span class="n">webapp</span> <span class="n">log</span> <span class="n">tail</span> <span class="p">-</span><span class="n">-resource-group</span> <span class="n">trump-nlp-rg</span> <span class="p">-</span><span class="n">-name</span> <span class="n">trump-speeches-nlp</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="c"># View metrics</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="n">az</span> <span class="n">monitor</span> <span class="n">metrics</span> <span class="n">list</span> <span class="p">`</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>  <span class="p">-</span><span class="n">-resource</span> <span class="p">/</span><span class="n">subscriptions</span><span class="p">/{</span><span class="n">subscription-id</span><span class="p">}/</span><span class="n">resourceGroups</span><span class="p">/</span><span class="n">trump-nlp-rg</span><span class="p">/</span><span class="n">providers</span><span class="p">/</span><span class="n">Microsoft</span><span class="p">.</span><span class="n">Web</span><span class="p">/</span><span class="n">sites</span><span class="p">/</span><span class="n">trump-speeches-nlp</span> <span class="p">`</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>  <span class="p">-</span><span class="n">-metric-names</span> <span class="n">Requests</span><span class="p">,</span><span class="n">ResponseTime</span><span class="p">,</span><span class="n">Http5xx</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="c"># Open in Azure Portal</span>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="n">az</span> <span class="n">webapp</span> <span class="n">browse</span> <span class="p">-</span><span class="n">-resource-group</span> <span class="n">trump-nlp-rg</span> <span class="p">-</span><span class="n">-name</span> <span class="n">trump-speeches-nlp</span>
+</span></code></pre></div>
+<h3 id="updating-the-deployment">Updating the Deployment<a class="headerlink" href="#updating-the-deployment" title="Permanent link">&para;</a></h3>
+<p>Deployments are automatic on push to <code>main</code>. To manually update:</p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c"># Trigger GitHub Actions workflow manually</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="c"># Or restart the web app to pull latest image</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">az</span> <span class="n">webapp</span> <span class="n">restart</span> <span class="p">-</span><span class="n">-resource-group</span> <span class="n">trump-nlp-rg</span> <span class="p">-</span><span class="n">-name</span> <span class="n">trump-speeches-nlp</span>
+</span></code></pre></div>
+<hr />
+<h2 id="cicd-with-github-actions">CI/CD with GitHub Actions<a class="headerlink" href="#cicd-with-github-actions" title="Permanent link">&para;</a></h2>
+<p>This project includes automated CI/CD pipelines using GitHub Actions. The workflows are split into multiple files for better organization:</p>
+<h3 id="workflow-files">Workflow Files<a class="headerlink" href="#workflow-files" title="Permanent link">&para;</a></h3>
+<p>All workflows are located in <code>.github/workflows/</code>:</p>
+<ul>
+<li><strong><code>ci.yml</code></strong> - Tests &amp; Linting</li>
+<li>Runs on: All pushes and PRs to <code>main</code>, <code>develop</code>, <code>feature/*</code></li>
+<li>Jobs: Unit tests, integration tests, code quality checks (flake8, black, isort, mypy)</li>
+<li>
+<p>Python versions tested: 3.11, 3.12, 3.13</p>
+</li>
+<li>
+<p><strong><code>security.yml</code></strong> - Security Scans</p>
+</li>
+<li>Runs on: All pushes and PRs, plus weekly schedule (Mondays 9 AM UTC)</li>
+<li>
+<p>Jobs: Dependency vulnerability scanning (pip-audit), code security analysis (bandit)</p>
+</li>
+<li>
+<p><strong><code>deploy-render.yml</code></strong> - Render Deployment</p>
+</li>
+<li>Runs on: Push to <code>main</code> branch only</li>
+<li>Jobs: Build Docker image, push to Docker Hub, test container</li>
+<li>
+<p>Render auto-deploys when new images are detected</p>
+</li>
+<li>
+<p><strong><code>deploy-azure.yml</code></strong> - Azure Deployment</p>
+</li>
+<li>Runs on: Push to <code>main</code> branch (manual trigger also available)</li>
+<li>Jobs: Build &amp; push to ACR/Docker Hub, deploy to Azure Web App, health check</li>
+<li>Supports both ACR and Docker Hub registries</li>
+</ul>
+<h3 id="deployment-architecture">Deployment Architecture<a class="headerlink" href="#deployment-architecture" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>┌─────────────────────────────────────────────────────────────┐
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>│                     Push to main branch                     │
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>└────────────┬────────────────────────────────────────────────┘
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>             │
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>             ├──────────────────┐
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>             │                  │
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>             ▼                  ▼
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>    ┌────────────────┐   ┌──────────────────┐
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>    │  Build Docker  │   │  Build Docker    │
+</span><span id="__span-17-10"><a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>    │  Image         │   │  Image           │
+</span><span id="__span-17-11"><a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>    └────────┬───────┘   └────────┬─────────┘
+</span><span id="__span-17-12"><a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>             │                    │
+</span><span id="__span-17-13"><a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>             ▼                    ▼
+</span><span id="__span-17-14"><a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a>    ┌────────────────┐   ┌──────────────────┐
+</span><span id="__span-17-15"><a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a>    │  Push to       │   │  Push to ACR     │
+</span><span id="__span-17-16"><a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>    │  Docker Hub    │   │  (or Docker Hub) │
+</span><span id="__span-17-17"><a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a>    └────────┬───────┘   └────────┬─────────┘
+</span><span id="__span-17-18"><a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a>             │                    │
+</span><span id="__span-17-19"><a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a>             ▼                    ▼
+</span><span id="__span-17-20"><a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a>    ┌────────────────┐   ┌──────────────────┐
+</span><span id="__span-17-21"><a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a>    │  Render        │   │  Azure Web App   │
+</span><span id="__span-17-22"><a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a>    │  Auto-Deploy   │   │  Deploy          │
+</span><span id="__span-17-23"><a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a>    └────────────────┘   └──────────────────┘
+</span></code></pre></div>
+<h3 id="setting-up-github-secrets">Setting Up GitHub Secrets<a class="headerlink" href="#setting-up-github-secrets" title="Permanent link">&para;</a></h3>
+<h4 id="required-for-all-deployments">Required for All Deployments<a class="headerlink" href="#required-for-all-deployments" title="Permanent link">&para;</a></h4>
+<ol>
+<li><strong><code>DOCKERHUB_USERNAME</code></strong> - Your Docker Hub username</li>
+<li><strong><code>DOCKERHUB_TOKEN</code></strong> - Docker Hub access token</li>
+<li>Create at: Docker Hub → Account Settings → Security → New Access Token</li>
+</ol>
+<h4 id="required-for-azure-deployment">Required for Azure Deployment<a class="headerlink" href="#required-for-azure-deployment" title="Permanent link">&para;</a></h4>
+<ol>
+<li><strong><code>AZURE_CREDENTIALS</code></strong> - Service principal credentials (JSON format)</li>
+</ol>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">az</span> <span class="n">ad</span> <span class="nb">sp </span><span class="n">create-for-rbac</span> <span class="p">-</span><span class="n">-name</span> <span class="s2">&quot;github-actions-trump-nlp&quot;</span> <span class="p">-</span><span class="n">-sdk-auth</span> <span class="p">-</span><span class="n">-role</span> <span class="n">contributor</span> <span class="p">-</span><span class="n">-scopes</span> <span class="p">/</span><span class="n">subscriptions</span><span class="p">/{</span><span class="n">subscription-id</span><span class="p">}/</span><span class="n">resourceGroups</span><span class="p">/</span><span class="n">trump-nlp-rg</span>
+</span></code></pre></div>
+<ol>
+<li><strong><code>AZURE_WEBAPP_NAME</code></strong> - Your Azure Web App name (e.g., <code>trump-speeches-nlp</code>)</li>
+</ol>
+<h4 id="required-for-azure-container-registry-optional">Required for Azure Container Registry (Optional)<a class="headerlink" href="#required-for-azure-container-registry-optional" title="Permanent link">&para;</a></h4>
+<ol>
+<li><strong><code>AZURE_REGISTRY_LOGIN_SERVER</code></strong> - ACR login server (e.g., <code>trumpnlpacr.azurecr.io</code>)</li>
+<li><strong><code>AZURE_REGISTRY_USERNAME</code></strong> - ACR admin username</li>
+<li><strong><code>AZURE_REGISTRY_PASSWORD</code></strong> - ACR admin password</li>
+</ol>
+<p>Get ACR credentials:</p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">az</span> <span class="n">acr</span> <span class="n">credential</span> <span class="n">show</span> <span class="p">-</span><span class="n">-name</span> <span class="n">trumpnlpacr</span>
+</span></code></pre></div>
+<h3 id="workflow-triggers">Workflow Triggers<a class="headerlink" href="#workflow-triggers" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Workflow</th>
+<th>Automatic Trigger</th>
+<th>Manual Trigger</th>
+<th>When to Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CI</strong></td>
+<td>Push/PR to main, develop, feature/*</td>
+<td>✅ Yes</td>
+<td>Testing code changes</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>Push/PR + Weekly (Mon 9AM)</td>
+<td>✅ Yes</td>
+<td>Regular security audits</td>
+</tr>
+<tr>
+<td><strong>Deploy Render</strong></td>
+<td>Push to main</td>
+<td>✅ Yes</td>
+<td>Deploy to Render</td>
+</tr>
+<tr>
+<td><strong>Deploy Azure</strong></td>
+<td>Push to main</td>
+<td>✅ Yes (with options)</td>
+<td>Deploy to Azure</td>
+</tr>
+</tbody>
+</table>
+<h3 id="manual-deployment-triggers">Manual Deployment Triggers<a class="headerlink" href="#manual-deployment-triggers" title="Permanent link">&para;</a></h3>
+<p><strong>For Azure:</strong></p>
+<ol>
+<li>Go to GitHub → Actions → "Deploy to Azure"</li>
+<li>Click "Run workflow"</li>
+<li>Select options:</li>
+<li><strong>Environment:</strong> production/staging</li>
+<li><strong>Use Docker Hub:</strong> true/false (ACR is default)</li>
+<li>Click "Run workflow"</li>
+</ol>
+<p><strong>For Render:</strong></p>
+<ol>
+<li>Go to GitHub → Actions → "Deploy to Render"</li>
+<li>Click "Run workflow"</li>
+<li>Click "Run workflow" to confirm</li>
+</ol>
+<h3 id="viewing-workflow-results">Viewing Workflow Results<a class="headerlink" href="#viewing-workflow-results" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Navigate to your repository → Actions tab</li>
+<li>Click on any workflow run to see detailed logs</li>
+<li>Failed workflows will show which step failed and why</li>
+<li>Deployment summaries are available in each workflow run</li>
+</ul>
+<h3 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Always test locally</strong> before pushing to <code>main</code></li>
+<li><strong>Use feature branches</strong> for development</li>
+<li><strong>Review CI results</strong> before merging PRs</li>
+<li><strong>Monitor deployments</strong> after pushing to <code>main</code></li>
+<li><strong>Check security scans</strong> weekly</li>
+<li><strong>Use manual triggers</strong> for testing deployment changes</li>
+</ol>
+<hr />
+<h2 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h2>
+<h3 id="required-variables">Required Variables<a class="headerlink" href="#required-variables" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PORT</code></td>
+<td>Port to run the application</td>
+<td><code>8000</code></td>
+</tr>
+<tr>
+<td><code>PYTHONUNBUFFERED</code></td>
+<td>Disable Python output buffering</td>
+<td><code>1</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="optional-variables">Optional Variables<a class="headerlink" href="#optional-variables" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PYTHON_VERSION</code></td>
+<td>Python version (for Render)</td>
+</tr>
+<tr>
+<td><code>WEBSITES_PORT</code></td>
+<td>Port for Azure App Service</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rag-specific-configuration">RAG-Specific Configuration<a class="headerlink" href="#rag-specific-configuration" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CHROMADB_PERSIST_DIR</code></td>
+<td>Directory for ChromaDB persistence</td>
+<td><code>./data/chromadb</code></td>
+</tr>
+<tr>
+<td><code>RAG_COLLECTION_NAME</code></td>
+<td>Name of the vector collection</td>
+<td><code>speeches</code></td>
+</tr>
+<tr>
+<td><code>RAG_CHUNK_SIZE</code></td>
+<td>Text chunk size for embeddings</td>
+<td><code>2048</code></td>
+</tr>
+<tr>
+<td><code>RAG_CHUNK_OVERLAP</code></td>
+<td>Overlap between chunks</td>
+<td><code>150</code></td>
+</tr>
+<tr>
+<td><code>EMBEDDING_MODEL</code></td>
+<td>sentence-transformers model</td>
+<td><code>all-MiniLM-L6-v2</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note:</strong> ChromaDB data is persisted to disk. Ensure the persist directory is included in volume mounts for Docker deployments to maintain indexed documents across restarts.</p>
+<hr />
+<h2 id="performance-tips">Performance Tips<a class="headerlink" href="#performance-tips" title="Permanent link">&para;</a></h2>
+<h3 id="for-free-tiers">For Free Tiers<a class="headerlink" href="#for-free-tiers" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Render Free Tier:</strong></li>
+<li>Apps sleep after 15 min of inactivity</li>
+<li>Use a health check service like <a href="https://cron-job.org">cron-job.org</a> to keep it awake</li>
+<li>Expect 30-60s cold start time</li>
+<li>
+<p><strong>RAG Impact:</strong> First request will also load embedding model (~80MB) + index documents</p>
+</li>
+<li>
+<p><strong>Azure Free Tier (F1):</strong></p>
+</li>
+<li>Limited to 60 CPU minutes/day</li>
+<li>1 GB RAM limit</li>
+<li>Consider B1 tier ($13/month) for better performance</li>
+<li><strong>RAG Requirements:</strong> Minimum 2GB RAM recommended with RAG enabled</li>
+</ol>
+<h3 id="optimizing-docker-image">Optimizing Docker Image<a class="headerlink" href="#optimizing-docker-image" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Use multi-stage builds (already implemented)</li>
+<li>Remove unnecessary data files</li>
+<li>Use <code>.dockerignore</code> to exclude notebooks and docs</li>
+<li><strong>RAG Models:</strong> Pre-download models during build to reduce startup time</li>
+</ul>
+<h3 id="rag-performance-considerations">RAG Performance Considerations<a class="headerlink" href="#rag-performance-considerations" title="Permanent link">&para;</a></h3>
+<p><strong>Memory Requirements:</strong>
+- <strong>Without RAG:</strong> ~1.5GB RAM
+- <strong>With RAG:</strong> ~2.5GB RAM (includes embeddings model + vector store)
+- <strong>Recommended:</strong> 4GB RAM for production with concurrent users</p>
+<p><strong>Storage Requirements:</strong>
+- <strong>Base application:</strong> ~1GB
+- <strong>ChromaDB index:</strong> ~50-100MB per 10,000 chunks
+- <strong>Embedding model:</strong> ~80MB</p>
+<p><strong>Startup Time:</strong>
+- <strong>Without RAG:</strong> 10-15 seconds
+- <strong>With RAG:</strong> 30-60 seconds (model loading + document indexing)
+- <strong>Tip:</strong> Documents are auto-indexed on first startup if collection is empty</p>
+<p><strong>Query Performance:</strong>
+- <strong>Semantic search:</strong> ~50-200ms per query
+- <strong>Question answering:</strong> ~200-500ms (includes search + answer generation)
+- <strong>Tip:</strong> Results improve with more indexed documents</p>
+<hr />
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="docker-build-fails">Docker Build Fails<a class="headerlink" href="#docker-build-fails" title="Permanent link">&para;</a></h3>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c"># Clean Docker cache and rebuild</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="n">docker</span> <span class="n">system</span> <span class="n">prune</span> <span class="n">-a</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="n">docker</span> <span class="n">build</span> <span class="p">-</span><span class="n">-no-cache</span> <span class="n">-t</span> <span class="n">trump-speeches-nlp-api</span> <span class="p">.</span>
+</span></code></pre></div>
+<h3 id="api-returns-503">API Returns 503<a class="headerlink" href="#api-returns-503" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Model may still be loading (can take 30-60s on first request)</li>
+<li>Check logs for errors</li>
+<li>Ensure sufficient memory (minimum 1GB recommended)</li>
+</ul>
+<h3 id="azure-deployment-issues">Azure Deployment Issues<a class="headerlink" href="#azure-deployment-issues" title="Permanent link">&para;</a></h3>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c"># Check app logs</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="n">az</span> <span class="n">webapp</span> <span class="n">log</span> <span class="n">tail</span> <span class="p">-</span><span class="n">-resource-group</span> <span class="n">trump-nlp-rg</span> <span class="p">-</span><span class="n">-name</span> <span class="n">trump-speeches-nlp</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="c"># Restart the app</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="n">az</span> <span class="n">webapp</span> <span class="n">restart</span> <span class="p">-</span><span class="n">-resource-group</span> <span class="n">trump-nlp-rg</span> <span class="p">-</span><span class="n">-name</span> <span class="n">trump-speeches-nlp</span>
+</span></code></pre></div>
+<h3 id="render-deployment-issues">Render Deployment Issues<a class="headerlink" href="#render-deployment-issues" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Check build logs in Render dashboard</li>
+<li>Verify <code>.render/render.yaml</code> configuration</li>
+<li>Ensure all dependencies are in <code>pyproject.toml</code></li>
+</ul>
+<hr />
+<h2 id="cost-comparison">Cost Comparison<a class="headerlink" href="#cost-comparison" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Free Tier</th>
+<th>Paid Tier</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Render</strong></td>
+<td>✅ Yes (with limitations)</td>
+<td>$7/month starter</td>
+<td>Quick demos, portfolio</td>
+</tr>
+<tr>
+<td><strong>Azure</strong></td>
+<td>✅ Yes (F1: 60 min/day)</td>
+<td>$13/month (B1)</td>
+<td>Enterprise, Azure ecosystem</td>
+</tr>
+<tr>
+<td><strong>Railway</strong></td>
+<td>✅ $5 free credit</td>
+<td>Pay-as-you-go</td>
+<td>Simple projects</td>
+</tr>
+<tr>
+<td><strong>Fly.io</strong></td>
+<td>✅ Free allowance</td>
+<td>Pay-as-you-go</td>
+<td>Global deployment</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<p>After deployment:</p>
+<ol>
+<li><strong>Test the API:</strong> Use the <code>/health</code> endpoint to verify</li>
+<li><strong>Update README:</strong> Add your live demo link</li>
+<li><strong>Monitor performance:</strong> Check logs and metrics</li>
+<li><strong>Set up alerts:</strong> Configure uptime monitoring</li>
+<li><strong>Add custom domain:</strong> (optional) Configure DNS</li>
+</ol>
+<hr />
+<h2 id="support">Support<a class="headerlink" href="#support" title="Permanent link">&para;</a></h2>
+<p>For issues or questions:</p>
+<ul>
+<li>Check the <a href="../README.md">main README</a></li>
+<li>Review API documentation at <code>/docs</code></li>
+<li>Open an issue on GitHub</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 Kristiyan Bonev
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/JustaKris" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>
