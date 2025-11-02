@@ -17,24 +17,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # --- Install uv (fast Python package installer) ---
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
+# --- Ensure uv is in PATH ---
+# ENV PATH="/root/.local/bin:$PATH"
+
 # --- Copy dependency metadata ---
 COPY pyproject.toml uv.lock* ./
 
-# --- Install PyTorch CPU-only FIRST to set constraints ---
-# This ensures other packages (like sentence-transformers) don't pull CUDA versions
-RUN pip install --no-cache-dir \
-    torch==2.4.0+cpu \
-    --index-url https://download.pytorch.org/whl/cpu
+# --- Export dependencies (excluding dev/docs/notebooks groups) ---
+RUN /root/.local/bin/uv export \
+    --format requirements-txt \
+    --no-group dev \
+    --no-group docs \
+    --no-group notebooks \
+    > requirements.txt
 
-# --- Export requirements WITHOUT optional groups ---
-# Excludes: dev, notebooks, torch-gpu, torch-cpu (torch already installed above)
-RUN /root/.local/bin/uv export --no-group dev --no-group notebooks --no-group torch-gpu --no-hashes > requirements.txt
-
-# --- Remove torch from requirements since we installed it manually ---
-RUN sed -i '/^torch==/d' requirements.txt
-
-# --- Install remaining dependencies ---
-RUN pip install --no-cache-dir -r requirements.txt
+# --- Install dependencies from requirements.txt ---
+RUN /root/.local/bin/uv pip install --system -r requirements.txt
 
 # --- Cleanup build artifacts (as root before switching user) ---
 RUN find /usr/local/lib/python3.12/site-packages -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true && \
@@ -70,12 +68,7 @@ RUN useradd -m -u 1000 appuser && chown -R appuser /app
 USER appuser
 
 # --- Minimal NLTK data ---
-RUN python -m nltk.downloader punkt stopwords
-
-# --- Cleanup (skip errors for permission-denied files) ---
-RUN rm -rf ~/.cache /tmp/* 2>/dev/null || true && \
-    find /usr/local/lib/python3.12/site-packages -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true && \
-    find /usr/local/lib/python3.12/site-packages -type f -name "*.py[co]" -delete 2>/dev/null || true
+RUN python -m nltk.downloader punkt stopwords punkt_tab
 
 EXPOSE ${PORT}
 

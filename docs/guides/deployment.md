@@ -43,13 +43,13 @@ This guide covers deploying the Trump Rally Speeches NLP API to various platform
 1. **Build the Docker image:**
 
    ```powershell
-   docker build -t nlp-text-analysis-api .
+   docker build -t trump-speeches-nlp-api .
    ```
 
 2. **Run the container:**
 
    ```powershell
-   docker run --rm -it -p 8000:8000 --name nlp-api nlp-text-analysis-api
+   docker run --rm -it -p 8000:8000 --env-file .env --name nlp-api trump-speeches-nlp-api
    ```
 
 3. **View logs:**
