@@ -1,31 +1,38 @@
 # Quick Start Guide
 
-## Running the NLP API Locally
+## Running the RAG-Powered NLP API
 
 ### Prerequisites
 
-- Python 3.12+ installed
-- Poetry installed (<https://python-poetry.org/docs/#installation>)
+- Python 3.11+ installed
+- uv installed ([install guide](https://docs.astral.sh/uv/getting-started/installation/))
+- Google Gemini API key ([get one free](https://ai.google.dev/))
 
-### Steps
+### Setup
 
 1. **Install Dependencies**
 
    ```powershell
-   poetry install
+   uv sync
    ```
 
-2. **Download NLTK Data** (first time only)
+2. **Configure Environment**
 
-   ```powershell
-   poetry run python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords'); nltk.download('punkt_tab')"
+   Create a `.env` file in the project root:
+   ```bash
+   GEMINI_API_KEY=your_api_key_here
    ```
 
 3. **Run the API**
 
    ```powershell
-   poetry run uvicorn src.api:app --reload
+   uv run uvicorn src.api:app --reload
    ```
+
+   The API will automatically:
+   - Load the FinBERT sentiment model
+   - Initialize ChromaDB vector database
+   - Index the 35 speech documents (first run only)
 
 4. **Access the Application**
    - Web UI: <http://localhost:8000>
@@ -47,63 +54,94 @@ docker run -p 8000:8000 trump-speeches-nlp-api
 docker-compose up
 ```
 
-## Testing the API
+## Testing the RAG System
 
 ### Using the Web Interface
 
 1. Open <http://localhost:8000>
-2. Enter text in the "Sentiment Analysis" tab
-3. Click "Analyze Sentiment"
+2. Navigate to the "RAG Q&A" tab
+3. Ask a question like *"What economic policies were discussed?"*
+4. View the AI-generated answer with confidence scores and sources
 
 ### Using curl
 
 ```powershell
-# Health check
-curl http://localhost:8000/health
+# Ask a question (RAG)
+curl -X POST http://localhost:8000/rag/ask `
+  -H "Content-Type: application/json" `
+  -d '{"question": "What was said about the economy?", "top_k": 5}'
 
-# Analyze sentiment
+# Semantic search
+curl -X POST http://localhost:8000/rag/search `
+  -H "Content-Type: application/json" `
+  -d '{"query": "immigration policy", "top_k": 5}'
+
+# Get RAG statistics
+curl http://localhost:8000/rag/stats
+
+# Sentiment analysis (traditional NLP)
 curl -X POST http://localhost:8000/analyze/sentiment `
   -H "Content-Type: application/json" `
-  -d '{"text": "We are going to make America great again!"}'
-
-# Get dataset statistics
-curl http://localhost:8000/speeches/stats
+  -d '{"text": "The economy is doing great!"}'
 ```
 
-### Using Python requests
+### Using Python
 
 ```python
 import requests
 
-# Analyze sentiment
+# RAG Question Answering
+response = requests.post(
+    "http://localhost:8000/rag/ask",
+    json={
+        "question": "What were the main themes in the 2020 speeches?",
+        "top_k": 5
+    }
+)
+result = response.json()
+print(f"Answer: {result['answer']}")
+print(f"Confidence: {result['confidence']} ({result['confidence_score']:.2f})")
+print(f"Sources: {', '.join(result['sources'])}")
+
+# Traditional NLP - Sentiment
 response = requests.post(
     "http://localhost:8000/analyze/sentiment",
-    json={"text": "This is amazing! The economy is booming."}
+    json={"text": "This is incredible! Best economy ever."}
 )
 print(response.json())
 ```
 
 ## Troubleshooting
 
-### Port Already in Use
+### "RAG service not initialized"
 
-If port 8000 is busy, run on a different port:
-
-```powershell
-poetry run uvicorn src.api:app --reload --port 8001
+The API auto-indexes documents on first startup. This takes ~30-60 seconds. Check the logs for progress:
+```
+INFO:     Loading documents into RAG service...
+INFO:     Loaded 35 documents into RAG service!
 ```
 
-### Model Loading Errors
+### Gemini API Errors
 
-The first request may take 30-60 seconds as the model downloads and loads.
-Check logs for progress.
+Ensure your `.env` file exists with a valid `GEMINI_API_KEY`. Get a free key at <https://ai.google.dev/>.
+
+### Model Download Taking Long
+
+First run downloads ~1-2 GB of models (FinBERT, MPNet embeddings). Subsequent runs are fast.
+
+### Port Already in Use
+
+```powershell
+uv run uvicorn src.api:app --reload --port 8001
+```
 
 ### Module Not Found
 
-Ensure you're in the project directory and have run `poetry install`.
+Ensure you're in the project root directory and have run `uv sync`.
 
 ## Next Steps
 
-- Explore the Jupyter notebooks in `notebooks/`
-- Read the deployment guide in `docs/DEPLOYMENT.md`
-- Check out the API documentation at <http://localhost:8000/docs>
+- Try the interactive web interface at <http://localhost:8000>
+- Explore API documentation at <http://localhost:8000/docs>
+- Read about RAG improvements in `docs/RAG_IMPROVEMENTS.md`
+- Deploy to production with `docs/DEPLOYMENT.md`

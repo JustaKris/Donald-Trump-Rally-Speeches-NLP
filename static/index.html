@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NLP Text Analysis API - Interactive Demo</title>
+    <title>AI-Powered Q&A System | RAG + NLP Analysis</title>
     <link rel="icon" type="image/jpeg" href="/static/images/favicon.jpg">
     <style>
         * {
@@ -14,9 +14,9 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #1a1a2e;
+            background: #0f0c29;
             background-image: 
-                linear-gradient(135deg, rgba(194, 21, 28, 0.9) 0%, rgba(26, 26, 46, 0.95) 100%),
+                linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.95) 100%),
                 url('/static/images/background.jpg');
             background-size: cover;
             background-position: center;
@@ -36,7 +36,7 @@
         }
         
         header {
-            background: linear-gradient(135deg, #c2151c 0%, #8b0000 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 50px 40px;
             text-align: center;
@@ -104,14 +104,14 @@
         }
         
         .tab:hover {
-            color: #c2151c;
-            background: rgba(194, 21, 28, 0.05);
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
         }
         
         .tab.active {
-            color: #c2151c;
-            border-bottom-color: #c2151c;
-            background: rgba(194, 21, 28, 0.08);
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: rgba(102, 126, 234, 0.08);
         }
         
         .tab-content {
@@ -142,12 +142,12 @@
         
         textarea:focus {
             outline: none;
-            border-color: #c2151c;
-            box-shadow: 0 0 0 3px rgba(194, 21, 28, 0.1);
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
         button.analyze {
-            background: linear-gradient(135deg, #c2151c 0%, #8b0000 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             padding: 15px 40px;
@@ -163,7 +163,7 @@
         
         button.analyze:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(194, 21, 28, 0.4);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
         }
         
         button.analyze:active {
@@ -195,7 +195,7 @@
             border-radius: 12px;
             margin-bottom: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            border-left: 4px solid #c2151c;
+            border-left: 4px solid #667eea;
         }
         
         .result-title {
@@ -246,7 +246,7 @@
         
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #c2151c 0%, #8b0000 100%);
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -266,19 +266,19 @@
         
         .word-tag {
             padding: 10px 20px;
-            background: linear-gradient(135deg, #c2151c 0%, #8b0000 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-radius: 25px;
             font-size: 14px;
             font-weight: 600;
             transition: transform 0.2s, box-shadow 0.2s;
             cursor: default;
-            box-shadow: 0 2px 8px rgba(194, 21, 28, 0.3);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
         }
         
         .word-tag:hover {
             transform: scale(1.1) rotate(-2deg);
-            box-shadow: 0 4px 15px rgba(194, 21, 28, 0.5);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
         }
         
         .stats-grid {
@@ -294,19 +294,19 @@
             border-radius: 12px;
             text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            border-top: 4px solid #c2151c;
+            border-top: 4px solid #667eea;
             transition: transform 0.3s, box-shadow 0.3s;
         }
         
         .stat-box:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(194, 21, 28, 0.2);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
         }
         
         .stat-value {
             font-size: 3em;
             font-weight: 800;
-            background: linear-gradient(135deg, #c2151c 0%, #8b0000 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -348,7 +348,7 @@
         
         .spinner {
             border: 5px solid #f3f3f3;
-            border-top: 5px solid #c2151c;
+            border-top: 5px solid #667eea;
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -371,7 +371,7 @@
         }
         
         .links a {
-            color: #c2151c;
+            color: #667eea;
             text-decoration: none;
             font-weight: 700;
             margin: 0 15px;
@@ -382,7 +382,7 @@
         }
         
         .links a:hover {
-            background: rgba(194, 21, 28, 0.1);
+            background: rgba(102, 126, 234, 0.1);
             transform: translateY(-2px);
         }
         
@@ -406,7 +406,7 @@
             }
             
             .tab.active {
-                border-left-color: #c2151c;
+                border-left-color: #667eea;
             }
             
             .links a {
@@ -419,22 +419,70 @@
 <body>
     <div class="container">
         <header>
-            <h1>📊 NLP Text Analysis API</h1>
-            <p class="subtitle">Professional Natural Language Processing • Sentiment Analysis • Topic Extraction</p>
+            <h1>🤖 AI-Powered Q&A System</h1>
+            <p class="subtitle">Retrieval-Augmented Generation • Semantic Search • Advanced NLP Analysis</p>
         </header>
         
         <div class="content">
             <div class="tabs">
-                <button class="tab active" data-tab="sentiment">Sentiment Analysis</button>
-                <button class="tab" data-tab="words">Word Frequency</button>
-                <button class="tab" data-tab="topics">Topic Extraction</button>
-                <button class="tab" data-tab="rag">Ask Questions (RAG)</button>
-                <button class="tab" data-tab="stats">Demo Dataset</button>
+                <button class="tab active" data-tab="rag">🧠 AI Q&A (RAG)</button>
+                <button class="tab" data-tab="sentiment">😊 Sentiment Analysis</button>
+                <button class="tab" data-tab="words">📝 Word Frequency</button>
+                <button class="tab" data-tab="topics">🏷️ Topic Extraction</button>
+                <button class="tab" data-tab="stats">📊 Demo Dataset</button>
+            </div>
+            
+            <!-- RAG (Ask Questions) Tab - NOW FIRST! -->
+            <div class="tab-content active" id="rag">
+                <h2>🧠 AI-Powered Question Answering</h2>
+                <p style="margin: 15px 0; color: #666; font-size: 16px; line-height: 1.6;">
+                    Ask questions about the indexed documents and get intelligent answers powered by <strong>Google Gemini 2.5 Flash</strong> and <strong>ChromaDB vector search</strong>. 
+                    The system uses semantic search to find relevant context, then generates comprehensive answers with confidence scoring and entity analytics.
+                </p>
+                <p style="margin: 10px 0 20px 0; color: #555; font-size: 14px; line-height: 1.6;">
+                    <strong>💡 Try asking:</strong>
+                    "What economic policies are discussed?" • "What topics appear most frequently?" • "What is the sentiment toward immigration?" • "What locations are mentioned?"
+                </p>
+                <textarea id="ragQuestion" placeholder="Ask a question about the documents... (e.g., 'What are the main economic policies discussed?')" style="min-height: 120px; font-size: 16px;"></textarea>
+                <button class="analyze" onclick="askRAG()">🚀 Ask AI</button>
+                
+                <div class="loading" id="ragLoading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 15px; color: #666;">🔍 Searching knowledge base and generating answer...</p>
+                </div>
+                
+                <div class="error" id="ragError"></div>
+                
+                <div class="results" id="ragResults">
+                    <div class="result-card">
+                        <div class="result-title">✨ AI-Generated Answer</div>
+                        <div id="ragAnswer" style="padding: 20px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 8px; line-height: 1.8; font-size: 16px; color: #333;"></div>
+                        <div id="ragConfidence" style="margin-top: 15px; font-size: 14px;"></div>
+                        <div id="ragConfidenceExplanation" style="margin-top: 10px; padding: 15px; background: #f0f4ff; border-radius: 8px; font-size: 14px; color: #555;"></div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <div class="result-title">📚 Supporting Context</div>
+                        <div id="ragContext"></div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <div class="result-title">📄 Source Documents</div>
+                        <div id="ragSources"></div>
+                    </div>
+                    
+                    <!-- Entity Analytics Card - Commented out for performance
+                    <div class="result-card" id="ragEntitiesCard" style="display: none;">
+                        <div class="result-title">🏷️ Entity Analytics</div>
+                        <div id="ragEntities"></div>
+                    </div>
+                    -->
+                </div>
             </div>
             
             <!-- Sentiment Analysis Tab -->
-            <div class="tab-content active" id="sentiment">
-                <h2>Sentiment Analysis</h2>
+            <div class="tab-content" id="sentiment">
+                <h2>😊 Sentiment Analysis</h2>
                 <p style="margin: 15px 0; color: #666;">Analyze the emotional tone of any text using FinBERT, a state-of-the-art transformer model. Works with social media posts, product reviews, news articles, and more.</p>
                 <textarea id="sentimentText" placeholder="Enter any text to analyze... (e.g., 'This product exceeded my expectations! The quality is amazing and delivery was fast.')"></textarea>
                 <button class="analyze" onclick="analyzeSentiment()">Analyze Sentiment</button>
@@ -461,7 +509,7 @@
             
             <!-- Word Frequency Tab -->
             <div class="tab-content" id="words">
-                <h2>Word Frequency Analysis</h2>
+                <h2>📝 Word Frequency Analysis</h2>
                 <p style="margin: 15px 0; color: #666;">Identify the most common words in your text, with stopwords automatically removed.</p>
                 <textarea id="wordsText" placeholder="Enter text to analyze..."></textarea>
                 <button class="analyze" onclick="analyzeWords()">Analyze Words</button>
@@ -488,7 +536,7 @@
             
             <!-- Topic Extraction Tab -->
             <div class="tab-content" id="topics">
-                <h2>Topic Extraction</h2>
+                <h2>🏷️ Topic Extraction</h2>
                 <p style="margin: 15px 0; color: #666;">Discover key themes and topics based on word frequency and relevance.</p>
                 <textarea id="topicsText" placeholder="Enter text to analyze..."></textarea>
                 <button class="analyze" onclick="analyzeTopics()">Extract Topics</button>
@@ -508,48 +556,12 @@
                 </div>
             </div>
             
-            <!-- RAG (Ask Questions) Tab -->
-            <div class="tab-content" id="rag">
-                <h2>Ask Questions (RAG)</h2>
-                <p style="margin: 15px 0; color: #666;">
-                    Ask questions about the indexed documents using Retrieval-Augmented Generation. 
-                    The system finds relevant context and provides answers based on the content.
-                </p>
-                <textarea id="ragQuestion" placeholder="Ask a question about the documents... (e.g., 'What economic policies are discussed?')"></textarea>
-                <button class="analyze" onclick="askRAG()">Ask Question</button>
-                
-                <div class="loading" id="ragLoading">
-                    <div class="spinner"></div>
-                    <p style="margin-top: 15px; color: #666;">Searching and generating answer...</p>
-                </div>
-                
-                <div class="error" id="ragError"></div>
-                
-                <div class="results" id="ragResults">
-                    <div class="result-card">
-                        <div class="result-title">Answer</div>
-                        <div id="ragAnswer" style="padding: 15px; background: #f8f9fa; border-radius: 8px; line-height: 1.6;"></div>
-                        <div id="ragConfidence" style="margin-top: 10px;"></div>
-                    </div>
-                    
-                    <div class="result-card">
-                        <div class="result-title">Supporting Context</div>
-                        <div id="ragContext"></div>
-                    </div>
-                    
-                    <div class="result-card">
-                        <div class="result-title">Source Documents</div>
-                        <div id="ragSources"></div>
-                    </div>
-                </div>
-            </div>
-            
             <!-- Stats Tab -->
             <div class="tab-content" id="stats">
-                <h2>Demo Dataset Statistics</h2>
+                <h2>📊 Demo Dataset Statistics</h2>
                 <p style="margin: 15px 0; color: #666;">
-                    This API includes a demo dataset of 35+ political rally speeches (2019-2020) to showcase its analytical capabilities.
-                    The API works with any text data - this dataset serves as a real-world example.
+                    This system includes a demo dataset of 35+ political rally speeches (2019-2020) indexed in the vector database.
+                    All AI features work with any text corpus - this dataset showcases real-world capabilities.
                 </p>
                 <button class="analyze" onclick="loadStats()">Load Demo Dataset Stats</button>
                 
@@ -843,37 +855,87 @@
             const answerEl = document.getElementById('ragAnswer');
             answerEl.textContent = data.answer;
             
-            // Display confidence
+            // Display confidence with enhanced styling
             const confidenceColors = {
                 high: '#28a745',
                 medium: '#ffc107',
                 low: '#dc3545'
             };
+            const confidenceIcons = {
+                high: '✅',
+                medium: '⚠️',
+                low: '❌'
+            };
             const confidenceEl = document.getElementById('ragConfidence');
             confidenceEl.innerHTML = `
-                <span style="color: ${confidenceColors[data.confidence]}; font-weight: bold;">
-                    ● Confidence: ${data.confidence.toUpperCase()}
+                <span style="color: ${confidenceColors[data.confidence]}; font-weight: bold; font-size: 16px;">
+                    ${confidenceIcons[data.confidence]} Confidence: ${data.confidence.toUpperCase()} (${(data.confidence_score * 100).toFixed(1)}%)
                 </span>
             `;
             
-            // Display context chunks
+            // Display confidence explanation
+            const explanationEl = document.getElementById('ragConfidenceExplanation');
+            if (data.confidence_explanation) {
+                explanationEl.innerHTML = `<strong>Why this confidence?</strong><br>${data.confidence_explanation}`;
+                explanationEl.style.display = 'block';
+            } else {
+                explanationEl.style.display = 'none';
+            }
+            
+            // Display context chunks with enhanced styling
             const contextEl = document.getElementById('ragContext');
             contextEl.innerHTML = data.context.map((ctx, i) => `
-                <div style="padding: 12px; background: #f8f9fa; border-left: 3px solid #667eea; margin-bottom: 10px; border-radius: 4px;">
-                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">
-                        <strong>Source:</strong> ${ctx.source} (Chunk ${ctx.chunk_index + 1})
+                <div style="padding: 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-left: 4px solid #667eea; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <div style="font-size: 0.85em; color: #666; margin-bottom: 8px;">
+                        <strong>📄 Source:</strong> ${ctx.source} <span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.9em;">Chunk ${ctx.chunk_index + 1}</span>
                     </div>
-                    <div style="line-height: 1.6;">${ctx.text}</div>
+                    <div style="line-height: 1.7; color: #333;">${ctx.text}</div>
+                    ${ctx.similarity_score ? `<div style="margin-top: 8px; font-size: 0.85em; color: #667eea;"><strong>Similarity:</strong> ${(ctx.similarity_score * 100).toFixed(1)}%</div>` : ''}
                 </div>
             `).join('');
             
-            // Display sources
+            // Display sources with enhanced styling
             const sourcesEl = document.getElementById('ragSources');
             sourcesEl.innerHTML = data.sources.map(source => `
-                <span style="display: inline-block; padding: 6px 12px; background: #667eea; color: white; border-radius: 20px; margin: 4px; font-size: 0.9em;">
-                    ${source}
+                <span style="display: inline-block; padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 20px; margin: 6px; font-size: 0.95em; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);">
+                    📄 ${source}
                 </span>
             `).join('');
+            
+            /* Entity Analytics Display - Commented out for performance reasons
+               (Sentiment analysis on entities takes too long for good UX)
+            
+            const entitiesCard = document.getElementById('ragEntitiesCard');
+            const entitiesEl = document.getElementById('ragEntities');
+            if (data.entity_statistics && Object.keys(data.entity_statistics).length > 0) {
+                let entityHTML = '';
+                for (const [entity, stats] of Object.entries(data.entity_statistics)) {
+                    let sentiment = 'neutral';
+                    if (stats.sentiment) {
+                        if (typeof stats.sentiment === 'object' && stats.sentiment.classification) {
+                            sentiment = stats.sentiment.classification.toLowerCase();
+                        } else if (typeof stats.sentiment === 'string') {
+                            sentiment = stats.sentiment.toLowerCase();
+                        }
+                    }
+                    const sentimentColor = sentiment === 'positive' ? '#28a745' : sentiment === 'negative' ? '#dc3545' : '#17a2b8';
+                    entityHTML += `
+                        <div style="padding: 12px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px;">
+                            <strong style="font-size: 1.1em; color: #333;">${entity}</strong>
+                            <div style="margin-top: 8px; display: flex; gap: 15px; flex-wrap: wrap;">
+                                <span style="color: #666;"><strong>Mentions:</strong> ${stats.mentions || 0}</span>
+                                <span style="color: ${sentimentColor}; font-weight: bold;"><strong>Sentiment:</strong> ${sentiment.toUpperCase()}</span>
+                                ${stats.associated_terms && stats.associated_terms.length > 0 ? `<span style="color: #666;"><strong>Associated with:</strong> ${stats.associated_terms.join(', ')}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+                entitiesEl.innerHTML = entityHTML;
+                entitiesCard.style.display = 'block';
+            } else {
+                entitiesCard.style.display = 'none';
+            }
+            */
             
             showResults('ragResults');
         }

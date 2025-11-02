@@ -102,19 +102,24 @@ graph LR
 
 ### 3. **RAG Service** (`src/rag_service.py`)
 
-Retrieval-Augmented Generation for question answering.
+Advanced Retrieval-Augmented Generation for intelligent question answering.
 
 **Components:**
-- **Vector Store:** ChromaDB for persistent storage
-- **Embeddings:** sentence-transformers (all-MiniLM-L6-v2)
+- **Vector Store:** ChromaDB with persistent SQLite storage
+- **Embeddings:** sentence-transformers (all-mpnet-base-v2, 768 dimensions)
+- **Hybrid Search:** Semantic (dense) + BM25 (sparse) retrieval
+- **Reranking:** Cross-encoder for precision optimization
 - **Text Splitter:** LangChain RecursiveCharacterTextSplitter
-- **Chunking:** 500 chars with 50 char overlap
+- **Chunking:** 2048 chars with 150 char overlap (~512-768 tokens)
+- **LLM:** Google Gemini for answer generation
 
 **Capabilities:**
-- Document loading and indexing
-- Semantic search
-- Context retrieval
-- Answer generation (extraction-based)
+- Document loading and indexing with progress tracking
+- Hybrid semantic + keyword search
+- Multi-factor confidence scoring
+- Entity extraction and analytics
+- Sentiment analysis for entities
+- Context-aware answer generation with Gemini
 
 ### 4. **Text Preprocessing** (`src/preprocessing.py`)
 
@@ -181,11 +186,11 @@ graph TB
 ```python
 1. Load documents from directory
 2. Split into chunks (RecursiveCharacterTextSplitter)
-   - chunk_size: 500 characters
-   - chunk_overlap: 50 characters
+   - chunk_size: 2048 characters (~512-768 tokens)
+   - chunk_overlap: 150 characters (~100-150 tokens)
 3. Generate embeddings (sentence-transformers)
-   - Model: all-MiniLM-L6-v2
-   - Dimension: 384
+   - Model: all-mpnet-base-v2
+   - Dimension: 768
 4. Store in ChromaDB with metadata:
    - source: filename
    - chunk_index: position in document
@@ -195,18 +200,42 @@ graph TB
 **2. Querying:**
 ```python
 1. Receive question from user
-2. Generate question embedding (same model)
-3. Perform similarity search (cosine distance)
-4. Retrieve top-k most relevant chunks (default k=3)
-5. Extract context from retrieved chunks
-6. Generate answer (currently extraction-based)
-7. Return answer + context + confidence + sources
+2. Extract entities from question (capitalized words)
+3. Generate question embedding (same model)
+4. Hybrid search:
+   a. Semantic search: cosine similarity on embeddings
+   b. BM25 search: keyword matching
+   c. Combine results with configurable weights
+5. Cross-encoder reranking for precision
+6. Retrieve top-k most relevant chunks (default k=5, max k=15)
+7. Calculate multi-factor confidence score:
+   - Retrieval quality (40%): semantic similarity
+   - Score consistency (25%): low variance = higher confidence
+   - Coverage (20%): number of supporting chunks
+   - Entity coverage (15%): mention frequency in results
+8. Generate entity statistics (mentions, sentiment, associations)
+9. Build context-aware prompt with entity focus
+10. Generate answer using Gemini LLM
+11. Return answer with:
+    - Generated text
+    - Confidence score and explanation
+    - Supporting context chunks
+    - Source attribution
+    - Entity analytics (if applicable)
 ```
 
 **3. Confidence Scoring:**
-- **High:** avg_distance < 0.5
-- **Medium:** 0.5 ≤ avg_distance < 0.8
-- **Low:** avg_distance ≥ 0.8
+
+Multi-factor calculation combining:
+- **Retrieval Quality (40%):** Average semantic similarity (0-1)
+- **Consistency (25%):** Score variance (low variance = high confidence)
+- **Coverage (20%):** Number of supporting chunks (normalized)
+- **Entity Coverage (15%):** % of chunks mentioning query entities
+
+**Confidence Levels:**
+- **High:** combined_score ≥ 0.7
+- **Medium:** 0.4 ≤ combined_score < 0.7
+- **Low:** combined_score < 0.4
 
 ---
 
@@ -325,9 +354,9 @@ except Exception as e:
 ```mermaid
 graph TB
     subgraph "Stage 1: Builder"
-        Poetry[Poetry 2.2.1]
+        UV[uv Package Manager]
         Deps[Install Dependencies]
-        Poetry --> Deps
+        UV --> Deps
     end
     
     subgraph "Stage 2: Runtime"
@@ -416,18 +445,21 @@ graph TB
 |-------|-----------|---------|
 | **API Framework** | FastAPI 0.116+ | High-performance async API |
 | **Web Server** | Uvicorn | ASGI server |
+| **LLM Integration** | Google Gemini 2.5 Flash | Answer generation |
 | **ML Framework** | PyTorch 2.5+ | Deep learning backend |
 | **NLP Library** | Transformers 4.57+ | Pre-trained models |
 | **Text Processing** | NLTK 3.9+ | Tokenization, stopwords |
-| **Vector DB** | ChromaDB 0.5+ | Embeddings storage |
-| **Embeddings** | sentence-transformers 3.3+ | Semantic embeddings |
-| **RAG Framework** | LangChain 0.3+ | Text splitting, RAG utils |
+| **Vector DB** | ChromaDB 0.5+ | Persistent embeddings storage |
+| **Embeddings** | sentence-transformers 3.3+ | Semantic embeddings (MPNet) |
+| **Reranking** | Cross-encoder | Precision optimization |
+| **Keyword Search** | rank-bm25 | Sparse retrieval |
+| **RAG Framework** | LangChain 0.3+ | Text splitting utilities |
 
 ### Supporting Technologies
 
 | Category | Technology | Version |
 |----------|-----------|---------|
-| **Dependency Mgmt** | Poetry | 2.2.1 |
+| **Dependency Mgmt** | uv | Latest |
 | **Containerization** | Docker | Latest |
 | **CI/CD** | GitHub Actions | - |
 | **Testing** | pytest | 8.3+ |
@@ -438,8 +470,10 @@ graph TB
 
 | Model | Task | Source | Size |
 |-------|------|--------|------|
+| **Gemini 2.5 Flash** | Answer Generation | Google AI | API-based |
 | **FinBERT** | Sentiment Analysis | ProsusAI/finbert | ~440MB |
-| **all-MiniLM-L6-v2** | Embeddings | sentence-transformers | ~80MB |
+| **all-mpnet-base-v2** | Embeddings (768d) | sentence-transformers | ~420MB |
+| **ms-marco-MiniLM** | Reranking | cross-encoder | ~80MB |
 
 ---
 
@@ -575,31 +609,34 @@ request_duration = Histogram('api_request_duration_seconds', 'Request duration')
 
 ## Future Architecture Enhancements
 
-### 1. Advanced RAG
+### 1. Advanced RAG Features
 
-- **LLM Integration:** Add GPT-4/Claude for answer generation
-- **Multi-modal:** Support PDFs, images, audio
-- **Hybrid Search:** Combine semantic + keyword search
-- **Re-ranking:** Improve retrieval accuracy
+- **Query Caching:** Redis layer for common questions
+- **Multi-modal:** Support PDFs, images, audio transcripts
+- **Temporal Analysis:** Sentiment trends over time
+- **Entity Relationships:** Knowledge graph visualization
+- **Fine-tuned Embeddings:** Domain-specific embedding models
 
-### 2. Fine-tuned Models
+### 2. Performance Optimizations
 
-- Train DistilBERT on domain-specific data
-- Custom sentiment classifiers
-- Named entity recognition (NER)
-- Text summarization
+- **Async Processing:** Background tasks for entity analytics
+- **GPU Acceleration:** CUDA support for faster inference
+- **Model Quantization:** Reduce model sizes
+- **Response Streaming:** WebSocket support for real-time answers
 
-### 3. Real-time Processing
+### 3. Enhanced NLP
 
-- WebSocket support for streaming
-- Event-driven architecture (Kafka)
-- Real-time analytics dashboard
+- **Proper NER:** spaCy or Hugging Face transformers for entity extraction
+- **Text Summarization:** Automatic speech summarization
+- **Topic Modeling:** LDA or BERTopic for theme discovery
+- **Fact Extraction:** Structured information extraction
 
-### 4. Multi-language Support
+### 4. Deployment & Scale
 
-- Translation API integration
-- Multi-lingual embeddings
-- Language detection
+- **Kubernetes:** Container orchestration
+- **Auto-scaling:** Based on request volume
+- **Multi-region:** Global deployment
+- **CDN:** Static asset delivery
 
 ---
 

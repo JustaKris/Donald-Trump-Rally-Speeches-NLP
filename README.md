@@ -5,20 +5,25 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A professional, production-ready NLP API showcasing advanced natural language processing capabilities. This portfolio project demonstrates expertise in machine learning, REST API development, cloud deployment, and software engineering best practices. Features a complete analysis of political rally speeches as a real-world demonstration dataset.
+A production-ready NLP API showcasing natural language processing and retrieval-augmented generation capabilities. This portfolio project demonstrates expertise in LLM integration, vector databases, semantic search, REST API development, and modern AI engineering practices.
 
 ## 🎯 Project Highlights
 
+### 🤖 Core AI Features
+
+- **RAG (Retrieval-Augmented Generation)** — Ask questions about 300,000+ words of political speeches using semantic search + Google Gemini LLM
+- **Intelligent Q&A System** — ChromaDB vector database + MPNet embeddings (768d) + cross-encoder reranking for accurate context retrieval
+- **Multi-Factor Confidence Scoring** — Sophisticated confidence calculation considering semantic similarity, consistency, coverage, and entity mentions
+- **Entity Analytics** — Automatic entity detection with sentiment analysis and contextual associations
+- **Transformer-based Sentiment Analysis** — FinBERT model for accurate sentiment classification
+
+### 🛠️ Engineering Excellence
+
 - **Production-ready FastAPI application** with 12+ RESTful endpoints
-- **Transformer-based sentiment analysis** using FinBERT (BERT fine-tuned model)
-- **RAG (Retrieval-Augmented Generation)** with ChromaDB for semantic search & Q&A
-- **Semantic embeddings** using sentence-transformers for vector similarity
-- **Statistical NLP methods**: word frequency, n-grams, topic extraction
-- **Real-world demo dataset**: 35 political rally speeches (300,000+ words, 2019-2020)
-- **Interactive web interface** with real-time analysis visualization
-- **Docker containerization** for cloud deployment (Render, Azure, AWS)
+- **Hybrid search architecture** — Combining semantic embeddings with BM25 keyword search
+- **Docker containerization** ready for cloud deployment
 - **Comprehensive testing** with pytest (50%+ code coverage)
-- **CI/CD pipelines** with GitHub Actions (testing, linting, security scans)
+- **CI/CD pipelines** with GitHub Actions
 - **Clean, documented code** following industry best practices
 
 ## 🚀 Live Demo
@@ -33,126 +38,155 @@ A professional, production-ready NLP API showcasing advanced natural language pr
 
 ## 📊 What's Inside
 
-### `src/` — Production API Code
+### 🤖 RAG System — The Star Feature
 
-Professional FastAPI application for general-purpose text analysis:
+**Ask questions about 35 political speeches** using state-of-the-art retrieval and generation:
 
-- **`api.py`** — RESTful API with 12+ endpoints for NLP analysis
-- **`models.py`** — ML model loading and inference (FinBERT sentiment analysis)
-- **`rag_service.py`** — RAG implementation with ChromaDB and semantic search
-- **`preprocessing.py`** — Text cleaning, tokenization, n-gram extraction
-- **`utils.py`** — Data loading, statistics, and helper functions
+- **`rag_service.py`** — Complete RAG implementation with:
+  - ChromaDB vector database for persistent embeddings
+  - MPNet sentence-transformers (768-dimensional embeddings)
+  - Hybrid search (semantic + BM25 keyword matching)
+  - Cross-encoder reranking for precision
+  - Multi-factor confidence scoring
+  - Entity extraction and analytics
+  
+- **`llm_service.py`** — Google Gemini integration:
+  - Context-aware prompt engineering
+  - Entity-focused answer generation
+  - Fallback extraction for robustness
+  - Source attribution and citations
 
-**Core API Endpoints:**
-- `POST /analyze/sentiment` — Sentiment analysis (positive/negative/neutral)
-- `POST /analyze/words` — Word frequency distribution
-- `POST /analyze/topics` — Topic/theme extraction
-- `POST /analyze/ngrams` — N-gram analysis (bigrams, trigrams, etc.)
-- `POST /text/clean` — Text normalization and cleaning
-- `POST /rag/ask` — **NEW!** Ask questions about indexed documents (RAG)
-- `POST /rag/search` — **NEW!** Semantic search over documents
-- `GET /rag/stats` — **NEW!** Vector database statistics
-- `POST /rag/index` — **NEW!** Index/re-index documents
-- `GET /speeches/stats` — Demo dataset statistics
-- `GET /speeches/list` — List demo dataset contents
+**RAG API Endpoints:**
+- `POST /rag/ask` — Ask natural language questions with AI-generated answers
+- `POST /rag/search` — Semantic search over indexed documents
+- `GET /rag/stats` — Vector database statistics and health check
+- `POST /rag/index` — Index/re-index documents
 
-### `static/` — Interactive Web Frontend
+### 📝 Traditional NLP Endpoints
 
-Beautiful, responsive single-page application for testing the API without coding. Features tabbed interface, real-time analysis, and visualizations.
+- **`api.py`** — FastAPI application with RESTful design
+- **`models.py`** — FinBERT sentiment analysis
+- **`preprocessing.py`** — Text cleaning and tokenization
+- **`utils.py`** — Data loading and statistics
 
-### `data/Donald Trump Rally Speeches/` — Demo Dataset
+**Additional Endpoints:**
+- `POST /analyze/sentiment` — Sentiment analysis
+- `POST /analyze/words` — Word frequency
+- `POST /analyze/topics` — Topic extraction
+- `POST /analyze/ngrams` — N-gram analysis
 
-35 political rally speech transcripts (2019-2020) serving as a real-world demonstration of NLP analysis capabilities. Total corpus: 300,000+ words across diverse locations and time periods.
+### 📊 Demo Dataset
 
-### `notebooks/` — Deep-Dive Analysis Notebooks
+35 political rally speech transcripts (2019-2020) totaling 300,000+ words — indexed in ChromaDB for RAG queries. The dataset demonstrates the system's ability to handle real-world political text with nuanced language.
 
-Three comprehensive Jupyter notebooks demonstrating advanced NLP techniques applied to the demo dataset:
+### 🎨 Interactive Web Interface
 
-#### 1. **Word Frequency & Topics Analysis.ipynb**
+Single-page application at the root (`/`) for testing all API features including the RAG Q&A system.
 
-- Interactive word clouds and frequency visualizations
-- N-gram analysis (unigrams, bigrams, trigrams)
-- Temporal patterns (2019 vs 2020 comparison)
-- Topic identification and tracking
+### 📓 Analysis Notebooks
 
-**Technologies:** pandas, NLTK, WordCloud, Plotly, tqdm
-
-#### 2. **Sentiment Analysis.ipynb**
-
-- FinBERT transformer model for sentiment classification
-- Chunked processing for long documents
-- Time-series sentiment analysis
-- Interactive dashboards and heatmaps
-
-**Technologies:** TensorFlow, Transformers (Hugging Face), Plotly
+Jupyter notebooks showcasing statistical NLP and exploratory data analysis techniques on the speech corpus.
 
 ## 🚀 Key Skills Demonstrated
 
-### Software Engineering
+### AI/ML Engineering
 
-- **API Development**: RESTful design with FastAPI, Pydantic validation
-- **Containerization**: Docker multi-stage builds for production deployment
-- **CI/CD**: Automated testing, linting, security scans via GitHub Actions
-- **Code Quality**: Black formatting, flake8 linting, type hints with mypy
-- **Testing**: Unit and integration tests with pytest
-- **Documentation**: Comprehensive API docs, README, deployment guides
+- **RAG Systems**: End-to-end retrieval-augmented generation with ChromaDB vector database
+- **LLM Integration**: Google Gemini API integration with context-aware prompting
+- **Semantic Search**: Hybrid search combining dense embeddings (MPNet) and sparse retrieval (BM25)
+- **Model Selection**: Cross-encoder reranking for precision optimization
+- **Confidence Scoring**: Multi-factor confidence calculation for answer quality assessment
+- **Transformer Models**: FinBERT sentiment analysis, sentence-transformers for embeddings
+- **Entity Analytics**: NER-based entity extraction with sentiment and co-occurrence analysis
 
-### Data Science & NLP
+### Backend Engineering
 
-- **Text preprocessing**: Tokenization, stopword removal, normalization
-- **Statistical NLP**: Word frequency, n-grams, topic extraction
-- **Deep Learning**: Transformer models (BERT) for sentiment analysis
-- **RAG (Retrieval-Augmented Generation)**: Semantic search and question answering
-- **Vector databases**: ChromaDB for persistent embeddings storage
-- **Semantic embeddings**: sentence-transformers for text similarity
-- **Data visualization**: Interactive Plotly dashboards
-- **Exploratory analysis**: Temporal patterns, distributions, aggregations
-- **Language modeling**: Fine-tuning BERT-based models on domain-specific data
-- **Model evaluation**: Perplexity, accuracy metrics, comparative analysis
+- **API Development**: Production-grade FastAPI with 12+ RESTful endpoints
+- **Vector Databases**: ChromaDB with persistent storage and efficient querying
+- **Error Handling**: Graceful fallbacks and comprehensive logging
+- **Performance**: Efficient chunking, caching strategies, optimized retrieval
+- **Type Safety**: Full Pydantic models and Python type hints
 
-### Visualization & Communication
+### DevOps & Quality
 
-- **Interactive dashboards**: Plotly-based multi-panel visualizations
-- **Time series analysis**: Trend lines, moving averages, year-over-year comparisons
-- **Clear documentation**: Markdown cells, docstrings, and inline comments
-- **Storytelling with data**: Extracting actionable insights from raw text
+- **Containerization**: Docker with multi-stage builds
+- **CI/CD**: GitHub Actions with automated testing and code quality checks
+- **Testing**: pytest with 50%+ coverage, unit and integration tests
+- **Code Quality**: Black, flake8, isort, mypy for consistent, maintainable code
+- **Documentation**: API docs via Swagger/ReDoc, comprehensive README
 
-### Software Engineering
+## � Example RAG Queries
 
-- **Production-ready code**: Modular functions, type hints, error handling
-- **Environment management**: Poetry for dependency management
-- **Best practices**: Progress bars, logging, reproducible workflows
-- **Clean code principles**: DRY, separation of concerns, readability
+Try asking the system natural language questions like:
 
-## 📈 Sample Insights from the Analysis
+- *"What economic policies were discussed in the speeches?"*
+- *"How many times was Biden mentioned and in what context?"*
+- *"What did the speaker say about immigration?"*
+- *"Compare the themes between 2019 and 2020 speeches"*
 
-- **Sentiment patterns**: Identified temporal shifts in speech sentiment between 2019 and 2020
-- **Vocabulary evolution**: Tracked how language usage changed over the campaign period
-- **Topic prevalence**: Quantified mentions of key themes (economy, immigration, media)
-- **Speech characteristics**: Average speech length of 8,500+ words with consistent patterns
+The system retrieves relevant context, analyzes entities, calculates confidence scores, and generates coherent answers with source attribution.
 
 ## 🚀 Quick Start
 
-### Option 1: Run the API (Recommended for Demo)
+### Prerequisites
+
+- Python 3.11+
+- uv ([install guide](https://docs.astral.sh/uv/getting-started/installation/))
+- Google Gemini API key ([get one free](https://ai.google.dev/))
+
+### Setup
 
 1. **Install dependencies**
 
    ```powershell
-   poetry install
+   uv sync
    ```
 
-2. **Start the FastAPI server**
+2. **Configure environment variables**
+
+   Create a `.env` file in the project root:
+   ```bash
+   GEMINI_API_KEY=your_api_key_here
+   ```
+
+3. **Start the FastAPI server**
 
    ```powershell
-   poetry run uvicorn src.api:app --reload
+   uv run uvicorn src.api:app --reload
    ```
 
-3. **Access the application**
+4. **Access the application**
    - **Web Interface:** <http://localhost:8000>
    - **API Docs:** <http://localhost:8000/docs>
    - **ReDoc:** <http://localhost:8000/redoc>
 
-### Option 2: Run with Docker
+### Try the RAG System
+
+**Web Interface:** Navigate to the RAG tab and ask a question
+
+**API Example:**
+```powershell
+curl -X POST http://localhost:8000/rag/ask `
+  -H "Content-Type: application/json" `
+  -d '{"question": "What was said about the economy?", "top_k": 5}'
+```
+
+**Python Example:**
+```python
+import requests
+
+response = requests.post(
+    "http://localhost:8000/rag/ask",
+    json={"question": "What economic policies were discussed?", "top_k": 5}
+)
+print(response.json()["answer"])
+```
+
+### Alternative: Docker
+
+**Note:** Add your Gemini API key to the Dockerfile or pass it as an environment variable.
+
+### Run with Docker
 
 1. **Build the Docker image**
 
@@ -172,41 +206,15 @@ Three comprehensive Jupyter notebooks demonstrating advanced NLP techniques appl
    docker-compose up -d
    ```
 
-### Option 3: Explore Jupyter Notebooks
+### Explore Analysis Notebooks (Optional)
 
-1. **Install dependencies**
-
-   ```powershell
-   poetry install
-   ```
-
-2. **Activate the environment**
-
-   ```powershell
-   poetry shell
-   ```
-
-3. **Launch Jupyter Lab**
-
-   ```powershell
-   poetry run jupyter lab
-   ```
-
-4. **Run notebooks in order**
-   - Start with `1. Word Frequency & Topics Analysis.ipynb`
-   - Then `2. Sentiment Analysis.ipynb`
-   - Finally `3. Masked Language Modeling.ipynb` (optional)
-
-### First-Time Setup
-
-Some notebooks require NLTK data. Run once in a notebook cell:
-
-```python
-import nltk
-nltk.download('punkt')
-nltk.download('punkt_tab')
-nltk.download('stopwords')
+```powershell
+# Install notebook dependencies (includes matplotlib, seaborn, plotly, etc.)
+uv sync --group notebooks
+uv run jupyter lab
 ```
+
+Navigate to `notebooks/` to explore statistical NLP analysis and visualizations.
 
 ## 🧪 Testing & Code Quality
 
@@ -216,38 +224,38 @@ This project includes comprehensive testing and code quality tools to demonstrat
 
 ```powershell
 # Install dev dependencies
-poetry install --with dev
+uv sync --group dev
 
 # Run all tests with coverage
-poetry run pytest
+uv run pytest
 
 # Run only unit tests
-poetry run pytest -m unit
+uv run pytest -m unit
 
 # Run only integration tests
-poetry run pytest -m integration
+uv run pytest -m integration
 
 # Generate HTML coverage report
-poetry run pytest --cov=src --cov-report=html
+uv run pytest --cov=src --cov-report=html
 ```
 
 ### Code Quality Checks
 
 ```powershell
 # Format code
-poetry run black src/
+uv run black src/
 
 # Lint code
-poetry run flake8 src/
+uv run flake8 src/
 
 # Sort imports
-poetry run isort src/
+uv run isort src/
 
 # Type checking
-poetry run mypy src/
+uv run mypy src/
 
 # Run all checks
-poetry run black src/ && poetry run isort src/ && poetry run flake8 src/ && poetry run pytest
+uv run black src/ && uv run isort src/ && uv run flake8 src/ && uv run pytest
 ```
 
 ### CI/CD Pipeline
@@ -263,210 +271,53 @@ See [`.github/workflows/ci.yml`](.github/workflows/ci.yml) for the full pipeline
 For detailed testing documentation, see [`docs/TESTING.md`](docs/TESTING.md).
 
 ## 📦 Dependencies
-```
 
 ## 📦 Core Dependencies
 
-**API & Web Framework:**
+**RAG & LLM:**
+- `chromadb` — Vector database for embeddings
+- `google-generativeai` — Gemini LLM integration
+- `sentence-transformers` — MPNet embeddings (768d)
+- `rank-bm25` — Keyword search for hybrid retrieval
+- `langchain` — Text splitting utilities
 
-```toml
-fastapi = "^0.115.0"          # Modern async API framework
-uvicorn[standard] = "^0.32.0" # ASGI server with auto-reload
-python-multipart = "^0.0.12"  # Form data parsing
-```
+**NLP & ML:**
+- `transformers` + `tensorflow` — FinBERT sentiment analysis
+- `nltk` — Text preprocessing
+- `scikit-learn` — ML utilities
 
-**NLP & Machine Learning:**
+**API & Infrastructure:**
+- `fastapi` — REST API framework
+- `uvicorn` — ASGI server
+- `pydantic` — Data validation
 
-```toml
-transformers = "^4.57.1"      # HuggingFace transformers (BERT, DistilBERT)
-tensorflow = "^2.20.0"        # Deep learning framework
-torch = "^2.9.0"              # PyTorch (transformers backend)
-nltk = "^3.9.2"               # Natural Language Toolkit
-scikit-learn = "^1.7.2"       # ML utilities
-```
-
-**Data & Visualization:**
-
-```toml
-pandas = "^2.3.3"             # Data manipulation
-numpy = "^2.3.4"              # Numerical computing
-plotly = "^6.3.1"             # Interactive visualizations
-matplotlib = "^3.10.7"        # Static plots
-seaborn = "^0.13.2"           # Statistical visualizations
-wordcloud = "^1.9.4"          # Word cloud generation
-```
-
-**Development:**
-
-```toml
-jupyterlab = "^4.4.10"        # Interactive notebooks
-ipykernel = "^7.0.1"          # Jupyter kernel
-tqdm = "^4.67.1"              # Progress bars
-```
-
-**Note**: TensorFlow installs CPU-only by default. For GPU support, follow [PyTorch's official guide](https://pytorch.org/get-started/locally/) to install the appropriate CUDA-enabled version.
+See `pyproject.toml` for complete dependency list.
 
 ## 💡 Project Structure
 
 ```
 Donald-Trump-Rally-Speeches-NLP/
 │
-├── src/                                # Production API code
-│   ├── __init__.py
-│   ├── api.py                         # FastAPI application
-│   ├── models.py                      # ML model loading & inference
-│   ├── preprocessing.py               # Text preprocessing utilities
-│   └── utils.py                       # Data loading & statistics
-│
-├── static/
-│   └── index.html                     # Interactive web frontend
+├── src/                          # Production API code
+│   ├── api.py                   # FastAPI with RAG & NLP endpoints
+│   ├── rag_service.py           # ⭐ RAG implementation (ChromaDB + hybrid search)
+│   ├── llm_service.py           # ⭐ Gemini LLM integration
+│   ├── models.py                # FinBERT sentiment analysis
+│   ├── preprocessing.py         # Text preprocessing
+│   └── utils.py                 # Data loading utilities
 │
 ├── data/
-│   └── Donald Trump Rally Speeches/   # 35 .txt files (one per speech)
+│   ├── Donald Trump Rally Speeches/  # 35 speech transcripts
+│   └── chromadb/                     # Vector database persistence
 │
-├── notebooks/
-│   ├── 1. Word Frequency & Topics Analysis.ipynb
-│   ├── 2. Sentiment Analysis.ipynb
-│   └── 3. Masked Language Modeling.ipynb
+├── static/
+│   └── index.html               # Web interface
 │
-├── docs/
-│   ├── COMMANDS.md
-│   ├── DEPLOYMENT.md                  # Deployment guide
-│   └── TESTING.md                     # Testing & code quality guide
-│
-├── tests/                             # Test suite
-│   ├── __init__.py
-│   ├── test_preprocessing.py          # Unit tests for preprocessing
-│   ├── test_utils.py                  # Unit tests for utilities
-│   └── test_api.py                    # Integration tests for API
-│
-├── .github/
-│   └── workflows/
-│       └── ci.yml                     # GitHub Actions CI/CD pipeline
-│
-├── .azure/
-│   └── deployment-guide.txt           # Azure deployment instructions
-│
-├── pytest.ini                         # Pytest configuration
-├── .flake8                            # Flake8 linting rules
-├── Dockerfile                         # Docker container definition
-├── docker-compose.yml                 # Docker Compose configuration
-├── render.yaml                        # Render deployment config
-├── pyproject.toml                     # Poetry dependencies + tool configs
-├── poetry.lock                        # Locked dependency versions
-└── README.md                          # This file
+├── notebooks/                   # Exploratory analysis
+├── tests/                       # pytest test suite
+├── docs/                        # Documentation
+└── pyproject.toml               # Dependencies
 ```
-
-## 🎓 Learning Outcomes & Portfolio Value
-
-This project demonstrates capabilities that are directly applicable to industry roles:
-
-### For Data Science Roles
-
-- End-to-end analysis from raw text to insights
-- Statistical rigor and proper evaluation methods
-- Clear communication of findings
-- Production deployment experience
-
-### For ML Engineering Roles
-
-- Working with state-of-the-art transformer models
-- Efficient data processing pipelines
-- Model fine-tuning and deployment considerations
-- RESTful API design and implementation
-- Docker containerization and cloud deployment
-
-### For Analytics Roles
-
-- Interactive visualization best practices
-- Temporal trend analysis
-- Stakeholder-ready reporting
-- Web-based dashboards
-
-### Full-Stack ML Skills
-
-- **Backend:** FastAPI, Python, async programming
-- **ML/NLP:** BERT models, sentiment analysis, text preprocessing
-- **DevOps:** Docker, container orchestration, cloud deployment, CI/CD pipelines
-- **Frontend:** HTML/CSS/JavaScript, responsive design
-- **Data Engineering:** ETL pipelines, data validation
-- **Testing:** pytest, unit/integration testing, code coverage
-- **Code Quality:** Linting (flake8), formatting (black), type checking (mypy)
-
-## 🚢 Deployment
-
-This project is ready to deploy to multiple cloud platforms!
-
-### Deployment Options
-
-- **[Render](https://render.com)** — Free tier available, automatic deployments from Git
-- **[Azure App Service](https://azure.microsoft.com/en-us/services/app-service/)** — Enterprise-grade, excellent for portfolio
-- **[Railway](https://railway.app)** — Simple deployment with free credits
-- **[Fly.io](https://fly.io)** — Global edge deployment
-
-### Quick Deploy to Render
-
-1. Push your code to GitHub
-2. Connect repository to Render
-3. Deploy with one click using `render.yaml`
-
-### Deploy with Docker
-
-```powershell
-# Build image
-docker build -t trump-speeches-nlp-api .
-
-# Run locally
-docker run -p 8000:8000 trump-speeches-nlp-api
-
-# Deploy to any cloud platform that supports Docker
-```
-
-📖 **Full deployment instructions:** See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
-
-## 🔧 Troubleshooting
-
-### Common Issues
-
-#### SSL Certificate Errors (Hugging Face downloads)
-
-```python
-import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
-```
-
-#### Out of Memory (TensorFlow/Sentiment Analysis)
-
-- Reduce batch size in sentiment analysis
-- Use smaller models (e.g., `distilbert-base-uncased`)
-- Close other memory-intensive applications
-
-#### Slow Performance
-
-- MLM training: Use GPU if available, or reduce epochs
-- Sentiment analysis: Already optimized with chunking and progress bars
-
-## 📝 Next Steps & Enhancements
-
-**Current features:**
-
-- ✅ FastAPI REST API with sentiment analysis
-- ✅ Interactive web frontend
-- ✅ Docker containerization
-- ✅ Deployment configurations for Render and Azure
-- ✅ Comprehensive documentation
-
-**Potential additions to strengthen the portfolio:**
-
-1. **Cloud deployment:** Deploy to Render or Azure and add live demo link
-2. **CI/CD pipeline:** GitHub Actions for automated testing and deployment
-3. **Testing suite:** Pytest for API endpoints and data processing
-4. **Enhanced frontend:** Add charts and visualizations using Plotly.js
-5. **Authentication:** Add API keys or OAuth for production use
-6. **Caching:** Redis for model predictions and frequently accessed data
-7. **Rate limiting:** Protect API from abuse
-8. **Monitoring:** Application performance monitoring (APM)
-9. **Database integration:** PostgreSQL for storing analysis results
 
 ## 📄 License & Attribution
 
@@ -477,7 +328,7 @@ This repository is for educational and portfolio purposes. The speech transcript
 - [Hugging Face Transformers](https://huggingface.co/docs/transformers/)
 - [FinBERT](https://huggingface.co/ProsusAI/finbert) for sentiment analysis
 - [Plotly](https://plotly.com/python/) for interactive visualizations
-- [Poetry](https://python-poetry.org/) for dependency management
+- [uv](https://docs.astral.sh/uv/) for dependency management
 
 ---
 

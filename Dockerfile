@@ -1,86 +1,82 @@
-# NLP Text Analysis API - Dockerfile
-# Multi-stage build for optimal image size
-# Production-ready container for general-purpose NLP text analysis
-
+# === Stage 1: Builder ===
 FROM python:3.12-slim AS builder
 
-# Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+WORKDIR /app
+
+# --- System deps needed for building wheels ---
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Poetry 2.2.1 (matches local development version)
-RUN pip install poetry==2.2.1
+# --- Install uv (fast Python package installer) ---
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Set working directory
-WORKDIR /app
+# --- Copy dependency metadata ---
+COPY pyproject.toml uv.lock* ./
 
-# Copy dependency files
-COPY pyproject.toml poetry.lock* ./
+# --- Install PyTorch CPU-only FIRST to set constraints ---
+# This ensures other packages (like sentence-transformers) don't pull CUDA versions
+RUN pip install --no-cache-dir \
+    torch==2.4.0+cpu \
+    --index-url https://download.pytorch.org/whl/cpu
 
-# Configure poetry to not create virtual env (we're in a container)
-RUN poetry config virtualenvs.create false
+# --- Export requirements WITHOUT optional groups ---
+# Excludes: dev, notebooks, torch-gpu, torch-cpu (torch already installed above)
+RUN /root/.local/bin/uv export --no-group dev --no-group notebooks --no-group torch-gpu --no-hashes > requirements.txt
 
-# Install dependencies (Poetry 2.x uses --without instead of --only)
-# Remove pip cache and unnecessary files to reduce size
-RUN poetry install --no-interaction --no-ansi --without dev && \
-    find /usr/local -type d -name '__pycache__' -exec rm -rf {} + && \
-    find /usr/local -type d -name 'tests' -exec rm -rf {} + && \
-    find /usr/local -type d -name '*.dist-info' -exec rm -rf {}/direct_url.json \; 2>/dev/null || true
+# --- Remove torch from requirements since we installed it manually ---
+RUN sed -i '/^torch==/d' requirements.txt
 
-# Final stage
+# --- Install remaining dependencies ---
+RUN pip install --no-cache-dir -r requirements.txt
+
+# --- Cleanup build artifacts (as root before switching user) ---
+RUN find /usr/local/lib/python3.12/site-packages -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true && \
+    find /usr/local/lib/python3.12/site-packages -type f -name "*.py[co]" -delete 2>/dev/null || true && \
+    find /usr/local/lib/python3.12/site-packages -type d -name "tests" -exec rm -rf {} + 2>/dev/null || true && \
+    rm -rf /root/.cache /tmp/*
+
+# === Stage 2: Runtime ===
 FROM python:3.12-slim
 
-# Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PORT=8000
 
-# Install only essential runtime dependencies
+WORKDIR /app
+
+# --- Minimal runtime deps ---
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
-RUN useradd -m -u 1000 appuser
-
-# Set working directory
-WORKDIR /app
-
-# Copy Python packages from builder
+# --- Copy dependencies from builder (includes CPU-only torch) ---
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
-# Copy application code
-COPY --chown=appuser:appuser src/ ./src/
-COPY --chown=appuser:appuser static/ ./static/
-COPY --chown=appuser:appuser data/ ./data/
+# --- Copy app code ---
+COPY src/ ./src/
+COPY static/ ./static/
+COPY data/ ./data/
 
-# Clean up unnecessary files to reduce final image size
-RUN find /usr/local -type d -name '__pycache__' -exec rm -rf {} + && \
-    find /usr/local -type f -name '*.pyc' -delete && \
-    find /usr/local -type f -name '*.pyo' -delete && \
-    find /usr/local -type d -name 'tests' -exec rm -rf {} + 2>/dev/null || true
-
-# Switch to non-root user
+# --- Non-root user ---
+RUN useradd -m -u 1000 appuser && chown -R appuser /app
 USER appuser
 
-# Download NLTK data as the appuser (will be stored in /home/appuser/nltk_data)
-RUN python -c "import nltk; nltk.download('punkt', quiet=True); nltk.download('stopwords', quiet=True); nltk.download('punkt_tab', quiet=True)"
+# --- Minimal NLTK data ---
+RUN python -m nltk.downloader punkt stopwords
 
-# Expose port
+# --- Cleanup (skip errors for permission-denied files) ---
+RUN rm -rf ~/.cache /tmp/* 2>/dev/null || true && \
+    find /usr/local/lib/python3.12/site-packages -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true && \
+    find /usr/local/lib/python3.12/site-packages -type f -name "*.py[co]" -delete 2>/dev/null || true
+
 EXPOSE ${PORT}
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:${PORT}/health')"
-
-# Run the application
 CMD ["uvicorn", "src.api:app", "--host", "0.0.0.0", "--port", "8000"]

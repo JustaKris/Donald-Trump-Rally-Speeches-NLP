@@ -1,0 +1,21 @@
+# Render deployment configuration - Docker-based deployment
+# NLP Text Analysis API - Production-ready NLP service
+# https://render.com/docs/yaml-spec
+
+services:
+  - type: web
+    name: nlp-text-analysis-api
+    runtime: image
+    plan: free
+    image:
+      url: docker.io/justakris/nlp-text-analysis-api:latest
+    
+    envVars:
+      - key: PORT
+        value: 8000
+    
+    healthCheckPath: /health
+    autoDeploy: true  # Auto-deploy when new image is pushed to Docker Hub
+    
+    # Resource configuration for free tier
+    # Free tier: 512 MB RAM, 0.1 CPU

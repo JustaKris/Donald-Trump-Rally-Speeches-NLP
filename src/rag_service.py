@@ -405,7 +405,7 @@ class RAGService:
         """
         # Detect entities in question for entity-aware retrieval
         entities = self._extract_entities(question)
-        
+
         # Retrieve relevant context
         search_results = self.search(question, top_k=top_k)
 
@@ -467,10 +467,11 @@ class RAGService:
                     "context": context_items,
                     "confidence": confidence_data["level"],
                     "confidence_score": confidence_data["score"],
+                    "confidence_explanation": confidence_data["explanation"],
                     "confidence_factors": confidence_data["factors"],
                     "sources": sources,
                 }
-                
+
                 # Add entity statistics if available
                 if entity_stats:
                     response["entity_statistics"] = entity_stats
@@ -489,16 +490,215 @@ class RAGService:
                 question, search_results, context_items, sources
             )
 
+    def _analyze_entity_sentiment(self, entity: str, contexts: List[str]) -> Dict[str, Any]:
+        """
+        Analyze sentiment of text chunks mentioning an entity.
+
+        Args:
+            entity: Entity name
+            contexts: Text chunks containing the entity
+
+        Returns:
+            Dict with average sentiment and classification
+        """
+        # Import sentiment analyzer only if needed
+        from .models import SentimentAnalyzer
+
+        try:
+            # Initialize analyzer if not already cached
+            if not hasattr(self, "_sentiment_analyzer"):
+                self._sentiment_analyzer = SentimentAnalyzer()
+
+            # Analyze sentiment for each context
+            sentiments = []
+            for context in contexts[:50]:  # Limit to 50 contexts for performance
+                try:
+                    result = self._sentiment_analyzer.analyze_sentiment(context)
+                    # Convert to numeric score: positive=1, neutral=0, negative=-1
+                    if result.get("dominant") == "positive":
+                        sentiments.append(result.get("positive", 0))
+                    elif result.get("dominant") == "negative":
+                        sentiments.append(-result.get("negative", 0))
+                    else:
+                        sentiments.append(0)
+                except Exception:
+                    # Skip failed analyses
+                    continue
+
+            if sentiments:
+                avg_sentiment = sum(sentiments) / len(sentiments)
+
+                # Classify overall sentiment
+                if avg_sentiment > 0.2:
+                    classification = "Positive"
+                elif avg_sentiment < -0.2:
+                    classification = "Negative"
+                else:
+                    classification = "Neutral"
+
+                return {
+                    "average_score": round(avg_sentiment, 2),
+                    "classification": classification,
+                    "sample_size": len(sentiments),
+                }
+
+        except Exception as e:
+            # Fallback if sentiment analysis fails
+            print(f"Sentiment analysis failed: {e}")
+
+        return {
+            "average_score": 0.0,
+            "classification": "Unknown",
+            "sample_size": 0,
+        }
+
+    def _find_entity_associations(
+        self, entity: str, contexts: List[str], top_n: int = 5
+    ) -> List[str]:
+        """
+        Find most common terms associated with an entity.
+
+        Args:
+            entity: Entity name
+            contexts: Text chunks containing the entity
+            top_n: Number of top associations to return
+
+        Returns:
+            List of most common associated terms
+        """
+        import re
+        from collections import Counter
+
+        # Common stopwords to exclude
+        stopwords = {
+            "the",
+            "a",
+            "an",
+            "and",
+            "or",
+            "but",
+            "in",
+            "on",
+            "at",
+            "to",
+            "for",
+            "of",
+            "with",
+            "by",
+            "from",
+            "as",
+            "is",
+            "was",
+            "are",
+            "were",
+            "been",
+            "be",
+            "have",
+            "has",
+            "had",
+            "do",
+            "does",
+            "did",
+            "will",
+            "would",
+            "could",
+            "should",
+            "may",
+            "might",
+            "can",
+            "this",
+            "that",
+            "these",
+            "those",
+            "i",
+            "you",
+            "he",
+            "she",
+            "it",
+            "we",
+            "they",
+            "what",
+            "which",
+            "who",
+            "when",
+            "where",
+            "why",
+            "how",
+            "all",
+            "each",
+            "every",
+            "both",
+            "few",
+            "more",
+            "most",
+            "other",
+            "some",
+            "such",
+            "no",
+            "not",
+            "only",
+            "own",
+            "same",
+            "so",
+            "than",
+            "too",
+            "very",
+            "s",
+            "t",
+            "just",
+            "now",
+            "said",
+            "says",
+            "going",
+            "go",
+            "get",
+            "got",
+            "know",
+            "think",
+            "see",
+            "make",
+            "made",
+            "like",
+            "ve",
+            "re",
+            "ll",
+            "m",
+            "don",
+            "didn",
+            "wasn",
+        }
+
+        # Extract words from contexts
+        words = []
+        entity_lower = entity.lower()
+
+        for context in contexts[:50]:  # Limit for performance
+            # Find sentences or windows containing the entity
+            context_lower = context.lower()
+            if entity_lower in context_lower:
+                # Extract words near the entity (window-based approach)
+                words_in_context = re.findall(r"\b[a-z]{3,}\b", context_lower)
+                words.extend(
+                    [w for w in words_in_context if w not in stopwords and w != entity_lower]
+                )
+
+        # Count and return most common
+        if words:
+            word_counts = Counter(words)
+            return [word for word, _ in word_counts.most_common(top_n)]
+
+        return []
+
     def _extract_entities(self, text: str) -> List[str]:
         """
         Extract potential named entities from text using simple heuristics.
-        
+
         Uses capitalized words as entity candidates. For production,
         consider using a proper NER model.
-        
+
         Args:
             text: Text to extract entities from
-            
+
         Returns:
             List of potential entity names
         """
@@ -507,40 +707,60 @@ class RAGService:
         entities = []
         for i, word in enumerate(words):
             # Remove punctuation
-            clean_word = word.strip('.,!?;:"\'')
+            clean_word = word.strip(".,!?;:\"'")
             # Check if capitalized and not first word, and longer than 2 chars
             if clean_word and clean_word[0].isupper() and len(clean_word) > 2:
                 # Skip common question words
-                if clean_word.lower() not in ['what', 'when', 'where', 'who', 'why', 'how', 'which']:
+                if clean_word.lower() not in [
+                    "what",
+                    "when",
+                    "where",
+                    "who",
+                    "why",
+                    "how",
+                    "which",
+                ]:
                     entities.append(clean_word)
-        
+
         return list(set(entities))  # Remove duplicates
 
-    def _get_entity_statistics(self, entities: List[str]) -> Dict[str, Any]:
+    def _get_entity_statistics(
+        self,
+        entities: List[str],
+        include_sentiment: bool = False,
+        include_associations: bool = True,
+    ) -> Dict[str, Any]:
         """
-        Get statistics about entity mentions across the corpus.
-        
+        Get comprehensive statistics about entity mentions across the corpus.
+
         Args:
             entities: List of entity names to analyze
-            
+            include_sentiment: Calculate sentiment for entity mentions
+            include_associations: Find commonly associated terms
+
         Returns:
-            Dict with entity statistics including frequency, speech count, etc.
+            Dict with entity statistics including frequency, sentiment, and associations
         """
         if not entities:
             return {}
-        
+
         stats = {}
         all_docs = self.collection.get(include=[IncludeEnum.documents, IncludeEnum.metadatas])
-        
+
         if not all_docs["documents"]:
             return {}
-        
+
+        # Import for text analysis
+        import re
+        from collections import Counter
+
         for entity in entities:
             entity_lower = entity.lower()
             mentions = 0
             speeches_with_entity = set()
             total_chars = 0
-            
+            entity_contexts: List[str] = []  # Store contexts for sentiment and association analysis
+
             for i, doc in enumerate(all_docs["documents"]):
                 doc_lower = doc.lower()
                 count = doc_lower.count(entity_lower)
@@ -550,20 +770,110 @@ class RAGService:
                     if all_docs["metadatas"] and i < len(all_docs["metadatas"]):
                         source = all_docs["metadatas"][i].get("source", "unknown")
                         speeches_with_entity.add(source)
-            
+
+                    # Store context for analysis (limit to avoid memory issues)
+                    if len(entity_contexts) < 100:
+                        entity_contexts.append(doc)
+
             if mentions > 0:
                 # Calculate percentage of corpus
                 total_corpus_chars = sum(len(doc) for doc in all_docs["documents"])
-                percentage = (total_chars / total_corpus_chars * 100) if total_corpus_chars > 0 else 0
-                
-                stats[entity] = {
+                percentage = (
+                    (total_chars / total_corpus_chars * 100) if total_corpus_chars > 0 else 0
+                )
+
+                entity_stats = {
                     "mention_count": mentions,
                     "speech_count": len(speeches_with_entity),
                     "corpus_percentage": round(percentage, 2),
                     "speeches": sorted(list(speeches_with_entity))[:10],  # Limit to first 10
                 }
-        
+
+                # Add sentiment analysis
+                if include_sentiment and entity_contexts:
+                    sentiment_data = self._analyze_entity_sentiment(entity, entity_contexts)
+                    entity_stats["sentiment"] = sentiment_data
+
+                # Add associated terms
+                if include_associations and entity_contexts:
+                    associations = self._find_entity_associations(entity, entity_contexts)
+                    entity_stats["associated_terms"] = associations
+
+                stats[entity] = entity_stats
+
         return stats
+
+    def _generate_confidence_explanation(
+        self,
+        level: str,
+        score: float,
+        retrieval_score: float,
+        consistency: float,
+        chunk_count: int,
+        entity_coverage: float,
+        entities: Optional[List[str]] = None,
+    ) -> str:
+        """
+        Generate human-readable explanation for confidence level.
+
+        Args:
+            level: Confidence level (high/medium/low)
+            score: Overall confidence score
+            retrieval_score: Average semantic similarity
+            consistency: Score consistency
+            chunk_count: Number of chunks
+            entity_coverage: Entity coverage ratio
+            entities: Detected entities
+
+        Returns:
+            Human-readable explanation string
+        """
+        explanations = []
+
+        # Main score explanation
+        explanations.append(f"Overall confidence is {level.upper()} (score: {score:.2f})")
+
+        # Retrieval quality
+        if retrieval_score > 0.8:
+            explanations.append(f"excellent semantic match (similarity: {retrieval_score:.2f})")
+        elif retrieval_score > 0.6:
+            explanations.append(f"good semantic match (similarity: {retrieval_score:.2f})")
+        elif retrieval_score > 0.4:
+            explanations.append(f"moderate semantic match (similarity: {retrieval_score:.2f})")
+        else:
+            explanations.append(f"weak semantic match (similarity: {retrieval_score:.2f})")
+
+        # Consistency
+        if consistency > 0.9:
+            explanations.append(f"very consistent results (consistency: {consistency:.2f})")
+        elif consistency > 0.7:
+            explanations.append(f"consistent results (consistency: {consistency:.2f})")
+        else:
+            explanations.append(f"varied results (consistency: {consistency:.2f})")
+
+        # Chunk coverage
+        explanations.append(f"{chunk_count} supporting context chunks")
+
+        # Entity coverage
+        if entities and entity_coverage is not None:
+            entity_names = ", ".join(entities[:2])  # First 2 entities
+            if entity_coverage > 0.8:
+                explanations.append(f"'{entity_names}' mentioned in all retrieved chunks")
+            elif entity_coverage > 0.5:
+                explanations.append(
+                    f"'{entity_names}' mentioned in most chunks ({entity_coverage:.0%})"
+                )
+            else:
+                explanations.append(
+                    f"'{entity_names}' mentioned in some chunks ({entity_coverage:.0%})"
+                )
+
+        # Join with appropriate separators
+        base = explanations[0]
+        if len(explanations) > 1:
+            details = ", ".join(explanations[1:])
+            return f"{base} based on {details}."
+        return f"{base}."
 
     def _calculate_confidence(
         self,
@@ -617,7 +927,7 @@ class RAGService:
         # Extract potential entities from question (simple heuristic: capitalized words)
         question_words = question.split()
         entities = [w for w in question_words if w[0].isupper() and len(w) > 2]
-        
+
         if entities:
             # Count how many chunks mention the entity
             entity_mentions = 0
@@ -641,9 +951,21 @@ class RAGService:
         else:
             level = "low"
 
+        # Generate human-readable explanation
+        explanation = self._generate_confidence_explanation(
+            level,
+            final_score,
+            avg_score,
+            consistency,
+            len(context_chunks),
+            entity_coverage,
+            entities,
+        )
+
         return {
             "score": round(final_score, 3),
             "level": level,
+            "explanation": explanation,
             "factors": {
                 "retrieval_score": round(avg_score, 3),
                 "consistency": round(consistency, 3),
@@ -709,6 +1031,7 @@ class RAGService:
             "context": context_items,
             "confidence": confidence_data["level"],
             "confidence_score": confidence_data["score"],
+            "confidence_explanation": confidence_data["explanation"],
             "confidence_factors": confidence_data["factors"],
             "sources": sources,
         }

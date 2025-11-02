@@ -198,10 +198,11 @@ class RAGAnswerResponse(BaseModel):
     context: List[Dict[str, Any]] = Field(..., description="Context chunks used")
     confidence: str = Field(..., description="Confidence level (high/medium/low)")
     confidence_score: float = Field(..., description="Numeric confidence score (0-1)")
+    confidence_explanation: str = Field(..., description="Human-readable explanation of confidence")
     confidence_factors: Dict[str, Any] = Field(..., description="Breakdown of confidence factors")
     sources: List[str] = Field(..., description="Source documents")
     entity_statistics: Optional[Dict[str, Any]] = Field(
-        None, description="Statistics about entities mentioned in the question"
+        None, description="Enhanced statistics about entities: mentions, sentiment, associations"
     )
 
 
