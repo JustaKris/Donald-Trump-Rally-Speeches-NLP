@@ -31,9 +31,9 @@ A production-ready NLP API showcasing natural language processing and retrieval-
 
 🔗 **[Try the API](http://localhost:8000)** (Coming soon: deployed version)
 
-📚 **[API Documentation](http://localhost:8000/docs)** - Interactive Swagger UI
+📚 **[API Documentation](http://localhost:8000/docs)** - Interactive Swagger UI (Coming soon: deployed version)
 
-📖 **[ReDoc Documentation](http://localhost:8000/redoc)** - Alternative API docs
+📖 **[ReDoc Documentation](http://localhost:8000/redoc)** - Alternative API docs (Coming soon: deployed version)
 
 📘 **[Documentation Site](https://justakris.github.io/Donald-Trump-Rally-Speeches-NLP/)** - Complete project documentation with guides and references
 
