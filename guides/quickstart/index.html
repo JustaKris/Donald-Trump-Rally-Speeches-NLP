@@ -1142,6 +1142,8 @@
 <li><strong>Install Dependencies</strong></li>
 </ol>
 <div class="language-powershell highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">uv</span> <span class="n">sync</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">uv</span> <span class="n">venv</span> <span class="p">-</span><span class="n">-python</span> <span class="n">3</span><span class="p">.</span><span class="n">12</span>  <span class="c"># if you need to set a specific vesion</span>
 </span></code></pre></div>
 <ol>
 <li><strong>Configure Environment</strong></li>
@@ -1152,7 +1154,7 @@
 <ol>
 <li><strong>Run the API</strong></li>
 </ol>
-<div class="language-powershell highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">uv</span> <span class="n">run</span> <span class="n">uvicorn</span> <span class="n">src</span><span class="p">.</span><span class="n">api</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-reload</span>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">uv</span> <span class="n">run</span> <span class="n">uvicorn</span> <span class="n">src</span><span class="p">.</span><span class="n">api</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-host</span> <span class="n">0</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">0</span> <span class="p">-</span><span class="n">-port</span> <span class="n">8000</span> <span class="p">-</span><span class="n">-reload</span>
 </span></code></pre></div>
 <p>The API will automatically:
    - Load the FinBERT sentiment model
@@ -1167,7 +1169,8 @@
 <h2 id="running-with-docker">Running with Docker<a class="headerlink" href="#running-with-docker" title="Permanent link">&para;</a></h2>
 <h3 id="build-and-run">Build and Run<a class="headerlink" href="#build-and-run" title="Permanent link">&para;</a></h3>
 <div class="language-powershell highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">docker</span> <span class="n">build</span> <span class="n">-t</span> <span class="n">trump-speeches-nlp-api</span> <span class="p">.</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">docker</span> <span class="n">run</span> <span class="n">-p</span> <span class="n">8000</span><span class="p">:</span><span class="n">8000</span> <span class="n">trump-speeches-nlp-api</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">docker</span> <span class="n">run</span> <span class="p">-</span><span class="n">-rm</span> <span class="n">-it</span> <span class="n">-p</span> <span class="n">8000</span><span class="p">:</span><span class="n">8000</span> <span class="p">-</span><span class="n">-env</span><span class="o">-file</span> <span class="p">.</span><span class="n">env</span> <span class="p">-</span><span class="n">-name</span> <span class="n">nlp-api</span> <span class="n">trump-speeches-nlp-api</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">docker</span> <span class="n">run</span> <span class="p">-</span><span class="n">-rm</span> <span class="n">-it</span> <span class="n">-p</span> <span class="n">8000</span><span class="p">:</span><span class="n">8000</span> <span class="n">-v</span> <span class="s2">&quot;${PWD}/data/chromadb:/app/data/chromadb&quot;</span> <span class="p">-</span><span class="n">-env</span><span class="o">-file</span> <span class="p">.</span><span class="n">env</span> <span class="p">-</span><span class="n">-name</span> <span class="n">nlp-api</span> <span class="n">trump-speeches-nlp-api</span>
 </span></code></pre></div>
 <h3 id="using-docker-compose">Using Docker Compose<a class="headerlink" href="#using-docker-compose" title="Permanent link">&para;</a></h3>
 <div class="language-powershell highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">docker-compose</span> <span class="n">up</span>
