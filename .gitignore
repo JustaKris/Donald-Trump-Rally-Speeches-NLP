@@ -145,12 +145,12 @@ secrets.yml
 .copilot-artifacts/
 
 # ChromaDB persistence
-data/chromadb/
-chroma/
-*.chroma
-*.sqlite3
-index/
-manifest.json
+# data/chromadb/
+# chroma/
+# *.chroma
+# *.sqlite3
+# index/
+# manifest.json
 
 # MkDocs build output
 site/

@@ -16,6 +16,8 @@ This guide gets you up and running with the NLP API in minutes. For comprehensiv
 
    ```powershell
    uv sync
+
+   uv venv --python 3.12  # if you need to set a specific vesion
    ```
 
 2. **Configure Environment**
@@ -28,7 +30,7 @@ This guide gets you up and running with the NLP API in minutes. For comprehensiv
 3. **Run the API**
 
    ```powershell
-   uv run uvicorn src.api:app --reload
+   uv run uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
    ```
 
    The API will automatically:
@@ -47,7 +49,8 @@ This guide gets you up and running with the NLP API in minutes. For comprehensiv
 
 ```powershell
 docker build -t trump-speeches-nlp-api .
-docker run -p 8000:8000 trump-speeches-nlp-api
+docker run --rm -it -p 8000:8000 --env-file .env --name nlp-api trump-speeches-nlp-api
+docker run --rm -it -p 8000:8000 -v "${PWD}/data/chromadb:/app/data/chromadb" --env-file .env --name nlp-api trump-speeches-nlp-api
 ```
 
 ### Using Docker Compose

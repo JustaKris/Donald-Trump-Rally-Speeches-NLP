@@ -81,9 +81,9 @@ render.yaml
 DEPLOYMENT_SETUP.md
 
 # ChromaDB (will be created fresh in container)
-data/chromadb/*.sqlite3
-data/chromadb/**/
-data/chromadb/**/*
+# data/chromadb/*.sqlite3
+# data/chromadb/**/
+# data/chromadb/**/*
 
 # Large model caches (will download on first run)
 .cache/

@@ -31,8 +31,13 @@ RUN /root/.local/bin/uv export \
     --no-group notebooks \
     > requirements.txt
 
-# --- Install dependencies from requirements.txt ---
-RUN /root/.local/bin/uv pip install --system -r requirements.txt
+# --- Install all dependencies with CPU-only PyTorch index ---
+# Using --index-url ensures torch installs from CPU-only wheels (170MB vs 2.5GB+ with CUDA)
+# All dependent packages will also use this index first, preventing CUDA downloads
+RUN /root/.local/bin/uv pip install --system \
+    --index-url https://download.pytorch.org/whl/cpu \
+    --extra-index-url https://pypi.org/simple/ \
+    -r requirements.txt
 
 # --- Cleanup build artifacts (as root before switching user) ---
 RUN find /usr/local/lib/python3.12/site-packages -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true && \

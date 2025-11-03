@@ -36,6 +36,10 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
+    # PyTorch (CPU-only) - 2.6.0 is minimum version due to CVE-2025-32434
+    "torch==2.6.0",
+    # "torch==2.9.0",
+
     # Core API Framework
     "fastapi (>=0.116.0,<0.117.0)",
     "uvicorn[standard] (>=0.32.0,<0.33.0)",
@@ -59,10 +63,13 @@ dependencies = [
     "scikit-learn (>=1.7.2,<2.0.0)",
     "huggingface-hub (>=0.36.0,<0.37.0)",
     
-    # Data Processing
-    "numpy (>=2.3.4,<3.0.0)",
-    "pandas (>=2.3.3,<3.0.0)",
-    "scipy (>=1.16.2,<2.0.0)",
+    # Data Processing - NumPy <2 for compatibility with PyTorch 2.6 CPU builds
+    "numpy (>=1.26.0,<2.0.0)",
+    "pandas (>=2.2.0,<3.0.0)",
+    "scipy (>=1.14.0,<2.0.0)",
+    # "numpy (>=1.26.0,<2.0.0)",
+    # "pandas (>=2.2.0,<3.0.0)",
+    # "scipy (>=1.14.0,<2.0.0)",
     "tqdm (>=4.67.1,<5.0.0)",
     
     # Security
@@ -103,11 +110,11 @@ docs = [
 ]
 
 # PyTorch with CUDA (massive, only for local GPU development)
-torch-gpu = [
-    "torch (>=2.9.0,<3.0.0)",
+# torch-gpu = [
+    # "torch (>=2.9.0,<3.0.0)",
     # "torchvision (>=0.19.0,<0.20.0)",
     # "torchaudio (>=2.9.0,<3.0.0)"
-]
+# ]
 
 # PyTorch CPU-only (for Docker/production - much smaller)
 # torch-cpu = [
