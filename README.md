@@ -1,7 +1,7 @@
-# NLP Text Analysis API — Production-Ready Portfolio Project
+# Trump Speeches NLP Chatbot — Production-Ready Portfolio Project
 
-[![CI/CD Pipeline](https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP/actions/workflows/ci.yml/badge.svg)](https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP/actions/workflows/ci.yml)
-[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://justakris.github.io/Donald-Trump-Rally-Speeches-NLP/)
+[![CI/CD Pipeline](https://github.com/JustaKris/Trump-Rally-Speeches-NLP-Chatbot/actions/workflows/ci.yml/badge.svg)](https://github.com/JustaKris/Trump-Rally-Speeches-NLP-Chatbot/actions/workflows/ci.yml)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://justakris.github.io/Trump-Rally-Speeches-NLP-Chatbot/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -35,9 +35,9 @@ A production-ready NLP API showcasing natural language processing and retrieval-
 
 📖 **[ReDoc Documentation](http://localhost:8000/redoc)** - Alternative API docs (Coming soon: deployed version)
 
-📘 **[Documentation Site](https://justakris.github.io/Donald-Trump-Rally-Speeches-NLP/)** - Complete project documentation with guides and references
+📘 **[Documentation Site](https://justakris.github.io/Trump-Rally-Speeches-NLP-Chatbot/)** - Complete project documentation with guides and references
 
-🏗️ **[System Architecture](https://justakris.github.io/Donald-Trump-Rally-Speeches-NLP/reference/architecture/)** - Detailed technical documentation with diagrams
+🏗️ **[System Architecture](https://justakris.github.io/Trump-Rally-Speeches-NLP-Chatbot/reference/architecture/)** - Detailed technical documentation with diagrams
 
 ## 📊 What's Inside
 
@@ -194,13 +194,13 @@ print(response.json()["answer"])
 1. **Build the Docker image**
 
    ```powershell
-   docker build -t trump-speeches-nlp-api .
+   docker build -t trump-speeches-nlp-chatbot .
    ```
 
 2. **Run the container**
 
    ```powershell
-   docker run -d -p 8000:8000 trump-speeches-nlp-api
+   docker run -d -p 8000:8000 trump-speeches-nlp-chatbot
    ```
 
 3. **Or use Docker Compose**
@@ -320,7 +320,7 @@ See `pyproject.toml` for complete dependency list.
 ## 💡 Project Structure
 
 ```
-Donald-Trump-Rally-Speeches-NLP/
+Trump-Rally-Speeches-NLP-Chatbot/
 │
 ├── src/                          # Production API code
 │   ├── api.py                   # FastAPI with RAG & NLP endpoints
@@ -350,7 +350,7 @@ Donald-Trump-Rally-Speeches-NLP/
 
 ## � Documentation
 
-**📘 [Full Documentation Site](https://justakris.github.io/Donald-Trump-Rally-Speeches-NLP/)** — Complete guides, tutorials, and API reference
+**📘 [Full Documentation Site](https://justakris.github.io/Trump-Rally-Speeches-NLP-Chatbot/)** — Complete guides, tutorials, and API reference
 
 ### View Documentation Locally (Optional)
 
@@ -364,7 +364,7 @@ uv run mkdocs serve --dev-addr localhost:8001
 
 Then open <http://localhost:8001> in your browser.
 
-For more information on working with the documentation, see the [Documentation Guide](https://justakris.github.io/Donald-Trump-Rally-Speeches-NLP/howto/documentation/).
+For more information on working with the documentation, see the [Documentation Guide](https://justakris.github.io/Trump-Rally-Speeches-NLP-Chatbot/howto/documentation/).
 
 ## �📄 License & Attribution
 

@@ -49,8 +49,8 @@ uvicorn_logger.addFilter(SuppressChromaDBTelemetryFilter())
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="NLP Text Analysis API",
-    description="Production-ready API for natural language processing: sentiment analysis, word frequency, topic extraction, and n-gram analysis. Powered by transformer models and statistical NLP methods.",
+    title="Trump Speeches NLP Chatbot API",
+    description="Production-ready NLP and RAG API for sentiment analysis, topic modeling, and conversational Q&A over Trump rally speeches. Built with FastAPI, ChromaDB, and Gemini.",
     version="0.1.0",
     docs_url="/docs",
     redoc_url="/redoc",

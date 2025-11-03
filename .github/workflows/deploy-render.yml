@@ -36,15 +36,15 @@ jobs:
         context: .
         push: true
         tags: |
-          ${{ secrets.DOCKERHUB_USERNAME }}/nlp-text-analysis-api:latest
-          ${{ secrets.DOCKERHUB_USERNAME }}/nlp-text-analysis-api:${{ github.sha }}
+          ${{ secrets.DOCKERHUB_USERNAME }}/trump-speeches-nlp-chatbot:latest
+          ${{ secrets.DOCKERHUB_USERNAME }}/trump-speeches-nlp-chatbot:${{ github.sha }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
     
     - name: Test Docker image
       run: |
-        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/nlp-text-analysis-api:latest
-        docker run -d -p 8000:8000 --name test-container ${{ secrets.DOCKERHUB_USERNAME }}/nlp-text-analysis-api:latest
+        docker pull ${{ secrets.DOCKERHUB_USERNAME }}/trump-speeches-nlp-chatbot:latest
+        docker run -d -p 8000:8000 --name test-container ${{ secrets.DOCKERHUB_USERNAME }}/trump-speeches-nlp-chatbot:latest
         
         echo "Waiting 60 seconds for container to start..."
         sleep 60
@@ -62,7 +62,7 @@ jobs:
     - name: Trigger Render deployment
       run: |
         # Render will automatically pull the latest image from Docker Hub
-        # if configured to use docker.io/${{ secrets.DOCKERHUB_USERNAME }}/nlp-text-analysis-api:latest
+        # if configured to use docker.io/${{ secrets.DOCKERHUB_USERNAME }}/trump-speeches-nlp-chatbot:latest
         echo "Image pushed to Docker Hub successfully"
         echo "Render will automatically detect and deploy the new image"
         echo "Monitor deployment at: https://dashboard.render.com"
@@ -76,7 +76,7 @@ jobs:
         echo "🚀 Render will auto-deploy from Docker Hub" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "**Deployment Details:**" >> $GITHUB_STEP_SUMMARY
-        echo "- Image: \`${{ secrets.DOCKERHUB_USERNAME }}/nlp-text-analysis-api:latest\`" >> $GITHUB_STEP_SUMMARY
+        echo "- Image: \`${{ secrets.DOCKERHUB_USERNAME }}/trump-speeches-nlp-chatbot:latest\`" >> $GITHUB_STEP_SUMMARY
         echo "- SHA: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "**Next Steps:**" >> $GITHUB_STEP_SUMMARY

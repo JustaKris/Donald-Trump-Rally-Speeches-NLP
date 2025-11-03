@@ -1,6 +1,6 @@
-# Trump Rally Speeches NLP — Documentation
+# Trump Speeches NLP Chatbot — Documentation
 
-Welcome to the documentation for the **Trump Rally Speeches NLP** project, a production-ready FastAPI application demonstrating modern AI engineering practices with RAG (Retrieval-Augmented Generation), semantic search, and sentiment analysis.
+Welcome to the documentation for the **Trump Speeches NLP Chatbot** project, a production-ready FastAPI application demonstrating modern AI engineering practices with RAG (Retrieval-Augmented Generation), semantic search, and sentiment analysis.
 
 ## 🎯 What This Project Demonstrates
 
@@ -37,7 +37,7 @@ Deep technical documentation:
 
 ## 🚀 Quick Links
 
-- **[GitHub Repository](https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP)** — Source code and issues
+- **[GitHub Repository](https://github.com/JustaKris/Trump-Rally-Speeches-NLP-Chatbot)** — Source code and issues
 - **[API Documentation (Swagger)](http://localhost:8000/docs)** — Interactive API docs (when running locally)
 - **[API Documentation (ReDoc)](http://localhost:8000/redoc)** — Alternative API docs
 
@@ -108,7 +108,7 @@ Single-page application at the root (`/`) for testing all features without writi
 
 ## 📞 Support & Contributing
 
-- **Issues:** [GitHub Issues](https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP/issues)
+- **Issues:** [GitHub Issues](https://github.com/JustaKris/Trump-Rally-Speeches-NLP-Chatbot/issues)
 - **Author:** Kristiyan Bonev
 - **License:** MIT
 

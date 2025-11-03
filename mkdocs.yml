@@ -1,15 +1,15 @@
-# MkDocs Configuration for Trump Rally Speeches NLP Project
+# MkDocs Configuration for Trump Speeches NLP Chatbot Project
 # This file controls the documentation site structure, theme, and features
 
 # Site metadata
-site_name: Trump Rally Speeches NLP
-site_description: Production-ready NLP API with RAG, semantic search, and sentiment analysis
+site_name: Trump Speeches NLP Chatbot
+site_description: Production-ready NLP Chatbot API with RAG, semantic search, and sentiment analysis
 site_author: Kristiyan Bonev
-site_url: https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP
+site_url: https://github.com/JustaKris/Trump-Rally-Speeches-NLP-Chatbot
 
 # Repository information (adds "Edit on GitHub" links)
-repo_name: JustaKris/Donald-Trump-Rally-Speeches-NLP
-repo_url: https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP
+repo_name: JustaKris/Trump-Rally-Speeches-NLP-Chatbot
+repo_url: https://github.com/JustaKris/Trump-Rally-Speeches-NLP-Chatbot
 edit_uri: edit/main/docs/
 
 # Theme configuration - Material for MkDocs is the most popular and feature-rich theme
@@ -103,7 +103,7 @@ markdown_extensions:
   - pymdownx.magiclink:         # Auto-link URLs
       repo_url_shorthand: true
       user: JustaKris
-      repo: Donald-Trump-Rally-Speeches-NLP
+      repo: Trump-Rally-Speeches-NLP-Chatbot
   - pymdownx.smartsymbols       # Smart symbols (arrows, etc.)
   - pymdownx.superfences:       # Code blocks with features
       custom_fences:

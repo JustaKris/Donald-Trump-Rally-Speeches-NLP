@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-This guide gets you up and running with the NLP API in minutes. For comprehensive documentation, visit the [full documentation site](https://justakris.github.io/Donald-Trump-Rally-Speeches-NLP/).
+This guide gets you up and running with the NLP Chatbot API in minutes. For comprehensive documentation, visit the [full documentation site](https://justakris.github.io/Trump-Rally-Speeches-NLP-Chatbot/).
 
 ## Running the RAG-Powered NLP API
 
@@ -48,9 +48,9 @@ This guide gets you up and running with the NLP API in minutes. For comprehensiv
 ### Build and Run
 
 ```powershell
-docker build -t trump-speeches-nlp-api .
-docker run --rm -it -p 8000:8000 --env-file .env --name nlp-api trump-speeches-nlp-api
-docker run --rm -it -p 8000:8000 -v "${PWD}/data/chromadb:/app/data/chromadb" --env-file .env --name nlp-api trump-speeches-nlp-api
+docker build -t trump-speeches-nlp-chatbot .
+docker run --rm -it -p 8000:8000 --env-file .env --name nlp-chatbot trump-speeches-nlp-chatbot
+docker run --rm -it -p 8000:8000 -v "${PWD}/data/chromadb:/app/data/chromadb" --env-file .env --name nlp-chatbot trump-speeches-nlp-chatbot
 ```
 
 ### Using Docker Compose

@@ -74,7 +74,7 @@ Before uploading, verify each file is under 1MB:
 - Add your contact information
 
 **Search for:** `JustaKris` and replace with your username
-**Search for:** `https://trump-speeches-nlp-api.onrender.com` and update with your deployed URL
+**Search for:** `https://trump-speeches-nlp-chatbot.onrender.com` and update with your deployed URL
 
 ## 🎯 What Makes This Kaggle-Friendly?
 
@@ -121,8 +121,8 @@ Before uploading, verify each file is under 1MB:
 ## 🔗 Expected Links to Update
 
 Current placeholders (replace with actual URLs):
-- GitHub repo: `https://github.com/JustaKris/Donald-Trump-Rally-Speeches-NLP`
-- Live API: `https://trump-speeches-nlp-api.onrender.com/docs`
+- GitHub repo: `https://github.com/JustaKris/Trump-Rally-Speeches-NLP-Chatbot`
+- Live API: `https://trump-speeches-nlp-chatbot.onrender.com/docs`
 - Author GitHub: `https://github.com/JustaKris`
 
 ## 🏆 Kaggle Medals

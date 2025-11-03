@@ -1,6 +1,6 @@
 # System Architecture
 
-This document provides a comprehensive overview of the NLP Text Analysis API architecture, including system components, data flows, and deployment strategies.
+This document provides a comprehensive overview of the Trump Speeches NLP Chatbot API architecture, including system components, data flows, and deployment strategies.
 
 ## Table of Contents
 
@@ -387,7 +387,7 @@ graph LR
 **Flow:**
 1. Push to `main` branch
 2. GitHub Actions builds Docker image
-3. Push to Docker Hub (`nlp-text-analysis-api:latest`)
+3. Push to Docker Hub (`trump-speeches-nlp-chatbot:latest`)
 4. Render detects new image
 5. Render pulls and deploys
 6. Health check `/health`

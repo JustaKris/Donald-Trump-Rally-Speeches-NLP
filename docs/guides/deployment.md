@@ -1,6 +1,6 @@
-# FastAPI Deployment Guide
+# Deployment Guide
 
-This guide covers deploying the Trump Rally Speeches NLP API to various platforms.
+This guide covers deploying the Trump Speeches NLP Chatbot API to various platforms.
 
 ## Table of Contents
 
@@ -17,19 +17,128 @@ This guide covers deploying the Trump Rally Speeches NLP API to various platform
 
 ### Running Without Docker
 
-1. **Install dependencies:**
+1. **Create a virtual environment (optional but recommended):**
 
    ```powershell
+   # Create venv with default Python version
+   uv venv
+   
+   # Create venv with specific Python version
+   uv venv --python 3.12
+   uv venv --python 3.11
+   
+   # Create venv in custom directory
+   uv venv .venv-dev
+   
+   # Activate the virtual environment (Windows PowerShell)
+   .venv\Scripts\Activate.ps1
+   
+   # Deactivate when done
+   deactivate
+   ```
+
+2. **Install dependencies:**
+
+   ```powershell
+   # Install all production dependencies
    uv sync
+   
+   # Install with specific dependency groups
+   uv sync --group dev              # Include dev tools
+   uv sync --group docs             # Include docs tools
+   uv sync --group notebooks        # Include notebook tools
+   uv sync --all-groups             # Include all optional groups
+   
+   # Install without optional groups
+   uv sync --no-group dev --no-group docs --no-group notebooks
+   
+   # Upgrade all dependencies to latest compatible versions
+   uv sync --upgrade
+   
+   # Install from scratch (ignore lock file)
+   uv sync --reinstall
    ```
 
-2. **Run the API:**
+3. **Add or remove packages:**
 
    ```powershell
-   uv run uvicorn src.api:app --reload
+   # Add a new package
+   uv add requests
+   uv add "fastapi>=0.100.0"
+   
+   # Add to a specific group
+   uv add --group dev pytest
+   uv add --group docs mkdocs-material
+   
+   # Remove a package
+   uv remove requests
+   
+   # Update lock file without installing
+   uv lock
+   
+   # Update specific package
+   uv lock --upgrade-package fastapi
    ```
 
-3. **Access the application:**
+4. **Run commands:**
+
+   ```powershell
+   # Run the API server
+   uv run uvicorn src.api:app --reload
+   
+   # Run with custom host and port
+   uv run uvicorn src.api:app --host 0.0.0.0 --port 8001 --reload
+   
+   # Run tests
+   uv run pytest
+   uv run pytest -v --cov=src
+   
+   # Run code formatters
+   uv run black src/
+   uv run isort src/
+   
+   # Run linters
+   uv run flake8 src/
+   uv run mypy src/
+   
+   # Run Python scripts
+   uv run python scripts/migrate_rag_embeddings.py
+   
+   # Run Python REPL with dependencies
+   uv run python
+   ```
+
+5. **Manage Python versions:**
+
+   ```powershell
+   # List available Python versions
+   uv python list
+   
+   # Install a specific Python version
+   uv python install 3.12
+   uv python install 3.11.8
+   
+   # Pin Python version for project
+   uv python pin 3.12
+   
+   # Show current Python version
+   uv python find
+   ```
+
+6. **Export dependencies:**
+
+   ```powershell
+   # Export to requirements.txt
+   uv pip compile pyproject.toml -o requirements.txt
+   
+   # Export with specific groups excluded
+   uv export --no-group dev --no-group docs -o requirements.txt
+   
+   # Export in different formats
+   uv export --format requirements-txt
+   ```
+
+7. **Access the application:**
    - Frontend: http://localhost:8000
    - API Docs: http://localhost:8000/docs
    - ReDoc: http://localhost:8000/redoc
@@ -43,19 +152,94 @@ This guide covers deploying the Trump Rally Speeches NLP API to various platform
 1. **Build the Docker image:**
 
    ```powershell
-   docker build -t trump-speeches-nlp-api .
+   docker build -t trump-speeches-nlp-chatbot .
+   
+   # Build with no cache (clean build)
+   ```powershell
+docker build --no-cache -t trump-speeches-nlp-chatbot .
+```
+   
+   # Build with a specific tag
+   docker build -t trump-speeches-nlp-chatbot:v1.0.0 .
    ```
 
 2. **Run the container:**
 
    ```powershell
-   docker run --rm -it -p 8000:8000 --env-file .env --name nlp-api trump-speeches-nlp-api
+   # Basic run
+   docker run --rm -it -p 8000:8000 --env-file .env --name nlp-chatbot trump-speeches-nlp-chatbot
+   
+   # Run in detached mode (background)
+   docker run -d -p 8000:8000 --env-file .env --name nlp-chatbot trump-speeches-nlp-chatbot
+   
+   # Run with persistent ChromaDB volume
+   docker run --rm -it -p 8000:8000 -v "${PWD}/data/chromadb:/app/data/chromadb" --env-file .env --name nlp-chatbot trump-speeches-nlp-chatbot
    ```
 
 3. **View logs:**
 
    ```powershell
-   docker logs -f nlp-api
+   # Follow logs (real-time)
+   docker logs -f nlp-chatbot
+   
+   # View last 100 lines
+   docker logs --tail 100 nlp-chatbot
+   
+   # View logs with timestamps
+   docker logs -t nlp-chatbot
+   ```
+
+4. **Manage containers:**
+
+   ```powershell
+   # Stop the container
+   docker stop nlp-chatbot
+   
+   # Start a stopped container
+   docker start nlp-chatbot
+   
+   # Restart the container
+   docker restart nlp-chatbot
+   
+   # Remove the container
+   docker rm nlp-chatbot
+   
+   # Remove with force (even if running)
+   docker rm -f nlp-chatbot
+   ```
+
+5. **Tag and push to Docker Hub:**
+
+   ```powershell
+   # Tag for Docker Hub
+   docker tag trump-speeches-nlp-chatbot yourusername/trump-speeches-nlp-chatbot:latest
+   docker tag trump-speeches-nlp-chatbot yourusername/trump-speeches-nlp-chatbot:v1.0.0
+   
+   # Login to Docker Hub
+   docker login
+   
+   # Push to Docker Hub
+   docker push yourusername/trump-speeches-nlp-chatbot:latest
+   docker push yourusername/trump-speeches-nlp-chatbot:v1.0.0
+   
+   # Push all tags
+   docker push --all-tags yourusername/trump-speeches-nlp-chatbot
+   ```
+
+6. **Clean up Docker resources:**
+
+   ```powershell
+   # Remove unused images
+   docker image prune
+   
+   # Remove all stopped containers
+   docker container prune
+   
+   # Remove all unused containers, networks, images
+   docker system prune
+   
+   # Remove everything (including volumes)
+   docker system prune -a --volumes
    ```
 
 ### Using Docker Compose
@@ -96,7 +280,7 @@ This project uses a **Docker-based deployment** approach for Render:
 
 1. **Docker Hub Account** (free)
    - Sign up at <https://hub.docker.com>
-   - Create a repository named `trump-speeches-nlp-api`
+   - Create a repository named `trump-speeches-nlp-chatbot`
 
 2. **Render Account** (free)
    - Sign up at <https://render.com>
@@ -114,11 +298,11 @@ Add these secrets to your GitHub repository (Settings → Secrets and variables 
 
 ### Step 2: Update render.yaml
 
-Edit `.render/render.yaml` and replace `<your-dockerhub-username>` with your actual Docker Hub username:
+Edit `render.yaml` and replace `<your-dockerhub-username>` with your actual Docker Hub username:
 
 ```yaml
 image:
-  url: docker.io/your-username/trump-speeches-nlp-api:latest
+  url: docker.io/your-username/trump-speeches-nlp-chatbot:latest
 ```
 
 ### Step 3: Deploy to Render
@@ -136,8 +320,8 @@ image:
 1. Go to Render Dashboard → "New +" → "Web Service"
 2. Choose "Deploy an existing image from a registry"
 3. Configure:
-   - **Image URL:** `docker.io/your-username/trump-speeches-nlp-api:latest`
-   - **Name:** `trump-speeches-nlp-api`
+   - **Image URL:** `docker.io/your-username/trump-speeches-nlp-chatbot:latest`
+   - **Name:** `trump-speeches-nlp-chatbot`
    - **Plan:** Free
 4. Add environment variable:
    - `PORT` = `8000`
@@ -159,7 +343,7 @@ This will:
 
 ### Accessing Your Render App
 
-Your API will be available at: `https://trump-speeches-nlp-api.onrender.com`
+Your API will be available at: `https://trump-speeches-nlp-chatbot.onrender.com`
 
 **Note:** Free tier apps spin down after 15 minutes of inactivity. First request may take 30-60 seconds to wake the service.
 
@@ -225,20 +409,20 @@ az appservice plan create `
 az webapp create `
   --resource-group trump-nlp-rg `
   --plan trump-nlp-plan `
-  --name trump-speeches-nlp `
-  --deployment-container-image-name trumpnlpacr.azurecr.io/trump-speeches-nlp-api:latest
+  --name trump-speeches-nlp-chatbot `
+  --deployment-container-image-name trumpnlpacr.azurecr.io/trump-speeches-nlp-chatbot:latest
 
 # Configure port
 az webapp config appsettings set `
   --resource-group trump-nlp-rg `
-  --name trump-speeches-nlp `
+  --name trump-speeches-nlp-chatbot `
   --settings WEBSITES_PORT=8000
 
 # Enable ACR integration
 az webapp config container set `
   --resource-group trump-nlp-rg `
-  --name trump-speeches-nlp `
-  --docker-custom-image-name trumpnlpacr.azurecr.io/trump-speeches-nlp-api:latest `
+  --name trump-speeches-nlp-chatbot `
+  --docker-custom-image-name trumpnlpacr.azurecr.io/trump-speeches-nlp-chatbot:latest `
   --docker-registry-server-url https://trumpnlpacr.azurecr.io
 ```
 
@@ -262,7 +446,7 @@ Add these secrets to your GitHub repository:
    az acr credential show --name trumpnlpacr
    ```
 
-4. **`AZURE_WEBAPP_NAME`** - e.g., `trump-speeches-nlp`
+4. **`AZURE_WEBAPP_NAME`** - e.g., `trump-speeches-nlp-chatbot`
 
 #### Step 3: Deploy
 
@@ -304,13 +488,13 @@ az appservice plan create `
 az webapp create `
   --resource-group trump-nlp-rg `
   --plan trump-nlp-plan `
-  --name trump-speeches-nlp `
-  --deployment-container-image-name docker.io/your-username/trump-speeches-nlp-api:latest
+  --name trump-speeches-nlp-chatbot `
+  --deployment-container-image-name docker.io/your-username/trump-speeches-nlp-chatbot:latest
 
 # Configure port
 az webapp config appsettings set `
   --resource-group trump-nlp-rg `
-  --name trump-speeches-nlp `
+  --name trump-speeches-nlp-chatbot `
   --settings WEBSITES_PORT=8000
 ```
 
@@ -336,21 +520,21 @@ Manually trigger the workflow:
 
 ### Accessing Your Azure App
 
-Your API will be available at: `https://trump-speeches-nlp.azurewebsites.net`
+Your API will be available at: `https://trump-speeches-nlp-chatbot.azurewebsites.net`
 
 ### Monitoring and Logs
 
 ```powershell
 # Stream logs
-az webapp log tail --resource-group trump-nlp-rg --name trump-speeches-nlp
+az webapp log tail --resource-group trump-nlp-rg --name trump-speeches-nlp-chatbot
 
 # View metrics
 az monitor metrics list `
-  --resource /subscriptions/{subscription-id}/resourceGroups/trump-nlp-rg/providers/Microsoft.Web/sites/trump-speeches-nlp `
+  --resource /subscriptions/{subscription-id}/resourceGroups/trump-nlp-rg/providers/Microsoft.Web/sites/trump-speeches-nlp-chatbot `
   --metric-names Requests,ResponseTime,Http5xx
 
 # Open in Azure Portal
-az webapp browse --resource-group trump-nlp-rg --name trump-speeches-nlp
+az webapp browse --resource-group trump-nlp-rg --name trump-speeches-nlp-chatbot
 ```
 
 ### Updating the Deployment
@@ -360,7 +544,7 @@ Deployments are automatic on push to `main`. To manually update:
 ```powershell
 # Trigger GitHub Actions workflow manually
 # Or restart the web app to pull latest image
-az webapp restart --resource-group trump-nlp-rg --name trump-speeches-nlp
+az webapp restart --resource-group trump-nlp-rg --name trump-speeches-nlp-chatbot
 ```
 
 ---

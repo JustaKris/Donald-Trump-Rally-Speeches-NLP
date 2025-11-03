@@ -57,7 +57,7 @@ uv run mkdocs gh-deploy --message "Update documentation"
 ## Project Structure
 
 ```
-Donald-Trump-Rally-Speeches-NLP/
+Trump-Rally-Speeches-NLP-Chatbot/
 ├── docs/                    # All documentation files
 │   ├── index.md            # Homepage
 │   ├── guides/             # Getting started guides
@@ -299,7 +299,7 @@ The project includes a GitHub Action that automatically deploys documentation to
 1. You push changes to `main`
 2. GitHub Actions builds the docs
 3. Deploys to GitHub Pages automatically
-4. Live at: https://justakris.github.io/Donald-Trump-Rally-Speeches-NLP/
+4. Live at: https://justakris.github.io/Trump-Rally-Speeches-NLP-Chatbot/
 
 **Configuration:** See `.github/workflows/deploy-docs.yml`
 
@@ -441,7 +441,7 @@ Documentation deploys automatically when:
 - **MkDocs Documentation:** https://www.mkdocs.org/
 - **Material for MkDocs:** https://squidfunk.github.io/mkdocs-material/
 - **Markdown Guide:** https://www.markdownguide.org/
-- **Live Documentation:** https://justakris.github.io/Donald-Trump-Rally-Speeches-NLP/
+- **Live Documentation:** https://justakris.github.io/Trump-Rally-Speeches-NLP-Chatbot/
 
 ## Summary
 

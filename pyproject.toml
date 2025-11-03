@@ -1,7 +1,7 @@
 [project]
-name = "dt-rally-speeches-nlp"
+name = "trump-speeches-nlp-chatbot"
 version = "0.1.0"
-description = "Production-ready NLP API for sentiment analysis, topic extraction, and text analysis. Includes demo dataset of political speeches."
+description = "Production-ready NLP Chatbot API with RAG for sentiment analysis, Q&A, topic extraction, and text analysis. Includes demo dataset of political speeches."
 license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
