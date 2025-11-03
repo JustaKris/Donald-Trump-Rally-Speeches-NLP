@@ -37,10 +37,10 @@ class TestSentimentEndpoint:
         """Test sentiment analysis with valid input."""
         payload = {"text": "This is a great day! I love it!"}
         response = client.post("/analyze/sentiment", json=payload)
-        
+
         # Should succeed or return 503 if model not loaded
         assert response.status_code in [200, 503]
-        
+
         if response.status_code == 200:
             data = response.json()
             assert "sentiment" in data
@@ -71,7 +71,7 @@ class TestWordFrequencyEndpoint:
         """Test word frequency analysis with valid input."""
         payload = {"text": "hello world hello python world world"}
         response = client.post("/analyze/words", json=payload)
-        
+
         assert response.status_code == 200
         data = response.json()
         assert "total_tokens" in data
@@ -84,7 +84,7 @@ class TestWordFrequencyEndpoint:
         """Test word frequency with top_n parameter."""
         payload = {"text": "word " * 20}
         response = client.post("/analyze/words?top_n=5", json=payload)
-        
+
         assert response.status_code == 200
         data = response.json()
         assert len(data["top_words"]) <= 5
@@ -105,7 +105,7 @@ class TestTopicEndpoint:
         """Test topic extraction with valid input."""
         payload = {"text": "economy jobs market growth employment"}
         response = client.post("/analyze/topics", json=payload)
-        
+
         assert response.status_code == 200
         data = response.json()
         assert "topics" in data
@@ -116,7 +116,7 @@ class TestTopicEndpoint:
         """Test topic extraction with top_n parameter."""
         payload = {"text": "word " * 20}
         response = client.post("/analyze/topics?top_n=3", json=payload)
-        
+
         assert response.status_code == 200
         data = response.json()
         assert len(data["topics"]) <= 3
@@ -130,7 +130,7 @@ class TestNGramEndpoint:
         """Test n-gram extraction for bigrams."""
         payload = {"text": "the quick brown fox jumps", "n": 2, "top_n": 10}
         response = client.post("/analyze/ngrams", json=payload)
-        
+
         assert response.status_code == 200
         data = response.json()
         assert "n" in data
@@ -143,7 +143,7 @@ class TestNGramEndpoint:
         """Test n-gram extraction for trigrams."""
         payload = {"text": "one two three four five", "n": 3, "top_n": 10}
         response = client.post("/analyze/ngrams", json=payload)
-        
+
         assert response.status_code == 200
         data = response.json()
         assert data["n"] == 3
@@ -164,7 +164,7 @@ class TestStatisticsEndpoint:
     def test_dataset_statistics(self, client):
         """Test getting dataset statistics."""
         response = client.get("/speeches/stats")
-        
+
         assert response.status_code == 200
         data = response.json()
         assert "total_speeches" in data
@@ -180,7 +180,7 @@ class TestSpeechListEndpoint:
     def test_list_speeches(self, client):
         """Test listing all speeches."""
         response = client.get("/speeches/list")
-        
+
         assert response.status_code == 200
         data = response.json()
         assert "total" in data
@@ -196,7 +196,7 @@ class TestTextCleanEndpoint:
         """Test text cleaning endpoint."""
         payload = {"text": "Hello World! https://example.com"}
         response = client.post("/text/clean", json=payload)
-        
+
         assert response.status_code == 200
         data = response.json()
         assert "cleaned_text" in data
@@ -208,7 +208,7 @@ class TestTextCleanEndpoint:
         """Test text cleaning with remove_stopwords parameter."""
         payload = {"text": "This is a test"}
         response = client.post("/text/clean?remove_stopwords=true", json=payload)
-        
+
         assert response.status_code == 200
         data = response.json()
         assert "cleaned_text" in data

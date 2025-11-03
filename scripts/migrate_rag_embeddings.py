@@ -11,10 +11,10 @@ Run this script after updating the RAG service to use the new model.
 import sys
 from pathlib import Path
 
+from src.rag_service import RAGService
+
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from src.rag_service import RAGService
 
 
 def migrate_embeddings():
@@ -29,17 +29,17 @@ def migrate_embeddings():
     print("  - Chunk size: 500 chars → 2048 chars (~512-768 tokens)")
     print("  - Chunk overlap: 50 chars → 150 chars")
     print()
-    
+
     # Initialize RAG service with new settings
     print("Initializing RAG service with new configuration...")
     rag = RAGService()
-    
-    print(f"Configuration:")
+
+    print("Configuration:")
     print(f"  - Embedding model: {rag.embedding_model}")
     print(f"  - Chunk size: {rag.chunk_size} chars")
     print(f"  - Chunk overlap: {rag.chunk_overlap} chars")
     print()
-    
+
     # Clear existing collection
     print("Clearing existing collection...")
     success = rag.clear_collection()
@@ -48,23 +48,23 @@ def migrate_embeddings():
     else:
         print("✗ Failed to clear collection")
         return False
-    
+
     print()
-    
+
     # Load documents with new embeddings
     print("Loading documents with new embeddings...")
     print("This may take a few minutes depending on the corpus size...")
     print()
-    
+
     try:
         docs_loaded = rag.load_documents()
         print(f"✓ Successfully loaded {docs_loaded} documents")
     except Exception as e:
         print(f"✗ Error loading documents: {e}")
         return False
-    
+
     print()
-    
+
     # Get statistics
     print("Collection statistics:")
     stats = rag.get_stats()
@@ -72,7 +72,7 @@ def migrate_embeddings():
     print(f"  - Unique sources: {stats['unique_sources']}")
     print(f"  - Embedding dimensions: {stats['embedding_model']}")
     print()
-    
+
     print("=" * 70)
     print("Migration completed successfully!")
     print("=" * 70)
@@ -84,7 +84,7 @@ def migrate_embeddings():
     print("  ✓ Enhanced confidence scoring")
     print("  ✓ Entity-aware retrieval and statistics")
     print()
-    
+
     return True
 
 

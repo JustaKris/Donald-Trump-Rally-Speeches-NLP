@@ -287,7 +287,7 @@ class TestCollectionManagement:
             service1 = RAGService(persist_directory=persist_dir)
             service1.load_documents(data_dir=temp_data_dir)
             count1 = service1.get_stats()["total_chunks"]
-            
+
             # Clean up first service
             del service1
             time.sleep(0.2)

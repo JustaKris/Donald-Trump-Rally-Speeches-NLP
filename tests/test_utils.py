@@ -19,7 +19,7 @@ class TestWordFrequency:
         """Test basic word frequency computation."""
         text = "hello world hello python world world"
         stats = get_word_frequency_stats(text, top_n=10)
-        
+
         assert isinstance(stats, dict)
         assert "total_tokens" in stats
         assert "unique_tokens" in stats
@@ -31,7 +31,7 @@ class TestWordFrequency:
         """Test that top_n parameter works."""
         text = " ".join(["word"] * 10 + ["other"] * 5 + ["test"] * 3)
         stats = get_word_frequency_stats(text, top_n=2)
-        
+
         assert len(stats["top_words"]) <= 2
         # Most frequent word should be first
         if stats["top_words"]:
@@ -50,7 +50,7 @@ class TestWordFrequency:
         """Test that word counts are correct."""
         text = "test test test"
         stats = get_word_frequency_stats(text, top_n=10)
-        
+
         # Should have tokens
         assert stats["total_tokens"] == 3
         assert stats["unique_tokens"] == 1
@@ -64,7 +64,7 @@ class TestTopicExtraction:
         """Test basic topic extraction."""
         text = "economy jobs growth economy employment jobs market economy"
         topics = extract_topics(text, top_n=5)
-        
+
         assert isinstance(topics, list)
         assert len(topics) > 0
         # Check structure of topic dictionaries
@@ -79,7 +79,7 @@ class TestTopicExtraction:
         """Test that relevance scores are normalized."""
         text = "test word test word test"
         topics = extract_topics(text, top_n=10)
-        
+
         for topic in topics:
             assert 0 <= topic["relevance"] <= 1
             # Top topic should have relevance of 1.0
@@ -91,7 +91,7 @@ class TestTopicExtraction:
         """Test that topics are sorted by relevance."""
         text = "economy economy economy jobs jobs market"
         topics = extract_topics(text, top_n=10)
-        
+
         # Should be sorted by relevance (descending)
         relevances = [t["relevance"] for t in topics]
         assert relevances == sorted(relevances, reverse=True)
@@ -101,7 +101,7 @@ class TestTopicExtraction:
         """Test that top_n parameter limits results."""
         text = " ".join([f"word{i}" for i in range(20)])
         topics = extract_topics(text, top_n=5)
-        
+
         assert len(topics) <= 5
 
     @pytest.mark.unit

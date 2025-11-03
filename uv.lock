@@ -716,113 +716,6 @@ wheels = [
 ]
 
 [[package]]
-name = "dt-rally-speeches-nlp"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "certifi" },
-    { name = "chromadb" },
-    { name = "fastapi" },
-    { name = "google-generativeai" },
-    { name = "httpx" },
-    { name = "huggingface-hub" },
-    { name = "langchain" },
-    { name = "langchain-community" },
-    { name = "nltk" },
-    { name = "numpy" },
-    { name = "pandas" },
-    { name = "python-dotenv" },
-    { name = "python-multipart" },
-    { name = "rank-bm25" },
-    { name = "scikit-learn" },
-    { name = "scipy" },
-    { name = "sentence-transformers" },
-    { name = "torch" },
-    { name = "tqdm" },
-    { name = "transformers" },
-    { name = "uvicorn", extra = ["standard"] },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "black" },
-    { name = "flake8" },
-    { name = "flake8-pyproject" },
-    { name = "isort" },
-    { name = "mypy" },
-    { name = "pip-audit" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "pytest-cov" },
-]
-docs = [
-    { name = "mkdocs" },
-    { name = "mkdocs-material" },
-]
-notebooks = [
-    { name = "ipykernel" },
-    { name = "ipywidgets" },
-    { name = "jupyterlab" },
-    { name = "matplotlib" },
-    { name = "plotly" },
-    { name = "seaborn" },
-    { name = "widgetsnbextension" },
-    { name = "wordcloud" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "certifi", specifier = ">=2025.10.5,<2026.0.0" },
-    { name = "chromadb", specifier = ">=0.5.0,<0.6.0" },
-    { name = "fastapi", specifier = ">=0.116.0,<0.117.0" },
-    { name = "google-generativeai", specifier = ">=0.8.0,<0.9.0" },
-    { name = "httpx", specifier = ">=0.28.0,<0.29.0" },
-    { name = "huggingface-hub", specifier = ">=0.36.0,<0.37.0" },
-    { name = "langchain", specifier = ">=0.3.0,<0.4.0" },
-    { name = "langchain-community", specifier = ">=0.3.0,<0.4.0" },
-    { name = "nltk", specifier = ">=3.9.2,<4.0.0" },
-    { name = "numpy", specifier = ">=1.26.0,<2.0.0" },
-    { name = "pandas", specifier = ">=2.2.0,<3.0.0" },
-    { name = "python-dotenv", specifier = ">=1.0.0,<2.0.0" },
-    { name = "python-multipart", specifier = ">=0.0.18,<0.0.19" },
-    { name = "rank-bm25", specifier = ">=0.2.2,<0.3.0" },
-    { name = "scikit-learn", specifier = ">=1.7.2,<2.0.0" },
-    { name = "scipy", specifier = ">=1.14.0,<2.0.0" },
-    { name = "sentence-transformers", specifier = ">=3.3.0,<4.0.0" },
-    { name = "torch", specifier = "==2.6.0" },
-    { name = "tqdm", specifier = ">=4.67.1,<5.0.0" },
-    { name = "transformers", specifier = ">=4.57.1,<5.0.0" },
-    { name = "uvicorn", extras = ["standard"], specifier = ">=0.32.0,<0.33.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "black", specifier = ">=24.0.0,<25.0.0" },
-    { name = "flake8", specifier = ">=7.1.0,<8.0.0" },
-    { name = "flake8-pyproject", specifier = ">=1.2.3,<2.0.0" },
-    { name = "isort", specifier = ">=5.13.0,<6.0.0" },
-    { name = "mypy", specifier = ">=1.13.0,<2.0.0" },
-    { name = "pip-audit", specifier = ">=2.9.0,<3.0.0" },
-    { name = "pytest", specifier = ">=8.3.0,<9.0.0" },
-    { name = "pytest-asyncio", specifier = ">=0.24.0,<0.25.0" },
-    { name = "pytest-cov", specifier = ">=6.0.0,<7.0.0" },
-]
-docs = [
-    { name = "mkdocs", specifier = ">=1.6.0,<2.0.0" },
-    { name = "mkdocs-material", specifier = ">=9.5.0,<10.0.0" },
-]
-notebooks = [
-    { name = "ipykernel", specifier = ">=7.0.1,<8.0.0" },
-    { name = "ipywidgets", specifier = ">=8.1.7,<9.0.0" },
-    { name = "jupyterlab", specifier = ">=4.4.10,<5.0.0" },
-    { name = "matplotlib", specifier = ">=3.10.7,<4.0.0" },
-    { name = "plotly", specifier = ">=6.3.1,<7.0.0" },
-    { name = "seaborn", specifier = ">=0.13.2,<0.14.0" },
-    { name = "widgetsnbextension", specifier = ">=4.0.14,<5.0.0" },
-    { name = "wordcloud", specifier = ">=1.9.4,<2.0.0" },
-]
-
-[[package]]
 name = "durationpy"
 version = "0.10"
 source = { registry = "https://pypi.org/simple" }
@@ -4104,6 +3997,113 @@ source = { registry = "https://pypi.org/simple" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a7/2e/757d2280d4fefe7d33af7615124e7e298ae7b8e3bc4446cdb8e88b0f9bab/triton-3.2.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8009a1fb093ee8546495e96731336a33fb8856a38e45bb4ab6affd6dbc3ba220", size = 253157636, upload-time = "2025-01-22T19:12:51.322Z" },
     { url = "https://files.pythonhosted.org/packages/06/00/59500052cb1cf8cf5316be93598946bc451f14072c6ff256904428eaf03c/triton-3.2.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8d9b215efc1c26fa7eefb9a157915c92d52e000d2bf83e5f69704047e63f125c", size = 253159365, upload-time = "2025-01-22T19:13:24.648Z" },
+]
+
+[[package]]
+name = "trump-speeches-nlp-chatbot"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "certifi" },
+    { name = "chromadb" },
+    { name = "fastapi" },
+    { name = "google-generativeai" },
+    { name = "httpx" },
+    { name = "huggingface-hub" },
+    { name = "langchain" },
+    { name = "langchain-community" },
+    { name = "nltk" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "python-dotenv" },
+    { name = "python-multipart" },
+    { name = "rank-bm25" },
+    { name = "scikit-learn" },
+    { name = "scipy" },
+    { name = "sentence-transformers" },
+    { name = "torch" },
+    { name = "tqdm" },
+    { name = "transformers" },
+    { name = "uvicorn", extra = ["standard"] },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "black" },
+    { name = "flake8" },
+    { name = "flake8-pyproject" },
+    { name = "isort" },
+    { name = "mypy" },
+    { name = "pip-audit" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-cov" },
+]
+docs = [
+    { name = "mkdocs" },
+    { name = "mkdocs-material" },
+]
+notebooks = [
+    { name = "ipykernel" },
+    { name = "ipywidgets" },
+    { name = "jupyterlab" },
+    { name = "matplotlib" },
+    { name = "plotly" },
+    { name = "seaborn" },
+    { name = "widgetsnbextension" },
+    { name = "wordcloud" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "certifi", specifier = ">=2025.10.5,<2026.0.0" },
+    { name = "chromadb", specifier = ">=0.5.0,<0.6.0" },
+    { name = "fastapi", specifier = ">=0.116.0,<0.117.0" },
+    { name = "google-generativeai", specifier = ">=0.8.0,<0.9.0" },
+    { name = "httpx", specifier = ">=0.28.0,<0.29.0" },
+    { name = "huggingface-hub", specifier = ">=0.36.0,<0.37.0" },
+    { name = "langchain", specifier = ">=0.3.0,<0.4.0" },
+    { name = "langchain-community", specifier = ">=0.3.0,<0.4.0" },
+    { name = "nltk", specifier = ">=3.9.2,<4.0.0" },
+    { name = "numpy", specifier = ">=1.26.0,<2.0.0" },
+    { name = "pandas", specifier = ">=2.2.0,<3.0.0" },
+    { name = "python-dotenv", specifier = ">=1.0.0,<2.0.0" },
+    { name = "python-multipart", specifier = ">=0.0.18,<0.0.19" },
+    { name = "rank-bm25", specifier = ">=0.2.2,<0.3.0" },
+    { name = "scikit-learn", specifier = ">=1.7.2,<2.0.0" },
+    { name = "scipy", specifier = ">=1.14.0,<2.0.0" },
+    { name = "sentence-transformers", specifier = ">=3.3.0,<4.0.0" },
+    { name = "torch", specifier = "==2.6.0" },
+    { name = "tqdm", specifier = ">=4.67.1,<5.0.0" },
+    { name = "transformers", specifier = ">=4.57.1,<5.0.0" },
+    { name = "uvicorn", extras = ["standard"], specifier = ">=0.32.0,<0.33.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "black", specifier = ">=24.0.0,<25.0.0" },
+    { name = "flake8", specifier = ">=7.1.0,<8.0.0" },
+    { name = "flake8-pyproject", specifier = ">=1.2.3,<2.0.0" },
+    { name = "isort", specifier = ">=5.13.0,<6.0.0" },
+    { name = "mypy", specifier = ">=1.13.0,<2.0.0" },
+    { name = "pip-audit", specifier = ">=2.9.0,<3.0.0" },
+    { name = "pytest", specifier = ">=8.3.0,<9.0.0" },
+    { name = "pytest-asyncio", specifier = ">=0.24.0,<0.25.0" },
+    { name = "pytest-cov", specifier = ">=6.0.0,<7.0.0" },
+]
+docs = [
+    { name = "mkdocs", specifier = ">=1.6.0,<2.0.0" },
+    { name = "mkdocs-material", specifier = ">=9.5.0,<10.0.0" },
+]
+notebooks = [
+    { name = "ipykernel", specifier = ">=7.0.1,<8.0.0" },
+    { name = "ipywidgets", specifier = ">=8.1.7,<9.0.0" },
+    { name = "jupyterlab", specifier = ">=4.4.10,<5.0.0" },
+    { name = "matplotlib", specifier = ">=3.10.7,<4.0.0" },
+    { name = "plotly", specifier = ">=6.3.1,<7.0.0" },
+    { name = "seaborn", specifier = ">=0.13.2,<0.14.0" },
+    { name = "widgetsnbextension", specifier = ">=4.0.14,<5.0.0" },
+    { name = "wordcloud", specifier = ">=1.9.4,<2.0.0" },
 ]
 
 [[package]]
