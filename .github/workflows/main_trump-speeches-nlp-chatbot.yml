@@ -1,8 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
-name: Build and deploy Python app to Azure Web App - Trump-Speeches-NLP-Chatbot
+name: Build and deploy container app to Azure Web App - Trump-Speeches-NLP-Chatbot
 
 on:
   push:
@@ -19,58 +18,46 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python version
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-      # 🛠️ Local Build Section (Optional)
-      # The following section in your workflow is designed to catch build issues early on the client side, before deployment. This can be helpful for debugging and validation. However, if this step significantly increases deployment time and early detection is not critical for your workflow, you may remove this section to streamline the deployment process.
-      - name: Create and Start virtual environment and Install dependencies
-        run: |
-          python -m venv antenv
-          source antenv/bin/activate
-          pip install -r requirements.txt
-                
-      # By default, when you enable GitHub CI/CD integration through the Azure portal, the platform automatically sets the SCM_DO_BUILD_DURING_DEPLOYMENT application setting to true. This triggers the use of Oryx, a build engine that handles application compilation and dependency installation (e.g., pip install) directly on the platform during deployment. Hence, we exclude the antenv virtual environment directory from the deployment artifact to reduce the payload size. 
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v4
+      - name: Log in to container registry
+        uses: docker/login-action@v2
         with:
-          name: python-app
-          path: |
-            .
-            !antenv/
+          registry: https://index.docker.io/v1/
+          username: ${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_1BE5734FC3ED4D67B6724802FE210D12 }}
+          password: ${{ secrets.AZUREAPPSERVICE_CONTAINERPASSWORD_3C48E5E573804151AD3253A6D09D7149 }}
 
-      # 🚫 Opting Out of Oryx Build
-      # If you prefer to disable the Oryx build process during deployment, follow these steps:
-      # 1. Remove the SCM_DO_BUILD_DURING_DEPLOYMENT app setting from your Azure App Service Environment variables.
-      # 2. Refer to sample workflows for alternative deployment strategies: https://github.com/Azure/actions-workflow-samples/tree/master/AppService
-      
+      - name: Build and push container image to registry
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: index.docker.io/${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_1BE5734FC3ED4D67B6724802FE210D12 }}/trump-speeches-nlp-chatbot:${{ github.sha }}
+          file: ./Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build
     permissions:
       id-token: write #This is required for requesting the JWT
       contents: read #This is required for actions/checkout
 
+    needs: build
+    
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: python-app
       
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_C9E79210965A49E3A7BDD12E951812AB }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_0B9D8C93607E4BFFB5878732057BE76C }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_730C29F1973B42A0A60D21A607AB62B9 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F48CD6E84620460AAA697086F3CDF0C9 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_E6F6712B16204D56B857409BACD92B49 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_39E465BF7EC54EF7854ED6E465F167FD }}
 
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3
+      - name: Deploy to Azure Web App
         id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
         with:
           app-name: 'Trump-Speeches-NLP-Chatbot'
           slot-name: 'Production'
+          images: 'index.docker.io/${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_1BE5734FC3ED4D67B6724802FE210D12 }}/trump-speeches-nlp-chatbot:${{ github.sha }}'
           
