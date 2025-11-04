@@ -46,6 +46,8 @@ In-depth technical documentation:
 - **[API Documentation (Swagger)](https://trump-speeches-nlp-chatbot.azurewebsites.net/docs)** — Interactive API documentation (local)
 - **[API Documentation (ReDoc)](https://trump-speeches-nlp-chatbot.azurewebsites.net/redoc)** — Alternative API documentation
 
+> NOTE: The Azure Web App links above point to a deployed instance that may take a minute or two to start (cold start) after a deployment or if idle. If the site doesn't load immediately, please wait 1–2 minutes and try again.
+
 ## Core Features
 
 ### RAG Q&A System

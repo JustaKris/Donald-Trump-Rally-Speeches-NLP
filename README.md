@@ -35,6 +35,8 @@ A production-ready NLP API showcasing natural language processing and retrieval-
 
 📖 **[ReDoc Documentation](https://trump-speeches-nlp-chatbot.azurewebsites.net/redoc)** - Alternative API docs
 
+> NOTE: The Azure Web App may be cold and can take a minute or two to boot after a deploy or when it hasn't been used recently. If the demo or API docs are temporarily unavailable, please wait 1–2 minutes and retry.
+
 📘 **[Documentation Site](https://justakris.github.io/Trump-Rally-Speeches-NLP-Chatbot/)** - Complete project documentation with guides and references
 
 🏗️ **[System Architecture](https://justakris.github.io/Trump-Rally-Speeches-NLP-Chatbot/reference/architecture/)** - Detailed technical documentation with diagrams
