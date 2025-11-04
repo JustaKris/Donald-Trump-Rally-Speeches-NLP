@@ -1,47 +1,52 @@
-# Trump Speeches NLP Chatbot — Documentation
+# Trump Speeches NLP Chatbot API — Technical Documentation
 
-Welcome to the documentation for the **Trump Speeches NLP Chatbot** project, a production-ready FastAPI application demonstrating modern AI engineering practices with RAG (Retrieval-Augmented Generation), semantic search, and sentiment analysis.
+Production-ready AI/ML platform demonstrating enterprise-grade practices in natural language processing, retrieval-augmented generation, and modern backend development.
 
-## 🎯 What This Project Demonstrates
+## Project Overview
 
-This portfolio project showcases:
+This portfolio project demonstrates expertise in:
 
-- **RAG System Architecture** — ChromaDB vector database + MPNet embeddings + Google Gemini LLM
-- **Hybrid Search** — Combining semantic search with BM25 keyword matching and cross-encoder reranking
-- **Production FastAPI Development** — RESTful API design with 12+ endpoints
-- **Entity Analytics** — Automatic entity extraction with sentiment analysis
-- **DevOps Practices** — Docker, CI/CD, comprehensive testing, code quality tools
+- **Advanced RAG Architecture** — ChromaDB vector database, MPNet embeddings (768-dim), Google Gemini LLM integration
+- **Hybrid Retrieval Systems** — Semantic search combined with BM25 keyword matching and cross-encoder reranking
+- **Production API Development** — FastAPI with 12+ RESTful endpoints, type-safe Pydantic models, comprehensive error handling
+- **Entity Analytics** — Automated entity extraction with sentiment analysis and contextual associations
+- **Professional DevOps** — Docker containerization, CI/CD pipelines, automated testing, code quality enforcement
 
-## 📚 Documentation Structure
+## Documentation Structure
 
-### Getting Started
+### Getting Started Guides
 
-New to the project? Start here:
+Quick setup and deployment:
 
-- **[Quickstart Guide](guides/quickstart.md)** — Get the API running in 5 minutes
-- **[Deployment Guide](guides/deployment.md)** — Deploy to Render, Azure, or Docker
+- **[Quickstart Guide](guides/quickstart.md)** — Local setup and first API calls
+- **[Deployment Guide](guides/deployment.md)** — Production deployment to Render, Azure, or Docker
 
 ### How-To Guides
 
-Task-oriented guides for specific features:
+Implementation details for specific features:
 
-- **[Testing Guide](howto/testing.md)** — Run tests, code quality checks, and CI/CD
-- **[Entity Analytics](howto/entity-analytics.md)** — Analyze entities mentioned in speeches
+- **[Testing & CI/CD](howto/testing.md)** — Testing strategy, code quality tools, continuous integration
+- **[Logging](howto/logging.md)** — Production logging with JSON formatting and cloud integration
+- **[Configuration](reference/configuration.md)** — Environment-based configuration management
+- **[Entity Analytics](howto/entity-analytics.md)** — Entity extraction and sentiment analysis
+- **[Documentation](howto/documentation.md)** — Contributing to project documentation
 
-### Reference Documentation
+### Technical Reference
 
-Deep technical documentation:
+In-depth technical documentation:
 
-- **[System Architecture](reference/architecture.md)** — System design, components, and diagrams
-- **[RAG Features](reference/rag-features.md)** — Detailed RAG implementation documentation
+- **[System Architecture](reference/architecture.md)** — Component design, data flows, deployment patterns
+- **[RAG Features](reference/rag-features.md)** — RAG implementation details and optimization
+- **[Configuration Reference](reference/configuration.md)** — Complete configuration options
+- **[Changelog](CHANGELOG.md)** — Version history and recent improvements
 
-## 🚀 Quick Links
+## Quick Links
 
-- **[GitHub Repository](https://github.com/JustaKris/Trump-Rally-Speeches-NLP-Chatbot)** — Source code and issues
-- **[API Documentation (Swagger)](http://localhost:8000/docs)** — Interactive API docs (when running locally)
-- **[API Documentation (ReDoc)](http://localhost:8000/redoc)** — Alternative API docs
+- **[GitHub Repository](https://github.com/JustaKris/Trump-Rally-Speeches-NLP-Chatbot)** — Source code and issue tracking
+- **[API Documentation (Swagger)](https://trump-speeches-nlp-chatbot.azurewebsites.net/docs)** — Interactive API documentation (local)
+- **[API Documentation (ReDoc)](https://trump-speeches-nlp-chatbot.azurewebsites.net/redoc)** — Alternative API documentation
 
-## 🤖 Core Features
+## Core Features
 
 ### RAG Q&A System
 

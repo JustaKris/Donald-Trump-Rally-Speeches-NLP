@@ -99,7 +99,7 @@ jobs:
     
     - name: Run flake8
       run: |
-        flake8 src/ --count --statistics --show-source
+        uv run flake8 src/ --count --statistics --show-source
     
     - name: Check code formatting with Black
       run: |

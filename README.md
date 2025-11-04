@@ -29,21 +29,21 @@ A production-ready NLP API showcasing natural language processing and retrieval-
 
 ## 🚀 Live Demo
 
-🔗 **[Try the API](http://localhost:8000)** (Coming soon: deployed version)
+🔗 **[Try the API](https://trump-speeches-nlp-chatbot.azurewebsites.net)** (Coming soon: deployed version)
 
-📚 **[API Documentation](http://localhost:8000/docs)** - Interactive Swagger UI (Coming soon: deployed version)
+📚 **[API Documentation](https://trump-speeches-nlp-chatbot.azurewebsites.net/docs)** - Interactive Swagger UI (Coming soon: deployed version)
 
-📖 **[ReDoc Documentation](http://localhost:8000/redoc)** - Alternative API docs (Coming soon: deployed version)
+📖 **[ReDoc Documentation](https://trump-speeches-nlp-chatbot.azurewebsites.net/redoc)** - Alternative API docs (Coming soon: deployed version)
 
 📘 **[Documentation Site](https://justakris.github.io/Trump-Rally-Speeches-NLP-Chatbot/)** - Complete project documentation with guides and references
 
 🏗️ **[System Architecture](https://justakris.github.io/Trump-Rally-Speeches-NLP-Chatbot/reference/architecture/)** - Detailed technical documentation with diagrams
 
-## 📊 What's Inside
+## 📊 Technical Implementation
 
-### 🤖 RAG System — The Star Feature
+### RAG (Retrieval-Augmented Generation) System
 
-**Ask questions about 35 political speeches** using state-of-the-art retrieval and generation:
+Production-ready question-answering system over 35 political speeches (300,000+ words):
 
 - **`rag_service.py`** — Complete RAG implementation with:
   - ChromaDB vector database for persistent embeddings
@@ -104,19 +104,23 @@ Jupyter notebooks showcasing statistical NLP and exploratory data analysis techn
 
 ### Backend Engineering
 
-- **API Development**: Production-grade FastAPI with 12+ RESTful endpoints
-- **Vector Databases**: ChromaDB with persistent storage and efficient querying
-- **Error Handling**: Graceful fallbacks and comprehensive logging
-- **Performance**: Efficient chunking, caching strategies, optimized retrieval
-- **Type Safety**: Full Pydantic models and Python type hints
+- **API Development**: Production-grade FastAPI with 12+ RESTful endpoints, async request handling
+- **Vector Databases**: ChromaDB with persistent storage, smart deduplication, efficient querying
+- **Configuration Management**: Pydantic Settings with type validation and environment-based config
+- **Production Logging**: JSON-formatted logs for cloud platforms, colored output for development
+- **Error Handling**: Graceful fallbacks, comprehensive exception handling, structured error responses
+- **Performance**: Efficient chunking (2048 chars), hybrid search, cross-encoder reranking
+- **Type Safety**: Full Pydantic validation, Python 3.11+ type hints throughout
 
 ### DevOps & Quality
 
-- **Containerization**: Docker with multi-stage builds
-- **CI/CD**: GitHub Actions with automated testing and code quality checks
-- **Testing**: pytest with 50%+ coverage, unit and integration tests
-- **Code Quality**: Black, flake8, isort, mypy for consistent, maintainable code
-- **Documentation**: API docs via Swagger/ReDoc, comprehensive README
+- **Containerization**: Multi-stage Docker builds, non-root user, health checks
+- **CI/CD**: GitHub Actions with automated testing, security scanning, code quality gates
+- **Testing**: pytest with 50%+ coverage, unit and integration tests, parametrized test cases
+- **Code Quality**: Black, flake8, isort, mypy enforced via pre-commit and CI
+- **Security**: pip-audit for vulnerability scanning, bandit for security analysis
+- **Documentation**: Comprehensive MkDocs site, API docs via Swagger/ReDoc, inline docstrings
+- **Observability**: Structured logging, health endpoints, startup configuration display
 
 ## � Example RAG Queries
 
@@ -128,6 +132,28 @@ Try asking the system natural language questions like:
 - *"Compare the themes between 2019 and 2020 speeches"*
 
 The system retrieves relevant context, analyzes entities, calculates confidence scores, and generates coherent answers with source attribution.
+
+## 🎯 Recent Improvements (November 2025)
+
+### Production-Ready Logging
+- **Dual-format logging**: JSON for production/cloud, colored for development
+- **Automatic environment detection**: Zero configuration needed
+- **Cloud-native**: Works with Azure Application Insights, CloudWatch, ELK stack
+- **Smart filtering**: Suppresses noisy third-party library logs
+
+### Professional Configuration Management  
+- **Type-safe settings**: Pydantic validation catches errors at startup
+- **Environment-based**: Full `.env` file support for local and cloud deployment
+- **Flexible**: Support for multiple LLM providers (Gemini, OpenAI, Anthropic)
+- **Cloud-ready**: Seamless Azure/AWS deployment with environment variables
+
+### Performance & Reliability
+- **Smart deduplication**: Prevents re-indexing existing ChromaDB chunks
+- **100x faster re-indexing**: Skip embedding computation for existing documents
+- **Clean logs**: No more duplicate ID warnings or telemetry errors
+- **Dependency injection**: Better testability and cleaner initialization
+
+[See full changelog](docs/CHANGELOG.md)
 
 ## 🚀 Quick Start
 
@@ -159,9 +185,9 @@ The system retrieves relevant context, analyzes entities, calculates confidence 
    ```
 
 4. **Access the application**
-   - **Web Interface:** <http://localhost:8000>
-   - **API Docs:** <http://localhost:8000/docs>
-   - **ReDoc:** <http://localhost:8000/redoc>
+   - **Web Interface:** <https://trump-speeches-nlp-chatbot.azurewebsites.net>
+   - **API Docs:** <https://trump-speeches-nlp-chatbot.azurewebsites.net/docs>
+   - **ReDoc:** <https://trump-speeches-nlp-chatbot.azurewebsites.net/redoc>
 
 ### Try the RAG System
 

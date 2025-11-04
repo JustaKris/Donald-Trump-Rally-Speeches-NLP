@@ -1,9 +1,9 @@
 """
-FastAPI Application for General-Purpose NLP Text Analysis.
+Trump Speeches NLP Chatbot API - Production-Ready AI Platform
 
-This API provides endpoints for sentiment analysis, word frequency analysis,
-topic extraction, and n-gram analysis using state-of-the-art NLP models.
-Includes a demo dataset of political speeches for showcase purposes.
+Comprehensive NLP and RAG platform for analyzing Trump rally speeches (2019-2020).
+Features AI-powered Q&A with Gemini, sentiment analysis with FinBERT, semantic search,
+and advanced text analytics. Built with FastAPI, ChromaDB, and LangChain.
 
 Run with: uvicorn src.api:app --reload
 """
@@ -18,6 +18,8 @@ from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from .config import Settings, get_settings
+from .llm_service import GeminiLLM
 from .models import SentimentAnalyzer
 from .preprocessing import clean_text, extract_ngrams, tokenize_text
 from .rag_service import RAGService
@@ -28,30 +30,19 @@ from .utils import (
     load_speeches_from_directory,
 )
 
-# Configure logging with clean format
-logging.basicConfig(
-    level=logging.INFO,
-    format="INFO:     %(message)s",  # Match Uvicorn's format
-)
+# Get configuration
+settings = get_settings()
+
+# Configure logging based on settings
+settings.setup_logging()
 logger = logging.getLogger(__name__)
-
-
-# Custom filter to suppress ChromaDB telemetry warnings (harmless bugs in ChromaDB)
-class SuppressChromaDBTelemetryFilter(logging.Filter):
-    def filter(self, record):
-        return "Failed to send telemetry event" not in record.getMessage()
-
-
-# Apply filter to uvicorn logger
-uvicorn_logger = logging.getLogger("uvicorn")
-uvicorn_logger.addFilter(SuppressChromaDBTelemetryFilter())
 
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="Trump Speeches NLP Chatbot API",
+    title=settings.app_name,
     description="Production-ready NLP and RAG API for sentiment analysis, topic modeling, and conversational Q&A over Trump rally speeches. Built with FastAPI, ChromaDB, and Gemini.",
-    version="0.1.0",
+    version=settings.app_version,
     docs_url="/docs",
     redoc_url="/redoc",
 )
@@ -60,7 +51,7 @@ app = FastAPI(
 # Add CORS middleware for frontend access
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify exact origins
+    allow_origins=settings.get_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -82,27 +73,76 @@ rag_service: Optional[RAGService] = None
 async def startup_event():
     """Load models on application startup."""
     global sentiment_analyzer, rag_service
-    logger.info("Loading sentiment analysis model...")
+
+    # Log configuration
+    logger.info("=" * 70)
+    settings.log_startup_info(logger)
+    logger.info("=" * 70)
+
+    # Load sentiment analysis model
+    logger.info(f"Loading sentiment analysis model: {settings.sentiment_model_name}")
     try:
-        sentiment_analyzer = SentimentAnalyzer()
-        logger.info("Sentiment analysis model loaded successfully!")
+        sentiment_analyzer = SentimentAnalyzer(model_name=settings.sentiment_model_name)
+        logger.info("✓ Sentiment analysis model loaded successfully")
     except Exception as e:
-        logger.error(f"Failed to load model: {e}")
+        logger.error(f"✗ Failed to load sentiment model: {e}")
         # Continue without model - endpoints will return errors
 
+    # Initialize LLM service if configured
+    llm_service = None
+    if settings.is_llm_configured():
+        try:
+            logger.info(f"Initializing {settings.llm_provider.upper()} LLM service...")
+            llm_service = GeminiLLM(
+                api_key=settings.get_llm_api_key(),  # type: ignore[arg-type]
+                model_name=settings.get_llm_model_name(),
+                temperature=settings.gemini_temperature,
+                max_output_tokens=settings.gemini_max_output_tokens,
+            )
+
+            # Test connection
+            if llm_service.test_connection():
+                logger.info("✓ LLM service initialized and tested successfully")
+            else:
+                logger.warning("⚠️  LLM connection test failed")
+                llm_service = None
+        except Exception as e:
+            logger.error(f"✗ Failed to initialize LLM: {e}")
+            llm_service = None
+    else:
+        logger.warning("⚠️  LLM not configured - RAG will use extraction-based answers")
+        logger.warning("   Set GEMINI_API_KEY in .env file for AI-powered answers")
+
+    # Initialize RAG service
     logger.info("Initializing RAG service...")
     try:
-        rag_service = RAGService()
+        rag_service = RAGService(
+            collection_name=settings.chromadb_collection_name,
+            persist_directory=settings.chromadb_persist_directory,
+            embedding_model=settings.embedding_model_name,
+            reranker_model=settings.reranker_model_name,
+            chunk_size=settings.chunk_size,
+            chunk_overlap=settings.chunk_overlap,
+            llm_service=llm_service,
+            use_reranking=settings.use_reranking,
+            use_hybrid_search=settings.use_hybrid_search,
+        )
+
         # Check if collection is empty and load documents if needed
         if rag_service.collection.count() == 0:
             logger.info("Loading documents into RAG service...")
-            docs_loaded = rag_service.load_documents()
-            logger.info(f"Loaded {docs_loaded} documents into RAG service!")
+            docs_loaded = rag_service.load_documents(settings.speeches_directory)
+            logger.info(f"✓ Loaded {docs_loaded} documents into RAG service")
         else:
-            logger.info(f"RAG service initialized with {rag_service.collection.count()} chunks")
+            chunk_count = rag_service.collection.count()
+            logger.info(f"✓ RAG service initialized with {chunk_count} existing chunks")
     except Exception as e:
-        logger.error(f"Failed to initialize RAG service: {e}")
+        logger.error(f"✗ Failed to initialize RAG service: {e}", exc_info=True)
         # Continue without RAG - endpoints will return errors
+
+    logger.info("=" * 70)
+    logger.info("Application startup complete")
+    logger.info("=" * 70)
 
 
 @app.on_event("shutdown")
@@ -231,10 +271,10 @@ async def root():
         return FileResponse(html_file)
     return """
     <html>
-        <head><title>NLP Text Analysis API</title></head>
+        <head><title>Trump Speeches NLP Chatbot API</title></head>
         <body>
-            <h1>📊 NLP Text Analysis API</h1>
-            <p>Professional natural language processing API for text analysis</p>
+            <h1>🧠 Trump Speeches NLP Chatbot API</h1>
+            <p>Production-ready NLP and RAG platform with AI Q&A, sentiment analysis, and semantic search</p>
             <ul>
                 <li><a href="/docs">📚 Interactive API Documentation</a></li>
                 <li><a href="/redoc">📖 ReDoc Documentation</a></li>
@@ -382,12 +422,12 @@ async def get_speech_statistics():
 @app.get("/speeches/list")
 async def list_speeches():
     """
-    List all speeches in the demo dataset with metadata.
+    List all speeches indexed in the RAG knowledge base.
 
-    The demo dataset contains 35+ political rally speeches from 2019-2020,
-    showcasing the API's ability to process and analyze real-world text data.
+    Returns all speeches in the demo dataset (35+ Trump rally speeches, 2019-2020)
+    with metadata including filename, location, date, and word count.
 
-    Returns a list of all speeches with location, date, and word count.
+    These speeches form the knowledge base for the RAG AI Q&A system.
     """
     try:
         df = load_speeches_from_directory()
@@ -430,12 +470,15 @@ async def clean_text_endpoint(input: TextInput, remove_stopwords: bool = True):
 @app.post("/rag/ask", response_model=RAGAnswerResponse)
 async def rag_ask_question(query: RAGQueryRequest):
     """
-    Ask a question about the indexed documents using RAG.
+    Ask a question about the indexed Trump rally speeches using Retrieval-Augmented Generation.
 
-    Uses semantic search to retrieve relevant context and generates an answer
-    based on the retrieved information. Works with any text corpus that has been indexed.
+    Combines semantic search with Google Gemini AI to:
+    1. Find relevant speech excerpts using vector similarity
+    2. Generate comprehensive answers grounded in the retrieved context
+    3. Provide confidence scores and source attribution
 
-    Returns an answer with supporting context, confidence level, and source documents.
+    Supports hybrid search (semantic + keyword) and cross-encoder re-ranking for best results.
+    Returns the AI-generated answer with supporting context chunks and source documents.
     """
     if rag_service is None:
         raise HTTPException(
@@ -457,10 +500,12 @@ async def rag_ask_question(query: RAGQueryRequest):
 @app.post("/rag/search")
 async def rag_semantic_search(query: RAGSearchRequest):
     """
-    Perform semantic search over indexed documents.
+    Perform semantic search over the indexed Trump rally speeches.
 
-    Searches for text chunks similar to the query using semantic embeddings.
-    Returns the most relevant chunks with metadata and similarity scores.
+    Finds speech excerpts similar to your query using vector embeddings from SentenceTransformers.
+    Combines semantic similarity with optional keyword matching (BM25) for hybrid search.
+
+    Returns the most relevant text chunks with similarity scores and source metadata.
     """
     if rag_service is None:
         raise HTTPException(
@@ -482,10 +527,13 @@ async def rag_semantic_search(query: RAGSearchRequest):
 @app.get("/rag/stats", response_model=RAGStatsResponse)
 async def get_rag_statistics():
     """
-    Get statistics about the RAG collection.
+    Get statistics about the RAG knowledge base.
 
-    Returns information about indexed documents, chunk counts, sources,
-    and embedding configuration.
+    Returns information about the indexed Trump rally speeches including:
+    - Total number of indexed chunks
+    - Unique source speeches
+    - Embedding model details
+    - Chunk configuration (size, overlap)
     """
     if rag_service is None:
         raise HTTPException(
@@ -507,12 +555,13 @@ async def get_rag_statistics():
 @app.post("/rag/index")
 async def index_documents(data_dir: str = "data/Donald Trump Rally Speeches"):
     """
-    Index or re-index documents from a directory.
+    Index or re-index documents into the RAG knowledge base.
 
-    Loads text files, chunks them, generates embeddings, and stores them
-    in the vector database for semantic search and retrieval.
+    Loads all text files from the specified directory, chunks them using LangChain,
+    generates vector embeddings, and stores them in ChromaDB for semantic search.
 
-    Use this to update the RAG knowledge base with new documents.
+    This clears the existing index and rebuilds it. Use to update the knowledge base
+    with new or modified speeches.
     """
     if rag_service is None:
         raise HTTPException(

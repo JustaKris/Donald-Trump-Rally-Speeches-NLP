@@ -29,11 +29,6 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 # Suppress transformers warnings about model initialization
 logging.getLogger("transformers").setLevel(logging.ERROR)
 
-# Configure consistent logging format
-logging.basicConfig(
-    level=logging.INFO,
-    format="INFO:     %(message)s",
-)
 logger = logging.getLogger(__name__)
 
 # Handle SSL certificate issues when downloading models
@@ -62,7 +57,7 @@ class SentimentAnalyzer:
 
     def _load_model(self):
         """Load the tokenizer and model from HuggingFace."""
-        logger.info(f"Loading {self.model_name}...")
+        logger.debug(f"Loading sentiment model: {self.model_name}")
 
         # Suppress specific model loading warnings
         with warnings.catch_warnings():
@@ -77,7 +72,7 @@ class SentimentAnalyzer:
             # Set model to evaluation mode
             self.model.eval()  # type: ignore[attr-defined]
 
-        logger.info("Model loaded successfully!")
+        logger.info(f"Sentiment model loaded: {self.model_name}")
 
     def analyze_sentiment(self, text: str, return_all_scores: bool = False) -> Dict[str, Any]:
         """

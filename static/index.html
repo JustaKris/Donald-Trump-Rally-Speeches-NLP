@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-Powered Q&A System | RAG + NLP Analysis</title>
+    <title>Trump Speeches NLP Chatbot API | AI Q&A, Sentiment Analysis & Search</title>
     <link rel="icon" type="image/jpeg" href="/static/images/favicon.jpg">
     <style>
         * {
@@ -419,8 +419,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>🤖 AI-Powered Q&A System</h1>
-            <p class="subtitle">Retrieval-Augmented Generation • Semantic Search • Advanced NLP Analysis</p>
+            <h1>🤖 Trump Speeches NLP Chatbot API</h1>
+            <p class="subtitle">AI-Powered Q&A with Gemini • Sentiment Analysis • Semantic Search • Advanced NLP</p>
         </header>
         
         <div class="content">
@@ -441,7 +441,7 @@
                 </p>
                 <p style="margin: 10px 0 20px 0; color: #555; font-size: 14px; line-height: 1.6;">
                     <strong>💡 Try asking:</strong>
-                    "What economic policies are discussed?" • "What topics appear most frequently?" • "What is the sentiment toward immigration?" • "What locations are mentioned?"
+                    "What economic policies are discussed?" • "What are Trump's views on Joe Biden?" • "What is the sentiment toward immigration?" • "What locations are mentioned?"
                 </p>
                 <textarea id="ragQuestion" placeholder="Ask a question about the documents... (e.g., 'What are the main economic policies discussed?')" style="min-height: 120px; font-size: 16px;"></textarea>
                 <button class="analyze" onclick="askRAG()">🚀 Ask AI</button>
@@ -483,7 +483,7 @@
             <!-- Sentiment Analysis Tab -->
             <div class="tab-content" id="sentiment">
                 <h2>😊 Sentiment Analysis</h2>
-                <p style="margin: 15px 0; color: #666;">Analyze the emotional tone of any text using FinBERT, a state-of-the-art transformer model. Works with social media posts, product reviews, news articles, and more.</p>
+                <p style="margin: 15px 0; color: #666;">Analyze the emotional tone of any text using <strong>FinBERT</strong>, a specialized BERT model fine-tuned for financial sentiment. Works with political speeches, news articles, social media posts, and any text where sentiment matters.</p>
                 <textarea id="sentimentText" placeholder="Enter any text to analyze... (e.g., 'This product exceeded my expectations! The quality is amazing and delivery was fast.')"></textarea>
                 <button class="analyze" onclick="analyzeSentiment()">Analyze Sentiment</button>
                 
@@ -558,10 +558,10 @@
             
             <!-- Stats Tab -->
             <div class="tab-content" id="stats">
-                <h2>📊 Demo Dataset Statistics</h2>
+                <h2>📊 Demo Dataset & RAG Index</h2>
                 <p style="margin: 15px 0; color: #666;">
-                    This system includes a demo dataset of 35+ political rally speeches (2019-2020) indexed in the vector database.
-                    All AI features work with any text corpus - this dataset showcases real-world capabilities.
+                    This system comes pre-indexed with <strong>35+ Trump rally speeches (2019-2020)</strong> stored in ChromaDB as semantic embeddings.
+                    The RAG system uses these as a knowledge base for AI-powered question answering. View statistics below, or upload your own documents via the API.
                 </p>
                 <button class="analyze" onclick="loadStats()">Load Demo Dataset Stats</button>
                 
@@ -834,11 +834,12 @@
                 const response = await fetch('/rag/ask', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({question, top_k: 3})
+                    body: JSON.stringify({question, top_k: 5})
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`API error: ${response.statusText}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.detail || `API error: ${response.statusText}`);
                 }
                 
                 const data = await response.json();

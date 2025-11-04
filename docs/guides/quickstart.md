@@ -1,10 +1,8 @@
 # Quick Start Guide
 
-This guide gets you up and running with the NLP Chatbot API in minutes. For comprehensive documentation, visit the [full documentation site](https://justakris.github.io/Trump-Rally-Speeches-NLP-Chatbot/).
+Get the Trump Speeches NLP Chatbot API running locally in minutes.
 
-## Running the RAG-Powered NLP API
-
-### Prerequisites
+## Prerequisites
 
 - Python 3.11+ installed
 - uv installed ([install guide](https://docs.astral.sh/uv/getting-started/installation/))
@@ -34,9 +32,22 @@ This guide gets you up and running with the NLP Chatbot API in minutes. For comp
    ```
 
    The API will automatically:
-   - Load the FinBERT sentiment model
-   - Initialize ChromaDB vector database
-   - Index the 35 speech documents (first run only)
+   - Load configuration from `.env`
+   - Initialize logging (colored output in development)
+   - Load FinBERT sentiment model (~440MB)
+   - Initialize Gemini LLM service
+   - Load ChromaDB vector database with existing embeddings
+   - Start FastAPI server
+
+   **Expected startup output**:
+   ```
+   2025-11-04 12:34:56 | INFO     | src.api              | Application: Trump Speeches NLP Chatbot API v0.1.0
+   2025-11-04 12:34:56 | INFO     | src.api              | Environment: development
+   2025-11-04 12:34:56 | INFO     | src.api              | ✓ Sentiment analysis model loaded successfully
+   2025-11-04 12:34:57 | INFO     | src.api              | ✓ LLM service initialized and tested successfully
+   2025-11-04 12:34:58 | INFO     | src.api              | ✓ RAG service initialized with 1082 existing chunks
+   2025-11-04 12:34:58 | INFO     | src.api              | Application startup complete
+   ```
 
 4. **Access the Application**
    - Web UI: <http://localhost:8000>
@@ -50,8 +61,9 @@ This guide gets you up and running with the NLP Chatbot API in minutes. For comp
 ```powershell
 docker build -t trump-speeches-nlp-chatbot .
 docker run --rm -it -p 8000:8000 --env-file .env --name nlp-chatbot trump-speeches-nlp-chatbot
-docker run --rm -it -p 8000:8000 -v "${PWD}/data/chromadb:/app/data/chromadb" --env-file .env --name nlp-chatbot trump-speeches-nlp-chatbot
-```
+
+
+docker run --rm -it -p 8000:8000 -v "${PWD}/data/chromadb:/app/data/chromadb" --env-file .env --name nlp-chatbot trump-speeches-nlp-api:torch-2.6.0
 
 ### Using Docker Compose
 

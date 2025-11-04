@@ -5,14 +5,12 @@ Provides integration with Google Gemini for high-quality answer synthesis
 from retrieved context chunks.
 """
 
-import os
+import logging
 from typing import Any, Dict, List, Optional
 
 import google.generativeai as genai
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+logger = logging.getLogger(__name__)
 
 
 class GeminiLLM:
@@ -25,27 +23,29 @@ class GeminiLLM:
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
+        api_key: str,
         model_name: str = "gemini-2.5-flash",
         temperature: float = 0.3,
+        max_output_tokens: int = 1024,
     ):
         """
         Initialize Gemini LLM service.
 
         Args:
-            api_key: Google API key (defaults to GEMINI_API_KEY env var)
+            api_key: Google API key (required)
             model_name: Gemini model to use (flash for speed, pro for quality)
             temperature: Generation temperature (0.0-1.0, lower = more focused)
+            max_output_tokens: Maximum tokens in generated responses
         """
-        self.api_key = api_key or os.getenv("GEMINI_API_KEY")
-        if not self.api_key:
-            raise ValueError(
-                "Gemini API key not found. Set GEMINI_API_KEY environment variable "
-                "or pass api_key parameter."
-            )
+        if not api_key:
+            raise ValueError("Gemini API key is required")
 
+        self.api_key = api_key
         self.model_name = model_name
         self.temperature = temperature
+        self.max_output_tokens = max_output_tokens
+
+        logger.debug(f"Initializing Gemini LLM with model: {model_name}")
 
         # Configure Gemini
         genai.configure(api_key=self.api_key)  # type: ignore[attr-defined]
@@ -66,8 +66,10 @@ class GeminiLLM:
             temperature=temperature,
             top_p=0.95,
             top_k=40,
-            max_output_tokens=1024,
+            max_output_tokens=max_output_tokens,
         )
+
+        logger.info(f"Gemini LLM initialized: model={model_name}, temp={temperature}")
 
     def generate_answer(
         self,
@@ -120,9 +122,19 @@ class GeminiLLM:
 
         try:
             # Generate answer
+            logger.debug(f"Sending prompt to Gemini (length: {len(prompt)} chars)")
             response = self.model.generate_content(prompt, generation_config=self.generation_config)
 
+            # Check if response was blocked or empty
+            if not response or not hasattr(response, "text"):
+                raise ValueError("Gemini response was empty or blocked by safety filters")
+
             answer_text = response.text.strip()
+
+            if not answer_text:
+                raise ValueError("Gemini returned empty answer")
+
+            logger.info(f"Gemini generated answer successfully (length: {len(answer_text)} chars)")
 
             return {
                 "answer": answer_text,
@@ -132,6 +144,7 @@ class GeminiLLM:
 
         except Exception as e:
             # Fallback to extraction-based answer on error
+            logger.error(f"Gemini generation failed: {str(e)}", exc_info=True)
             fallback_answer = self._extraction_fallback(question, context_chunks)
             return {
                 "answer": fallback_answer,
@@ -214,13 +227,16 @@ INSTRUCTIONS:
             True if connection successful, False otherwise
         """
         try:
+            logger.debug("Testing Gemini API connection...")
             response = self.model.generate_content(
-                "Hello", generation_config=self.generation_config
+                "Say 'OK' to confirm you are working.", generation_config=self.generation_config
             )
             # Try to access the text - this will fail if blocked/no content
-            _ = response.text
+            result = response.text
+            logger.info(f"Gemini API connection test successful: {result[:50]}")
             return True
-        except Exception:
+        except Exception as e:
+            logger.error(f"Gemini API connection test failed: {e}")
             return False
 
     def get_model_info(self) -> Dict[str, Any]:

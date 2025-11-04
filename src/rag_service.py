@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional, Tuple, cast
 
 import chromadb
 from chromadb.api.types import IncludeEnum
-from chromadb.config import Settings
+from chromadb.config import Settings as ChromaSettings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from rank_bm25 import BM25Okapi
 from sentence_transformers import CrossEncoder, SentenceTransformer
@@ -23,8 +23,7 @@ from .llm_service import GeminiLLM
 # Disable ChromaDB telemetry to avoid annoying warnings
 os.environ["ANONYMIZED_TELEMETRY"] = "False"
 
-# Suppress ChromaDB telemetry error messages (these are harmless bugs in ChromaDB)
-logging.getLogger("chromadb.telemetry.product.posthog").setLevel(logging.ERROR)
+logger = logging.getLogger(__name__)
 
 
 class RAGService:
@@ -43,12 +42,12 @@ class RAGService:
         reranker_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2",
         chunk_size: int = 2048,
         chunk_overlap: int = 150,
-        use_llm: bool = True,
+        llm_service: Optional[GeminiLLM] = None,
         use_reranking: bool = True,
         use_hybrid_search: bool = True,
     ):
         """
-        Initialize RAG service with ChromaDB, sentence-transformers, and Gemini.
+        Initialize RAG service with ChromaDB, sentence-transformers, and optional LLM.
 
         Args:
             collection_name: Name of the ChromaDB collection
@@ -57,7 +56,7 @@ class RAGService:
             reranker_model: Cross-encoder model for re-ranking
             chunk_size: Maximum size of text chunks in characters (~512-768 tokens)
             chunk_overlap: Overlap between chunks in characters (~100-150 tokens)
-            use_llm: Use Gemini LLM for answer generation
+            llm_service: Optional LLM service instance (if None, uses extraction-based answers)
             use_reranking: Use cross-encoder for re-ranking results
             use_hybrid_search: Combine semantic and keyword search
         """
@@ -65,37 +64,37 @@ class RAGService:
         self.persist_directory = persist_directory
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
-        self.use_llm = use_llm
         self.use_reranking = use_reranking
         self.use_hybrid_search = use_hybrid_search
 
+        logger.debug(f"Initializing RAG service: collection={collection_name}")
+
         # Initialize embedding model
+        logger.info(f"Loading embedding model: {embedding_model}")
         self.embedding_model = SentenceTransformer(embedding_model)
 
         # Initialize re-ranker if enabled
         self.reranker = None
         if use_reranking:
             try:
+                logger.info(f"Loading re-ranker model: {reranker_model}")
                 self.reranker = CrossEncoder(reranker_model)
             except Exception as e:
-                print(f"Warning: Could not load re-ranker: {e}")
+                logger.warning(f"Could not load re-ranker: {e}")
                 self.use_reranking = False
 
-        # Initialize LLM if enabled
-        self.llm = None
-        if use_llm:
-            try:
-                self.llm = GeminiLLM()
-            except Exception as e:
-                print(f"Warning: Could not initialize Gemini: {e}")
-                print("Falling back to extraction-based answers")
-                self.use_llm = False
+        # Set LLM service
+        self.llm = llm_service
+        if llm_service:
+            logger.info("RAG service using LLM for answer generation")
+        else:
+            logger.info("RAG service using extraction-based answers (no LLM)")
 
         # Initialize ChromaDB client with persistence
         os.makedirs(persist_directory, exist_ok=True)
         self.chroma_client = chromadb.PersistentClient(
             path=persist_directory,
-            settings=Settings(
+            settings=ChromaSettings(
                 anonymized_telemetry=False,
                 allow_reset=True,
             ),
@@ -162,27 +161,58 @@ class RAGService:
                 documents_added += 1
 
             except Exception as e:
-                print(f"Error loading {file_path.name}: {e}")
+                logger.error(f"Error loading {file_path.name}: {e}")
                 continue
 
-        # Add all chunks to ChromaDB in batch
+        # Add all chunks to ChromaDB in batch (skip duplicates)
         if all_chunks:
-            # Generate embeddings
-            embeddings = self.embedding_model.encode(
-                all_chunks, show_progress_bar=True, convert_to_numpy=True
-            ).tolist()
+            # Check for existing IDs to avoid duplicates
+            try:
+                existing_data = self.collection.get()
+                existing_ids = set(existing_data.get("ids", []))
+                logger.debug(f"Found {len(existing_ids)} existing chunks in collection")
+            except Exception as e:
+                logger.warning(f"Could not fetch existing IDs: {e}")
+                existing_ids = set()
 
-            # Add to collection
-            self.collection.add(
-                documents=all_chunks,
-                embeddings=embeddings,
-                metadatas=all_metadatas,  # type: ignore[arg-type]
-                ids=all_ids,
-            )
+            # Filter out chunks that already exist
+            new_chunks = []
+            new_metadatas = []
+            new_ids = []
 
-            # Initialize BM25 for hybrid search
+            for chunk, metadata, chunk_id in zip(all_chunks, all_metadatas, all_ids):
+                if chunk_id not in existing_ids:
+                    new_chunks.append(chunk)
+                    new_metadatas.append(metadata)
+                    new_ids.append(chunk_id)
+
+            if new_chunks:
+                logger.info(
+                    f"Adding {len(new_chunks)} new chunks to collection (skipped {len(all_chunks) - len(new_chunks)} duplicates)"
+                )
+
+                # Generate embeddings only for new chunks
+                embeddings = self.embedding_model.encode(
+                    new_chunks, show_progress_bar=True, convert_to_numpy=True
+                ).tolist()
+
+                # Add to collection
+                self.collection.add(
+                    documents=new_chunks,
+                    embeddings=embeddings,
+                    metadatas=new_metadatas,  # type: ignore[arg-type]
+                    ids=new_ids,
+                )
+            else:
+                logger.info("All chunks already exist in collection, skipping add operation")
+
+            # Initialize BM25 for hybrid search (use all chunks including existing)
             if self.use_hybrid_search:
-                self._initialize_bm25(all_chunks)
+                # Fetch all documents from collection for BM25
+                all_collection_data = self.collection.get()
+                all_collection_docs = all_collection_data.get("documents", [])
+                if all_collection_docs:
+                    self._initialize_bm25(all_collection_docs)
 
         return documents_added
 
@@ -431,8 +461,8 @@ class RAGService:
         # Get unique sources
         sources = list(set(item["source"] for item in context_items))
 
-        # Use LLM-powered generation if enabled
-        if self.use_llm and self.llm is not None:
+        # Use LLM-powered generation if available
+        if self.llm is not None:
             try:
                 # Prepare context for LLM with flattened metadata
                 context_chunks = [
@@ -448,9 +478,13 @@ class RAGService:
                     for result in search_results
                 ]
 
-                # Generate answer using Gemini with entity awareness
+                # Generate answer using LLM with entity awareness
+                logger.debug(
+                    f"Generating answer with {len(context_chunks)} context chunks using LLM"
+                )
                 llm_response = self.llm.generate_answer(question, context_chunks, entities=entities)
                 answer_text = llm_response.get("answer", "Unable to generate answer.")
+                logger.debug(f"LLM response received (length: {len(answer_text)} chars)")
 
                 # Calculate enhanced confidence with multiple factors
                 confidence_data = self._calculate_confidence(
@@ -480,12 +514,15 @@ class RAGService:
 
             except Exception as e:
                 # Fall back to extraction if LLM fails
-                print(f"LLM generation failed, falling back to extraction: {e}")
+                logger.error(
+                    f"LLM generation failed, falling back to extraction: {e}", exc_info=True
+                )
                 return self._extraction_based_answer_formatted(
                     question, search_results, context_items, sources
                 )
         else:
             # Use extraction-based answering
+            logger.debug("Using extraction-based answering (no LLM)")
             return self._extraction_based_answer_formatted(
                 question, search_results, context_items, sources
             )
@@ -544,7 +581,7 @@ class RAGService:
 
         except Exception as e:
             # Fallback if sentiment analysis fails
-            print(f"Sentiment analysis failed: {e}")
+            logger.warning(f"Sentiment analysis failed: {e}")
 
         return {
             "average_score": 0.0,
@@ -1078,5 +1115,5 @@ class RAGService:
             )
             return True
         except Exception as e:
-            print(f"Error clearing collection: {e}")
+            logger.error(f"Error clearing collection: {e}")
             return False
