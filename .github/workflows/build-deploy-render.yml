@@ -1,4 +1,4 @@
-name: Deploy to Render (App is too heavy for Render)
+name: Build and Deploy to Render (Too Heavy for Render)
 
 on:
   # push:
