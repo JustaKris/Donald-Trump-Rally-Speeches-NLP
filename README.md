@@ -29,11 +29,11 @@ A production-ready NLP API showcasing natural language processing and retrieval-
 
 ## 🚀 Live Demo
 
-🔗 **[Try the API](https://trump-speeches-nlp-chatbot.azurewebsites.net)** (Coming soon: deployed version)
+🔗 **[Try the API](https://trump-speeches-nlp-chatbot.azurewebsites.net)**
 
-📚 **[API Documentation](https://trump-speeches-nlp-chatbot.azurewebsites.net/docs)** - Interactive Swagger UI (Coming soon: deployed version)
+📚 **[API Documentation](https://trump-speeches-nlp-chatbot.azurewebsites.net/docs)** - Interactive Swagger UI
 
-📖 **[ReDoc Documentation](https://trump-speeches-nlp-chatbot.azurewebsites.net/redoc)** - Alternative API docs (Coming soon: deployed version)
+📖 **[ReDoc Documentation](https://trump-speeches-nlp-chatbot.azurewebsites.net/redoc)** - Alternative API docs
 
 📘 **[Documentation Site](https://justakris.github.io/Trump-Rally-Speeches-NLP-Chatbot/)** - Complete project documentation with guides and references
 
