@@ -37,8 +37,8 @@ classifiers = [
 ]
 dependencies = [
     # PyTorch (CPU-only) - 2.6.0 is minimum version due to CVE-2025-32434
-    # "torch==2.6.0",
-    "torch==2.9.0",
+    "torch==2.6.0",
+    # "torch==2.9.0",
 
     # Core API Framework
     "fastapi (>=0.116.0,<0.117.0)",
@@ -66,9 +66,6 @@ dependencies = [
     "huggingface-hub (>=0.36.0,<0.37.0)",
     
     # Data Processing - NumPy <2 for compatibility with PyTorch 2.6 CPU builds
-    # "numpy (>=1.26.0,<2.0.0)",
-    # "pandas (>=2.2.0,<3.0.0)",
-    # "scipy (>=1.14.0,<2.0.0)",
     "numpy (>=1.26.0,<2.0.0)",
     "pandas (>=2.2.0,<3.0.0)",
     "scipy (>=1.14.0,<2.0.0)",
