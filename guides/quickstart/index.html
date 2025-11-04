@@ -472,23 +472,14 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#running-the-rag-powered-nlp-api" class="md-nav__link">
-    <span class="md-ellipsis">
-      Running the RAG-Powered NLP API
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Running the RAG-Powered NLP API">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
       Prerequisites
     </span>
   </a>
   
-</li>
+    <nav class="md-nav" aria-label="Prerequisites">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#setup" class="md-nav__link">
@@ -518,15 +509,6 @@
   <a href="#build-and-run" class="md-nav__link">
     <span class="md-ellipsis">
       Build and Run
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#using-docker-compose" class="md-nav__link">
-    <span class="md-ellipsis">
-      Using Docker Compose
     </span>
   </a>
   
@@ -933,23 +915,14 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#running-the-rag-powered-nlp-api" class="md-nav__link">
-    <span class="md-ellipsis">
-      Running the RAG-Powered NLP API
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Running the RAG-Powered NLP API">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
       Prerequisites
     </span>
   </a>
   
-</li>
+    <nav class="md-nav" aria-label="Prerequisites">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#setup" class="md-nav__link">
@@ -979,15 +952,6 @@
   <a href="#build-and-run" class="md-nav__link">
     <span class="md-ellipsis">
       Build and Run
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#using-docker-compose" class="md-nav__link">
-    <span class="md-ellipsis">
-      Using Docker Compose
     </span>
   </a>
   
@@ -1129,9 +1093,8 @@
 
 
 <h1 id="quick-start-guide">Quick Start Guide<a class="headerlink" href="#quick-start-guide" title="Permanent link">&para;</a></h1>
-<p>This guide gets you up and running with the NLP Chatbot API in minutes. For comprehensive documentation, visit the <a href="https://justakris.github.io/Trump-Rally-Speeches-NLP-Chatbot/">full documentation site</a>.</p>
-<h2 id="running-the-rag-powered-nlp-api">Running the RAG-Powered NLP API<a class="headerlink" href="#running-the-rag-powered-nlp-api" title="Permanent link">&para;</a></h2>
-<h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
+<p>Get the Trump Speeches NLP Chatbot API running locally in minutes.</p>
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Python 3.11+ installed</li>
 <li>uv installed (<a href="https://docs.astral.sh/uv/getting-started/installation/">install guide</a>)</li>
@@ -1157,9 +1120,20 @@
 <div class="language-powershell highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">uv</span> <span class="n">run</span> <span class="n">uvicorn</span> <span class="n">src</span><span class="p">.</span><span class="n">api</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-host</span> <span class="n">0</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">0</span> <span class="p">-</span><span class="n">-port</span> <span class="n">8000</span> <span class="p">-</span><span class="n">-reload</span>
 </span></code></pre></div>
 <p>The API will automatically:
-   - Load the FinBERT sentiment model
-   - Initialize ChromaDB vector database
-   - Index the 35 speech documents (first run only)</p>
+   - Load configuration from <code>.env</code>
+   - Initialize logging (colored output in development)
+   - Load FinBERT sentiment model (~440MB)
+   - Initialize Gemini LLM service
+   - Load ChromaDB vector database with existing embeddings
+   - Start FastAPI server</p>
+<p><strong>Expected startup output</strong>:
+   <div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>2025-11-04 12:34:56 | INFO     | src.api              | Application: Trump Speeches NLP Chatbot API v0.1.0
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>2025-11-04 12:34:56 | INFO     | src.api              | Environment: development
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>2025-11-04 12:34:56 | INFO     | src.api              | ✓ Sentiment analysis model loaded successfully
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>2025-11-04 12:34:57 | INFO     | src.api              | ✓ LLM service initialized and tested successfully
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>2025-11-04 12:34:58 | INFO     | src.api              | ✓ RAG service initialized with 1082 existing chunks
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>2025-11-04 12:34:58 | INFO     | src.api              | Application startup complete
+</span></code></pre></div></p>
 <ol>
 <li><strong>Access the Application</strong></li>
 <li>Web UI: <a href="http://localhost:8000">http://localhost:8000</a></li>
@@ -1168,12 +1142,16 @@
 </ol>
 <h2 id="running-with-docker">Running with Docker<a class="headerlink" href="#running-with-docker" title="Permanent link">&para;</a></h2>
 <h3 id="build-and-run">Build and Run<a class="headerlink" href="#build-and-run" title="Permanent link">&para;</a></h3>
-<div class="language-powershell highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">docker</span> <span class="n">build</span> <span class="n">-t</span> <span class="n">trump-speeches-nlp-chatbot</span> <span class="p">.</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">docker</span> <span class="n">run</span> <span class="p">-</span><span class="n">-rm</span> <span class="n">-it</span> <span class="n">-p</span> <span class="n">8000</span><span class="p">:</span><span class="n">8000</span> <span class="p">-</span><span class="n">-env</span><span class="o">-file</span> <span class="p">.</span><span class="n">env</span> <span class="p">-</span><span class="n">-name</span> <span class="n">nlp-chatbot</span> <span class="n">trump-speeches-nlp-chatbot</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">docker</span> <span class="n">run</span> <span class="p">-</span><span class="n">-rm</span> <span class="n">-it</span> <span class="n">-p</span> <span class="n">8000</span><span class="p">:</span><span class="n">8000</span> <span class="n">-v</span> <span class="s2">&quot;${PWD}/data/chromadb:/app/data/chromadb&quot;</span> <span class="p">-</span><span class="n">-env</span><span class="o">-file</span> <span class="p">.</span><span class="n">env</span> <span class="p">-</span><span class="n">-name</span> <span class="n">nlp-chatbot</span> <span class="n">trump-speeches-nlp-chatbot</span>
-</span></code></pre></div>
-<h3 id="using-docker-compose">Using Docker Compose<a class="headerlink" href="#using-docker-compose" title="Permanent link">&para;</a></h3>
-<div class="language-powershell highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">docker-compose</span> <span class="n">up</span>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">docker</span> <span class="n">build</span> <span class="n">-t</span> <span class="n">trump-speeches-nlp-chatbot</span> <span class="p">.</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">docker</span> <span class="n">run</span> <span class="p">-</span><span class="n">-rm</span> <span class="n">-it</span> <span class="n">-p</span> <span class="n">8000</span><span class="p">:</span><span class="n">8000</span> <span class="p">-</span><span class="n">-env</span><span class="o">-file</span> <span class="p">.</span><span class="n">env</span> <span class="p">-</span><span class="n">-name</span> <span class="n">nlp-chatbot</span> <span class="n">trump-speeches-nlp-chatbot</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">docker</span> <span class="n">run</span> <span class="p">-</span><span class="n">-rm</span> <span class="n">-it</span> <span class="n">-p</span> <span class="n">8000</span><span class="p">:</span><span class="n">8000</span> <span class="n">-v</span> <span class="s2">&quot;${PWD}/data/chromadb:/app/data/chromadb&quot;</span> <span class="p">-</span><span class="n">-env</span><span class="o">-file</span> <span class="p">.</span><span class="n">env</span> <span class="p">-</span><span class="n">-name</span> <span class="n">nlp-chatbot</span> <span class="n">trump-speeches-nlp-api</span><span class="p">:</span><span class="n">torch</span><span class="p">-</span><span class="n">2</span><span class="p">.</span><span class="n">6</span><span class="p">.</span><span class="n">0</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c">### Using Docker Compose</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">```</span><span class="n">powershell</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="n">docker-compose</span> <span class="n">up</span>
 </span></code></pre></div>
 <h2 id="testing-the-rag-system">Testing the RAG System<a class="headerlink" href="#testing-the-rag-system" title="Permanent link">&para;</a></h2>
 <h3 id="using-the-web-interface">Using the Web Interface<a class="headerlink" href="#using-the-web-interface" title="Permanent link">&para;</a></h3>
