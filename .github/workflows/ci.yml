@@ -42,8 +42,9 @@ jobs:
     - name: Install dependencies
       run: |
         uv sync --group dev
-      env:
-        UV_PROJECT_ENVIRONMENT: .venv
+
+    - name: Debug installed packages
+      run: uv run pip list
     
     - name: Download NLTK data
       run: |
@@ -98,22 +99,23 @@ jobs:
     - name: Install linting tools
       run: |
         uv sync --group dev
-      env:
-        UV_PROJECT_ENVIRONMENT: .venv
+
+    - name: Debug installed packages
+      run: uv run pip list
     
     - name: Run flake8
       run: |
-        uv run flake8 src/ --count --statistics --show-source
+        uv run python -m flake8 src/ --count --statistics --show-source
     
     - name: Check code formatting with Black
       run: |
-        uv run black --check src/
+        uv run python -m black --check src/
     
     - name: Check import sorting with isort
       run: |
-        uv run isort --check-only src/
+        uv run python -m isort --check-only src/
     
     - name: Type checking with mypy
       run: |
-        uv run mypy src/ --ignore-missing-imports
+        uv run python -m mypy src/ --ignore-missing-imports
       continue-on-error: true
