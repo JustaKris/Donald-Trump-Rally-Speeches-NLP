@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Production-ready NLP Chatbot API with RAG for sentiment analysis, Q&A, topic extraction, and text analysis. Includes demo dataset of political speeches."
 license = { text = "MIT" }
 readme = "README.md"
-requires-python = ">=3.11,<3.14"
+requires-python = ">=3.11,<3.15"
 keywords = [
     "nlp",
     "natural-language-processing",

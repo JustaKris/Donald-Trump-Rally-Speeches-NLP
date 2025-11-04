@@ -156,11 +156,7 @@ This guide covers deploying the Trump Speeches NLP Chatbot API to various platfo
    
    # Build with no cache (clean build)
    ```powershell
-docker build --no-cache -t trump-speeches-nlp-chatbot .
-```
-   
-   # Build with a specific tag
-   docker build -t trump-speeches-nlp-chatbot:v1.0.0 .
+   docker build --no-cache -t trump-speeches-nlp-chatbot:latest .
    ```
 
 2. **Run the container:**
