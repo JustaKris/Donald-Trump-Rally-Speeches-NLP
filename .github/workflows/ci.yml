@@ -1,4 +1,4 @@
-name: Testsing & Linting
+name: CI - Tests & Linting
 
 on:
   push:
@@ -41,7 +41,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        uv sync --group dev
+        uv sync --group dev --env .venv
       env:
         UV_PROJECT_ENVIRONMENT: .venv
     
