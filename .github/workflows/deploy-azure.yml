@@ -34,14 +34,14 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'Titanic-Survival-Predictor'
+          app-name: 'Trump-Speeches-NLP-Chatbot'
           slot-name: 'Production'
-          images: 'index.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/titanic-survival-predictor:latest'
+          images: 'index.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/trump-speeches-nlp-chatbot:latest'
 
       - name: Health check
         run: |
           for i in {1..30}; do
-            if curl -f https://titanic-survival-predictor.azurewebsites.net/health; then
+            if curl -f https://trump-speeches-nlp-chatbot.azurewebsites.net/health; then
               echo "Deployment successful!"
               exit 0
             fi
@@ -56,7 +56,7 @@ jobs:
 #     runs-on: ubuntu-latest
 #     needs: deploy-azure
 #     env:
-#       AZURE_WEBAPP_NAME: 'Titanic-Survival-Predictor'
+#       AZURE_WEBAPP_NAME: 'Trump-Speeches-NLP-Chatbot'
 #       AZURE_HEALTH_INITIAL_DELAY: 60
 #       AZURE_HEALTH_RETRIES: 20
 #       AZURE_HEALTH_INTERVAL: 20
