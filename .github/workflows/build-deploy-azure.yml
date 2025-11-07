@@ -8,17 +8,17 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  push:
-    branches:
-      - main
-    # Avoid running deploy for small documentation or CI workflow edits
-    paths-ignore:
-      - '.github/**'
-      - '.github/workflows/**'
-      - 'docs/**'
-      - 'README.md'
-      - '*.md'
-      - 'docs/**'
+  # push:
+  #   branches:
+  #     - main
+  #   # Avoid running deploy for small documentation or CI workflow edits
+  #   paths-ignore:
+  #     - '.github/**'
+  #     - '.github/workflows/**'
+  #     - 'docs/**'
+  #     - 'README.md'
+  #     - '*.md'
+  #     - 'docs/**'
   workflow_dispatch:
 
 jobs:

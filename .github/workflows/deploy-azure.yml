@@ -1,0 +1,106 @@
+name: Deploy to Azure
+
+concurrency:
+  group: deploy-azure-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_run:
+    workflows: ["Build and Push to Docker Hub"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy-azure:
+    name: Deploy to Azure Web App
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F48CD6E84620460AAA697086F3CDF0C9 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_E6F6712B16204D56B857409BACD92B49 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_39E465BF7EC54EF7854ED6E465F167FD }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'Titanic-Survival-Predictor'
+          slot-name: 'Production'
+          images: 'index.docker.io/${{ secrets.DOCKERHUB_USERNAME }}/titanic-survival-predictor:latest'
+
+      - name: Health check
+        run: |
+          for i in {1..30}; do
+            if curl -f https://titanic-survival-predictor.azurewebsites.net/health; then
+              echo "Deployment successful!"
+              exit 0
+            fi
+            echo "Attempt $i: Waiting for service to be ready..."
+            sleep 10
+          done
+          echo "Deployment health check failed!"
+          exit 1
+
+#   verify:
+#     name: Verify Deployment
+#     runs-on: ubuntu-latest
+#     needs: deploy-azure
+#     env:
+#       AZURE_WEBAPP_NAME: 'Titanic-Survival-Predictor'
+#       AZURE_HEALTH_INITIAL_DELAY: 60
+#       AZURE_HEALTH_RETRIES: 20
+#       AZURE_HEALTH_INTERVAL: 20
+#       AZURE_HEALTH_PATH: "/health"
+
+#     steps:
+#       - name: Wait and Probe Health Endpoint
+#         run: |
+#           echo "Waiting ${AZURE_HEALTH_INITIAL_DELAY}s for deployment to settle..."
+#           sleep "${AZURE_HEALTH_INITIAL_DELAY}"
+
+#           if [ -n "$AZURE_WEBAPP_NAME" ]; then
+#             HEALTH_HOST="$AZURE_WEBAPP_NAME.azurewebsites.net"
+#           else
+#             HEALTH_HOST="trump-speeches-nlp-chatbot.azurewebsites.net"
+#           fi
+
+#           HEALTH_URL="https://${HEALTH_HOST}${AZURE_HEALTH_PATH}"
+#           echo "Checking health endpoint: $HEALTH_URL (max ${AZURE_HEALTH_RETRIES} attempts, interval ${AZURE_HEALTH_INTERVAL}s)"
+
+#           attempt=1
+#           while [ "$attempt" -le "$AZURE_HEALTH_RETRIES" ]; do
+#             echo "Attempt $attempt of $AZURE_HEALTH_RETRIES..."
+#             if curl -fsS --max-time 10 "$HEALTH_URL" >/dev/null 2>&1; then
+#               echo "✅ Health check passed on attempt $attempt"
+#               exit 0
+#             fi
+#             echo "Attempt $attempt failed; sleeping ${AZURE_HEALTH_INTERVAL}s before retry..."
+#             sleep "$AZURE_HEALTH_INTERVAL"
+#             attempt=$((attempt + 1))
+#           done
+
+#           echo "❌ Health check failed after ${AZURE_HEALTH_RETRIES} attempts."
+#           echo "You can inspect logs in Azure Portal or increase AZURE_HEALTH_RETRIES/INTERVAL in the workflow."
+#           exit 1
+
+#       - name: Deployment Summary
+#         if: success()
+#         run: |
+#           echo "## Azure Deployment Status" >> $GITHUB_STEP_SUMMARY
+#           echo "✅ Docker image built and pushed" >> $GITHUB_STEP_SUMMARY
+#           echo "✅ Deployed to Azure Web App" >> $GITHUB_STEP_SUMMARY
+#           echo "✅ Health check passed" >> $GITHUB_STEP_SUMMARY
+#           echo "" >> $GITHUB_STEP_SUMMARY
+#           echo "**Deployment Details:**" >> $GITHUB_STEP_SUMMARY
+#           echo "- App Name: 'Trump-Speeches-NLP-Chatbot'" >> $GITHUB_STEP_SUMMARY
+#           echo "- URL: https://trump-speeches-nlp-chatbot.azurewebsites.net" >> $GITHUB_STEP_SUMMARY

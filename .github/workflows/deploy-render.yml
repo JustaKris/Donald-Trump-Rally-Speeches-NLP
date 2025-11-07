@@ -1,0 +1,51 @@
+name: Deploy to Render
+
+concurrency:
+  group: deploy-render-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_run:
+    workflows: ["Build and Push to Docker Hub"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy-render:
+    name: Deploy to Render
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Render via Webhook
+        run: |
+          if [ -z "${{ secrets.RENDER_DEPLOY_WEBHOOK }}" ]; then
+            echo "RENDER_DEPLOY_WEBHOOK secret not configured, skipping deployment"
+            exit 0
+          fi
+          curl -X POST "${{ secrets.RENDER_DEPLOY_WEBHOOK }}" \
+            -H "Content-Type: application/json" \
+            -d '{"ref": "main"}'
+
+      - name: Wait for deployment
+        run: sleep 30
+
+      - name: Health check
+        run: |
+          if [ -z "${{ secrets.RENDER_DEPLOY_WEBHOOK }}" ]; then
+            echo "Skipping health check - Render deployment not configured"
+            exit 0
+          fi
+          for i in {1..30}; do
+            if curl -f https://trump-speeches-nlp-chatbot-eymq.onrender.com/health; then
+              echo "Deployment successful!"
+              exit 0
+            fi
+            echo "Attempt $i: Waiting for service to be ready..."
+            sleep 10
+          done
+          echo "Deployment health check failed!"
+          exit 1
