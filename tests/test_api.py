@@ -6,7 +6,7 @@ Tests the API routes using FastAPI's TestClient.
 
 import pytest
 from fastapi.testclient import TestClient
-from src.api import app
+from src.main import app
 
 
 @pytest.fixture

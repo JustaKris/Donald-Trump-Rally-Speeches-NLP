@@ -4,6 +4,35 @@ All notable changes and improvements to the Trump Speeches NLP Chatbot API.
 
 ## [Recent Updates] - November 2025
 
+### Added - Modular RAG Architecture (Code Refactoring)
+
+**New Modules: `src/services/rag/`**
+
+Restructured RAG service into dedicated, testable components:
+
+- **Component Separation**:
+  - `search_engine.py` - Hybrid search with semantic, BM25, and cross-encoder reranking
+  - `confidence.py` - Multi-factor confidence scoring (retrieval quality, consistency, coverage, entity mentions)
+  - `entity_analyzer.py` - Entity extraction, sentiment analysis, co-occurrence analytics
+  - `document_loader.py` - Smart chunking with metadata tracking
+  - `models.py` - Pydantic data models for type-safe RAG operations
+
+- **Improved Testability**:
+  - 65%+ overall test coverage, 90%+ for core RAG components
+  - Component-level unit tests with mocked dependencies
+  - Integration tests for full RAG pipeline
+  - 108 tests total (28 integration, 80 component/unit)
+
+- **Type Safety**: Pydantic models for all RAG data structures
+- **Maintainability**: Clear separation of concerns, easier to extend and debug
+- **Performance**: Unchanged - modular design maintains original efficiency
+
+**Benefits**:
+- Each component testable in isolation
+- Easier to understand and modify individual features
+- Better error tracking and debugging
+- Foundation for future enhancements
+
 ### Added - Production Logging System
 
 **New Module: `src/logging_config.py`**

@@ -4,13 +4,40 @@
 
 This project implements a production-grade Retrieval-Augmented Generation (RAG) system for question-answering over a corpus of 35 political speeches (300,000+ words).
 
+**Architectural Highlights:**
+- **Modular Design:** Separated concerns with dedicated components for search, confidence, entities, and document loading
+- **Testable:** 65%+ test coverage with component-level unit tests
+- **Type-Safe:** Pydantic models for all RAG data structures
+- **Maintainable:** Clear separation of concerns, easy to extend and debug
+
+## Modular Architecture
+
+### Core Components
+
+**Orchestration:**
+- **`RAGService`** (`services/rag_service.py`) - Manages ChromaDB collection and coordinates components
+
+**Specialized Services** (`services/rag/`):
+- **`SearchEngine`** (`search_engine.py`) - Hybrid search with semantic, BM25, and cross-encoder reranking
+- **`ConfidenceCalculator`** (`confidence.py`) - Multi-factor confidence scoring
+- **`EntityAnalyzer`** (`entity_analyzer.py`) - Entity extraction, sentiment, co-occurrence analysis
+- **`DocumentLoader`** (`document_loader.py`) - Smart chunking with metadata tracking
+
+**Supporting Services:**
+- **`GeminiLLM`** (`services/llm_service.py`) - Answer generation with Google Gemini
+
 ## Core Architecture
 
 ### Vector Database
 - **ChromaDB** with persistent storage
 - **MPNet embeddings** (768 dimensions) for semantic understanding
+- **Efficient querying** with smart deduplication
+
+### Search Engine
 - **Hybrid search** combining dense embeddings with BM25 sparse retrieval
-- **Cross-encoder reranking** for precision optimization
+- **Cross-encoder reranking** for precision optimization  
+- **Configurable weights** for semantic vs keyword balance
+- **Deduplication** removes duplicate results by ID
 
 ### LLM Integration
 - **Google Gemini** (gemini-2.5-flash) for answer generation
@@ -45,11 +72,18 @@ response = rag.ask("What economic policies were discussed?", top_k=5)
 
 ### 2. Multi-Factor Confidence Scoring
 
-Sophisticated confidence assessment considering:
+Sophisticated confidence assessment handled by `ConfidenceCalculator` component.
+
+**Confidence Factors (weighted):**
 - **Retrieval Quality (40%)** — Semantic similarity of retrieved chunks
 - **Consistency (25%)** — Low variance in scores = higher confidence
-- **Coverage (20%)** — Number of supporting chunks
+- **Coverage (20%)** — Number of supporting chunks (normalized 0-1)
 - **Entity Coverage (15%)** — For entity queries, mention frequency
+
+**Confidence Levels:**
+- **High:** combined_score ≥ 0.7
+- **Medium:** 0.4 ≤ combined_score < 0.7
+- **Low:** combined_score < 0.4
 
 **Example output:**
 ```json
@@ -68,12 +102,14 @@ Sophisticated confidence assessment considering:
 
 ### 3. Entity Analytics
 
-Automatic entity detection with comprehensive statistics:
+Automatic entity detection with comprehensive statistics handled by `EntityAnalyzer` component.
 
+**Features:**
 - **Mention counts** across entire corpus
-- **Speech coverage** — which documents mention the entity
-- **Sentiment analysis** — average sentiment toward entity
-- **Co-occurrence analysis** — most common associated terms
+- **Speech coverage** — which documents mention the entity  
+- **Corpus percentage** — percentage of documents containing entity
+- **Sentiment analysis** — average sentiment toward entity (optional)
+- **Co-occurrence analysis** — most common associated terms (filtered for stopwords)
 
 **Example output:**
 ```json
@@ -97,19 +133,28 @@ Automatic entity detection with comprehensive statistics:
 
 ### 4. Hybrid Search
 
-Combines semantic and keyword search for optimal retrieval:
+`SearchEngine` component combines semantic and keyword search for optimal retrieval:
 
-- **Semantic search** — Dense embeddings capture meaning and context
+- **Semantic search** — Dense embeddings capture meaning and context (MPNet 768d)
 - **BM25 keyword search** — Ensures exact term matches aren't missed
-- **Cross-encoder reranking** — Final precision optimization
-- **Configurable weights** — Adjust semantic vs keyword importance
+- **Score combination** — Configurable weights (default: 0.7 semantic, 0.3 BM25)
+- **Cross-encoder reranking** — Optional final precision optimization
+- **Deduplication** — Removes duplicate results by ID
+
+**Search Modes:**
+- `semantic` - Pure vector similarity
+- `hybrid` - Combined semantic + BM25 (default)
+- `reranking` - Adds cross-encoder pass
 
 ### 5. Optimized Chunking
 
+`DocumentLoader` component handles smart document chunking:
+
 - **2048 character chunks** (~512-768 tokens) for complete context
-- **150 character overlap** to preserve continuity
-- Smart splitting with RecursiveCharacterTextSplitter
+- **150 character overlap** to preserve continuity across chunks
+- Smart splitting with LangChain's RecursiveCharacterTextSplitter
 - Maintains coherent context boundaries
+- **Metadata tracking:** source filename, chunk index, total chunks
 
 ## API Usage
 
@@ -167,7 +212,7 @@ for i, result in enumerate(results, 1):
 ### RAGService Parameters
 
 ```python
-from src.rag_service import RAGService
+from src.services.rag_service import RAGService
 
 rag = RAGService(
     collection_name="speeches",
@@ -178,8 +223,23 @@ rag = RAGService(
     chunk_overlap=150,                        # ~100-150 tokens
     use_llm=True,                             # Enable Gemini
     use_reranking=True,                       # Enable cross-encoder
-    use_hybrid_search=True                    # Enable BM25 + semantic
+    use_hybrid_search=True,                   # Enable BM25 + semantic
+    semantic_weight=0.7,                      # Hybrid search weight for semantic
+    keyword_weight=0.3                        # Hybrid search weight for BM25
 )
+```
+
+### Component Initialization
+
+The RAG service automatically initializes all components:
+
+```python
+# Initialized internally:
+# - DocumentLoader (for chunking)
+# - SearchEngine (for hybrid retrieval)
+# - ConfidenceCalculator (for scoring)
+# - EntityAnalyzer (for entity extraction)
+# - GeminiLLM (for answer generation, if use_llm=True)
 ```
 
 ### API Endpoint Configuration

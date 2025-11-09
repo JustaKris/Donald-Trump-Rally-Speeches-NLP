@@ -17,7 +17,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from .api import chatbot_router, health_router, nlp_router
-from .api.dependencies import set_llm_service, set_nlp_service, set_rag_service, set_sentiment_analyzer
+from .api.dependencies import (
+    set_llm_service,
+    set_nlp_service,
+    set_rag_service,
+    set_sentiment_analyzer,
+)
 from .core import get_settings
 from .services import GeminiLLM, NLPService, RAGService, SentimentAnalyzer
 

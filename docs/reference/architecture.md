@@ -54,9 +54,9 @@ graph TB
 
 ## Component Architecture
 
-### 1. **API Layer** (`src/api.py`)
+### 1. **API Layer** (`src/api/`)
 
-FastAPI application serving as the main entry point.
+FastAPI application with modular route organization.
 
 **Responsibilities:**
 - HTTP request handling
@@ -64,23 +64,26 @@ FastAPI application serving as the main entry point.
 - Error handling and logging
 - CORS middleware
 - Static file serving
-- Service orchestration
+- Dependency injection for services
+
+**Route Modules:**
+- `routes_chatbot.py` - RAG question-answering endpoints
+- `routes_nlp.py` - Traditional NLP analysis endpoints
+- `routes_health.py` - Health checks and system status
+- `dependencies.py` - Service dependency injection
 
 **Endpoints:**
-- `/analyze/sentiment` - Sentiment analysis
-- `/analyze/words` - Word frequency analysis
-- `/analyze/topics` - Topic extraction
-- `/analyze/ngrams` - N-gram analysis
-- `/text/clean` - Text preprocessing
 - `/rag/ask` - RAG question answering
 - `/rag/search` - Semantic search
 - `/rag/stats` - Collection statistics
 - `/rag/index` - Document indexing
-- `/speeches/stats` - Dataset statistics
-- `/speeches/list` - List all speeches
+- `/analyze/sentiment` - Sentiment analysis
+- `/analyze/words` - Word frequency analysis
+- `/analyze/topics` - Topic extraction
+- `/analyze/ngrams` - N-gram analysis
 - `/health` - Health check
 
-### 2. **Sentiment Analysis** (`src/models.py`)
+### 2. **Sentiment Analysis** (`src/services/sentiment_service.py`)
 
 Transformer-based sentiment classification using FinBERT.
 
@@ -100,28 +103,120 @@ graph LR
     Aggregate --> Output[Sentiment + Confidence]
 ```
 
-### 3. **RAG Service** (`src/rag_service.py`)
+### 3. **RAG Service** (`src/services/rag_service.py`)
 
-Advanced Retrieval-Augmented Generation for intelligent question answering.
+Orchestrates the RAG pipeline, coordinating modular components for intelligent question answering.
 
-**Components:**
-- **Vector Store:** ChromaDB with persistent SQLite storage
-- **Embeddings:** sentence-transformers (all-mpnet-base-v2, 768 dimensions)
-- **Hybrid Search:** Semantic (dense) + BM25 (sparse) retrieval
-- **Reranking:** Cross-encoder for precision optimization
-- **Text Splitter:** LangChain RecursiveCharacterTextSplitter
-- **Chunking:** 2048 chars with 150 char overlap (~512-768 tokens)
-- **LLM:** Google Gemini for answer generation
+**Architecture:**
+The RAG service now uses a modular design with dedicated components:
+- **Orchestration:** Manages ChromaDB collection and coordinates components
+- **Delegation:** Delegates to specialized services for search, confidence, entities, and loading
+
+**Components Used:**
+- `SearchEngine` (from `services/rag/search_engine.py`)
+- `ConfidenceCalculator` (from `services/rag/confidence.py`)
+- `EntityAnalyzer` (from `services/rag/entity_analyzer.py`)
+- `DocumentLoader` (from `services/rag/document_loader.py`)
+- `GeminiLLM` (from `services/llm_service.py`)
+
+### 4. **RAG Components** (`src/services/rag/`)
+
+Modular, testable components for RAG functionality.
+
+#### 4.1 **SearchEngine** (`search_engine.py`)
+
+Hybrid search engine combining multiple retrieval strategies.
+
+**Features:**
+- **Semantic Search:** MPNet embeddings (768d) with cosine similarity
+- **BM25 Search:** Keyword-based sparse retrieval
+- **Hybrid Search:** Configurable weighting of semantic + BM25 scores
+- **Cross-encoder Reranking:** Final precision optimization
+- **Deduplication:** Removes duplicate results by ID
+
+**Search Modes:**
+- `semantic` - Pure vector similarity search
+- `hybrid` - Combines semantic + BM25 (default weights: 0.7/0.3)
+- `reranking` - Optional cross-encoder for top results
+
+#### 4.2 **ConfidenceCalculator** (`confidence.py`)
+
+Multi-factor confidence scoring for RAG answers.
+
+**Confidence Factors (weighted):**
+- **Retrieval Quality (40%):** Average semantic similarity of results
+- **Consistency (25%):** Score variance (low variance = high confidence)
+- **Coverage (20%):** Normalized chunk count (more chunks = better coverage)
+- **Entity Coverage (15%):** Percentage of results mentioning query entities
+
+**Confidence Levels:**
+- **High:** combined_score ≥ 0.7
+- **Medium:** 0.4 ≤ combined_score < 0.7
+- **Low:** combined_score < 0.4
+
+**Output:**
+- Confidence level (high/medium/low)
+- Numeric confidence score (0-1)
+- Detailed explanation
+- Individual factor scores
+
+#### 4.3 **EntityAnalyzer** (`entity_analyzer.py`)
+
+Entity extraction and statistical analysis.
 
 **Capabilities:**
-- Document loading and indexing with progress tracking
-- Hybrid semantic + keyword search
-- Multi-factor confidence scoring
-- Entity extraction and analytics
-- Sentiment analysis for entities
-- Context-aware answer generation with Gemini
+- **Entity Extraction:** Identifies capitalized words (filtered for stopwords, question words)
+- **Mention Counting:** Tracks entity mentions across corpus
+- **Speech Coverage:** Identifies which documents mention each entity
+- **Sentiment Analysis:** Average sentiment toward entity (optional)
+- **Co-occurrence Analysis:** Most common words appearing near entity
+- **Corpus Percentage:** Percentage of documents mentioning entity
 
-### 4. **Text Preprocessing** (`src/preprocessing.py`)
+**Statistics Output:**
+```python
+{
+    "mention_count": 524,
+    "speech_count": 30,
+    "corpus_percentage": 85.7,
+    "speeches": ["file1.txt", "file2.txt", ...],
+    "sentiment": {
+        "average_score": -0.15,
+        "classification": "Neutral",
+        "sample_size": 50
+    },
+    "associations": ["people", "country", "great", ...]
+}
+```
+
+#### 4.4 **DocumentLoader** (`document_loader.py`)
+
+Smart document loading and chunking.
+
+**Features:**
+- **Recursive Text Splitting:** LangChain RecursiveCharacterTextSplitter
+- **Configurable Chunking:** Default 2048 chars (~512-768 tokens)
+- **Overlap:** 150 char overlap for context continuity
+- **Metadata Tracking:** Preserves source filename, chunk index, total chunks
+- **Directory Loading:** Batch loading from directories with progress tracking
+
+**Chunking Strategy:**
+```python
+chunk_size = 2048       # ~512-768 tokens (full context)
+chunk_overlap = 150     # ~100-150 tokens (preserve continuity)
+```
+
+### 5. **LLM Service** (`src/services/llm_service.py`)
+
+Google Gemini integration for answer generation.
+
+**Features:**
+- **Context-Aware Prompting:** Builds prompts with retrieved context
+- **Entity-Focused Generation:** Emphasizes entity mentions when applicable
+- **Fallback Extraction:** Returns context snippets if LLM fails
+- **Source Attribution:** Tracks and cites source documents
+- **Error Handling:** Graceful degradation with informative fallbacks
+
+### 4. **Text Preprocessing** (`src/utils/text_preprocessing.py`)
 
 Text cleaning and normalization utilities.
 
@@ -132,64 +227,64 @@ Text cleaning and normalization utilities.
 - URL removal
 - N-gram extraction
 
-### 5. **Utilities** (`src/utils.py`)
+### 5. **Utilities** (`src/utils/`)
 
 Data loading and analysis helpers.
 
-**Functions:**
-- Speech loading from directory
-- Word frequency statistics
-- Topic extraction (TF-IDF)
-- Dataset statistics calculation
+**Modules:**
+- `io_helpers.py` - Speech loading from directory
+- `formatters.py` - Word frequency statistics
+- `text_preprocessing.py` - Topic extraction (TF-IDF) and dataset statistics
 
 ---
 
 ## RAG Pipeline
 
-Detailed architecture of the Retrieval-Augmented Generation system.
+Modular architecture for Retrieval-Augmented Generation.
 
 ```mermaid
 graph TB
-    subgraph "Indexing Phase (Startup)"
-        Docs[Text Documents<br/>*.txt files]
-        Load[Document Loader]
-        Split[Text Splitter<br/>500 chars, 50 overlap]
-        Embed[Embedding Model<br/>all-MiniLM-L6-v2]
-        Store[(ChromaDB<br/>Vector Store)]
-        
-        Docs --> Load
-        Load --> Split
-        Split -->|Text Chunks| Embed
-        Embed -->|384-dim Vectors| Store
+    subgraph "RAG Service (Orchestrator)"
+        Orchestrator[RAGService<br/>Collection Management]
     end
     
-    subgraph "Query Phase (Runtime)"
-        Question[User Question]
-        QEmbed[Query Embedding]
-        Search[Similarity Search<br/>Cosine Distance]
-        Retrieve[Top-K Retrieval]
-        Generate[Answer Generation<br/>Context-based]
-        Response[Answer + Context]
-        
-        Question --> QEmbed
-        QEmbed --> Search
-        Store -.->|Vector Lookup| Search
-        Search --> Retrieve
-        Retrieve --> Generate
-        Generate --> Response
+    subgraph "Indexing Components"
+        Loader[DocumentLoader<br/>Chunking & Metadata]
+        Embedder[Embedding Model<br/>all-mpnet-base-v2]
+        DB[(ChromaDB<br/>Vector Store)]
     end
+    
+    subgraph "Query Components"
+        Search[SearchEngine<br/>Hybrid Retrieval]
+        Entities[EntityAnalyzer<br/>Extraction & Stats]
+        Confidence[ConfidenceCalculator<br/>Multi-factor Scoring]
+        LLM[GeminiLLM<br/>Answer Generation]
+    end
+    
+    Orchestrator --> Loader
+    Loader --> Embedder
+    Embedder --> DB
+    
+    Orchestrator --> Search
+    Search --> DB
+    Orchestrator --> Entities
+    Entities --> DB
+    Orchestrator --> Confidence
+    Orchestrator --> LLM
 ```
 
 ### RAG Workflow Details
 
 **1. Indexing (One-time or on-demand):**
+
 ```python
+# DocumentLoader handles chunking
 1. Load documents from directory
 2. Split into chunks (RecursiveCharacterTextSplitter)
    - chunk_size: 2048 characters (~512-768 tokens)
    - chunk_overlap: 150 characters (~100-150 tokens)
-3. Generate embeddings (sentence-transformers)
-   - Model: all-mpnet-base-v2
+3. Generate embeddings via ChromaDB
+   - Model: all-mpnet-base-v2 (sentence-transformers)
    - Dimension: 768
 4. Store in ChromaDB with metadata:
    - source: filename
@@ -198,30 +293,36 @@ graph TB
 ```
 
 **2. Querying:**
+
 ```python
+# Orchestrated by RAGService, delegated to components
 1. Receive question from user
-2. Extract entities from question (capitalized words)
-3. Generate question embedding (same model)
-4. Hybrid search:
+2. EntityAnalyzer extracts entities from question
+3. SearchEngine performs hybrid retrieval:
    a. Semantic search: cosine similarity on embeddings
    b. BM25 search: keyword matching
-   c. Combine results with configurable weights
-5. Cross-encoder reranking for precision
-6. Retrieve top-k most relevant chunks (default k=5, max k=15)
-7. Calculate multi-factor confidence score:
-   - Retrieval quality (40%): semantic similarity
-   - Score consistency (25%): low variance = higher confidence
-   - Coverage (20%): number of supporting chunks
-   - Entity coverage (15%): mention frequency in results
-8. Generate entity statistics (mentions, sentiment, associations)
-9. Build context-aware prompt with entity focus
-10. Generate answer using Gemini LLM
-11. Return answer with:
-    - Generated text
-    - Confidence score and explanation
-    - Supporting context chunks
-    - Source attribution
-    - Entity analytics (if applicable)
+   c. Combine results with weights (0.7 semantic, 0.3 BM25)
+   d. Optional cross-encoder reranking
+4. ConfidenceCalculator computes multi-factor score:
+   - Retrieval quality (40%): average semantic similarity
+   - Consistency (25%): low score variance
+   - Coverage (20%): normalized chunk count
+   - Entity coverage (15%): % chunks mentioning entities
+5. EntityAnalyzer generates statistics (if entities found):
+   - Mention counts across corpus
+   - Speech coverage percentage
+   - Sentiment analysis (optional)
+   - Co-occurrence analysis
+6. GeminiLLM generates answer:
+   - Build context-aware prompt
+   - Include entity focus if applicable
+   - Fallback to context extraction if LLM fails
+7. Return complete response:
+   - Generated answer
+   - Confidence level + score + explanation
+   - Supporting context chunks
+   - Source attribution
+   - Entity statistics (if applicable)
 ```
 
 **3. Confidence Scoring:**
@@ -459,12 +560,18 @@ graph TB
 
 | Category | Technology | Version |
 |----------|-----------|---------|
-| **Dependency Mgmt** | uv | Latest |
+| **Dependency Mgmt** | uv | 0.9+ |
 | **Containerization** | Docker | Latest |
 | **CI/CD** | GitHub Actions | - |
 | **Testing** | pytest | 8.3+ |
-| **Code Quality** | black, flake8, mypy, isort | Latest |
+| **Code Quality** | black, flake8, isort | Latest |
 | **Security** | pip-audit, bandit | Latest |
+
+**Testing Strategy:**
+- **Unit Tests:** Component-level testing for SearchEngine, ConfidenceCalculator, EntityAnalyzer, DocumentLoader
+- **Integration Tests:** Full RAG pipeline testing
+- **Coverage:** 65%+ overall, 90%+ for core RAG components
+- **Fixtures:** Modular pytest fixtures for isolated component testing
 
 ### Model Details
 
@@ -609,6 +716,13 @@ request_duration = Histogram('api_request_duration_seconds', 'Request duration')
 
 ## Future Architecture Enhancements
 
+### Recently Completed (November 2025)
+
+- ✅ **Modular RAG Architecture:** Separated RAG functionality into dedicated, testable components
+- ✅ **Component Testing:** Achieved 65%+ test coverage with component-level unit tests
+- ✅ **Type Safety:** Pydantic models for all RAG data structures
+- ✅ **Production Logging:** Dual-format logging (JSON for cloud, colored for development)
+
 ### 1. Advanced RAG Features
 
 - **Query Caching:** Redis layer for common questions
@@ -654,6 +768,46 @@ graph LR
 
 ---
 
+## Testing Strategy
+
+### Component-Level Testing
+
+Each RAG component has dedicated unit tests ensuring isolation and reliability:
+
+**Test Files:**
+- `tests/test_search_engine.py` - SearchEngine component tests (18 tests)
+- `tests/test_confidence.py` - ConfidenceCalculator tests (11 tests)  
+- `tests/test_entity_analyzer.py` - EntityAnalyzer tests (20 tests)
+- `tests/test_document_loader.py` - DocumentLoader tests (11 tests)
+- `tests/test_rag_integration.py` - Full RAG pipeline integration tests (28 tests)
+
+**Coverage:**
+- Overall: 65%+
+- Core RAG components: 90%+
+- SearchEngine: 94%
+- ConfidenceCalculator: 93%
+- DocumentLoader: 93%
+- EntityAnalyzer: 73%
+
+**Testing Approach:**
+- **Unit Tests:** Isolated component testing with mocked dependencies
+- **Integration Tests:** Full pipeline testing with real ChromaDB
+- **Fixtures:** Reusable pytest fixtures for component setup
+- **Parametrized Tests:** Testing multiple scenarios efficiently
+- **Edge Cases:** Empty collections, invalid inputs, boundary conditions
+
+### Continuous Integration
+
+GitHub Actions workflow runs on every push:
+- Python 3.11, 3.12, 3.13 matrix testing
+- Unit tests with coverage reporting
+- Integration tests (excluding model loading)
+- Linting (flake8, black, isort)
+- Type checking (mypy for select modules)
+- Security scanning (bandit, pip-audit)
+
+---
+
 ## References
 
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)
@@ -661,9 +815,10 @@ graph LR
 - [ChromaDB Documentation](https://docs.trychroma.com/)
 - [LangChain Documentation](https://python.langchain.com/)
 - [Docker Best Practices](https://docs.docker.com/develop/dev-best-practices/)
+- [pytest Documentation](https://docs.pytest.org/)
 
 ---
 
-**Last Updated:** October 2025  
-**Version:** 0.1.0  
+**Last Updated:** November 2025  
+**Version:** 0.2.0  
 **Maintainer:** Kristiyan Bonev

@@ -5,7 +5,7 @@ Tests the text cleaning, tokenization, and n-gram extraction functions.
 """
 
 import pytest
-from src.preprocessing import (
+from src.utils.text_preprocessing import (
     clean_text,
     tokenize_text,
     extract_ngrams,

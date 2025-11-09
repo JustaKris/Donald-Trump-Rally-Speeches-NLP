@@ -8,7 +8,11 @@ This service aggregates functionality from utils for cleaner API separation.
 import logging
 from typing import Any, Dict, List
 
-from ..utils.io_helpers import get_dataset_statistics, get_word_frequency_stats, load_speeches_from_directory
+from ..utils.io_helpers import (
+    get_dataset_statistics,
+    get_word_frequency_stats,
+    load_speeches_from_directory,
+)
 from ..utils.text_preprocessing import extract_ngrams, get_stopwords, tokenize_text
 
 logger = logging.getLogger(__name__)
@@ -97,7 +101,7 @@ class NLPService:
         return {
             "n": n,
             "total_ngrams": len(ngrams),
-            "unique_ngrams": len(set(ngrams)),
+            "unique_ngrams": len(list(set(ngrams))),
             "top_ngrams": [{"ngram": ngram, "count": count} for ngram, count in top_ngrams],
         }
 
