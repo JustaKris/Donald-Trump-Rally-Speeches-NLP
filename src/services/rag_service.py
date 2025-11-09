@@ -18,7 +18,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from rank_bm25 import BM25Okapi
 from sentence_transformers import CrossEncoder, SentenceTransformer
 
-from .llm_service import GeminiLLM
+from ..services.llm_service import GeminiLLM
 
 # Disable ChromaDB telemetry to avoid annoying warnings
 os.environ["ANONYMIZED_TELEMETRY"] = "False"
@@ -539,7 +539,7 @@ class RAGService:
             Dict with average sentiment and classification
         """
         # Import sentiment analyzer only if needed
-        from .models import SentimentAnalyzer
+        from .sentiment_service import SentimentAnalyzer
 
         try:
             # Initialize analyzer if not already cached

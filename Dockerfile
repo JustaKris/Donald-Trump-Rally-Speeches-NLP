@@ -65,7 +65,6 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 
 # --- Copy app code ---
 COPY src/ ./src/
-COPY static/ ./static/
 COPY data/ ./data/
 
 # --- Non-root user ---
@@ -77,4 +76,4 @@ RUN python -m nltk.downloader punkt stopwords punkt_tab
 
 EXPOSE ${PORT}
 
-CMD ["uvicorn", "src.api:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]

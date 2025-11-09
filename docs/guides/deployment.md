@@ -84,10 +84,10 @@ This guide covers deploying the Trump Speeches NLP Chatbot API to various platfo
 
    ```powershell
    # Run the API server
-   uv run uvicorn src.api:app --reload
+   uv run uvicorn src.main:app --reload
    
    # Run with custom host and port
-   uv run uvicorn src.api:app --host 0.0.0.0 --port 8001 --reload
+   uv run uvicorn src.main:app --host 0.0.0.0 --port 8001 --reload
    
    # Run tests
    uv run pytest
