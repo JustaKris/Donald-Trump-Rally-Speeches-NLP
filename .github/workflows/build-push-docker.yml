@@ -50,7 +50,6 @@ jobs:
         with:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/trump-speeches-nlp-chatbot
           tags: |
-            type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
