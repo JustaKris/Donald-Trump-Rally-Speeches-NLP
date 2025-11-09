@@ -753,6 +753,93 @@ All workflows are located in `.github/workflows/`:
 
 ## Troubleshooting
 
+### Environment Variable Parsing Errors in Docker
+
+**Error:**
+```
+pydantic_core._pydantic_core.ValidationError: 13 validation errors for Settings
+  environment
+    Input should be 'development', 'staging' or 'production' [type=literal_error, input_value='"development"  # develop...', input_type=str]
+  log_level
+    Value error, Invalid log level. Must be one of: DEBUG, INFO, WARNING, ERROR, CRITICAL [type=value_error, input_value='"INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL', input_type=str]
+  ...
+```
+
+**Root Cause:**
+Your `.env` file has quoted values and/or inline comments. When Python-dotenv loads the file, it reads the **entire value including quotes and comments as a literal string**. So `"development"` becomes a string with quotes, which doesn't match the expected literal value `development`.
+
+**Solution:**
+
+Edit your `.env` file and follow these rules:
+
+```env
+# ✅ CORRECT Format
+
+# Variables without quotes
+ENVIRONMENT=development
+LOG_LEVEL=INFO
+API_PORT=8000
+
+# Booleans as lowercase true/false (no quotes)
+LLM_ENABLED=true
+USE_RERANKING=true
+API_RELOAD=false
+
+# Numbers without quotes
+CHUNK_SIZE=2048
+GEMINI_TEMPERATURE=0.3
+
+# Comments on separate lines only
+# Get free key at https://ai.google.dev/
+GEMINI_API_KEY=your-api-key-here
+
+# Paths with spaces are fine (no quotes needed)
+SPEECHES_DIRECTORY=./data/Donald Trump Rally Speeches
+```
+
+```env
+# ❌ INCORRECT Format (DO NOT USE)
+
+# Quoted values - Pydantic will see the quotes as part of the value
+ENVIRONMENT="development"
+LOG_LEVEL="INFO"
+
+# Inline comments - Will be read as part of the value
+CHUNK_SIZE="2048"  # Maximum characters per chunk
+USE_RERANKING="true"  # Enable reranking
+
+# Booleans with quotes - Can't parse as boolean
+LLM_ENABLED="true"
+```
+
+**Key Rules for `.env` files:**
+- ❌ No quotes around values (not needed and causes parsing errors)
+- ❌ No inline comments (use separate lines or comment blocks)
+- ✅ Booleans as `true` or `false` (lowercase, no quotes)
+- ✅ Numbers without quotes
+- ✅ Strings can contain spaces without quotes
+- ✅ Comments on their own lines with `#` prefix
+
+**Test your `.env` file:**
+
+After fixing, verify it parses correctly:
+
+```powershell
+# Run without Docker to test locally first
+uv run uvicorn src.main:app --reload
+
+# Or test the config in Python
+uv run python -c "from src.core.config import get_settings; s = get_settings(); print(f'Environment: {s.environment}, Log Level: {s.log_level}')"
+```
+
+Then try Docker again:
+
+```powershell
+docker run --rm -it -p 8000:8000 --env-file .env --name nlp-chatbot trump-speeches-nlp-chatbot
+```
+
+---
+
 ### Docker Build Fails
 
 ```powershell
