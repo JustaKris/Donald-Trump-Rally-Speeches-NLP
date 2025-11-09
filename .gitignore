@@ -131,7 +131,6 @@ docker-compose.override.yml
 
 # Model cache (HuggingFace)
 .transformers_cache/
-models/
 
 # API logs
 api_logs/
