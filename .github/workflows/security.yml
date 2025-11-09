@@ -3,8 +3,17 @@ name: Security Scan
 on:
   push:
     branches: [ main, develop, feature/* ]
+    paths:
+      - 'src/**'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/security.yml'
   pull_request:
     branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'pyproject.toml'
+      - 'uv.lock'
   workflow_dispatch:  # Allow manual triggering
   schedule:
     # Run security scans weekly on Mondays at 9 AM UTC

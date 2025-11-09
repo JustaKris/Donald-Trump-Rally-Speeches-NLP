@@ -28,6 +28,7 @@ jobs:
     outputs:
       image-tag: ${{ steps.meta.outputs.tags }}
       image-digest: ${{ steps.build.outputs.digest }}
+      short-sha-tag: ${{ steps.meta.outputs.version }}
 
     steps:
       - name: Checkout code
@@ -54,7 +55,7 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha,prefix={{branch}}-,format=short
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=prod,enable={{is_default_branch}}
 
       - name: Build and Push Docker Image
         id: build
