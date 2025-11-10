@@ -6,11 +6,12 @@ Production-ready AI/ML platform demonstrating enterprise-grade practices in natu
 
 This portfolio project demonstrates expertise in:
 
-- **Advanced RAG Architecture** — ChromaDB vector database, MPNet embeddings (768-dim), Google Gemini LLM integration
-- **Hybrid Retrieval Systems** — Semantic search combined with BM25 keyword matching and cross-encoder reranking
-- **Production API Development** — FastAPI with 12+ RESTful endpoints, type-safe Pydantic models, comprehensive error handling
+- **Advanced RAG Architecture** — Modular design with dedicated components for search, confidence scoring, entity analytics, and document loading
+- **Hybrid Retrieval Systems** — Semantic search (MPNet 768d) combined with BM25 keyword matching and cross-encoder reranking
+- **Production API Development** — FastAPI with 12+ RESTful endpoints, modular route organization, type-safe Pydantic models
 - **Entity Analytics** — Automated entity extraction with sentiment analysis and contextual associations
-- **Professional DevOps** — Docker containerization, CI/CD pipelines, automated testing, code quality enforcement
+- **Professional DevOps** — Docker containerization, CI/CD pipelines, automated testing (65%+ coverage), code quality enforcement
+- **LLM Integration** — Google Gemini for context-aware answer generation with fallback extraction
 
 ## Documentation Structure
 
@@ -61,11 +62,12 @@ curl -X POST http://localhost:8000/rag/ask \
 ```
 
 **Features:**
+- Modular RAG components: SearchEngine, ConfidenceCalculator, EntityAnalyzer, DocumentLoader
 - Semantic search using MPNet embeddings (768-dimensional)
 - Hybrid search combining vector similarity and BM25 keyword matching
 - Cross-encoder reranking for improved precision
-- Multi-factor confidence scoring
-- Entity extraction and analytics
+- Multi-factor confidence scoring (retrieval quality, consistency, coverage, entity mentions)
+- Entity extraction and analytics with sentiment analysis
 - Google Gemini LLM for answer generation
 
 ### NLP Endpoints

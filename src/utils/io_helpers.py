@@ -15,7 +15,7 @@ import pandas as pd
 
 def get_project_root() -> Path:
     """Get the project root directory."""
-    return Path(__file__).parent.parent
+    return Path(__file__).parent.parent.parent
 
 
 def load_speeches_from_directory(data_dir: Optional[Any] = None) -> pd.DataFrame:
@@ -110,7 +110,7 @@ def get_word_frequency_stats(text: str, top_n: int = 50) -> Dict[str, Any]:
     Returns:
         Dictionary with word frequency data
     """
-    from .preprocessing import clean_text, tokenize_text
+    from .text_preprocessing import clean_text, tokenize_text
 
     # Clean and tokenize
     cleaned = clean_text(text, remove_stopwords=True)

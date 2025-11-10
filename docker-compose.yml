@@ -35,9 +35,8 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ./src:/app/src
-      - ./static:/app/static
       - ./data:/app/data:ro
-    command: uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
     restart: unless-stopped
     profiles:
       - dev

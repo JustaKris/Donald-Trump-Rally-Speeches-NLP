@@ -15,7 +15,7 @@ import numpy as np
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-from .preprocessing import chunk_text_for_bert
+from ..utils.text_preprocessing import chunk_text_for_bert
 
 # Force transformers to use PyTorch backend (not TensorFlow)
 os.environ["TRANSFORMERS_BACKEND"] = "pytorch"

@@ -45,21 +45,18 @@ A production-ready NLP API showcasing natural language processing and retrieval-
 
 ### RAG (Retrieval-Augmented Generation) System
 
-Production-ready question-answering system over 35 political speeches (300,000+ words):
+Production-ready question-answering system over 35 political speeches (300,000+ words) built with a modular, testable architecture:
 
-- **`rag_service.py`** — Complete RAG implementation with:
-  - ChromaDB vector database for persistent embeddings
-  - MPNet sentence-transformers (768-dimensional embeddings)
-  - Hybrid search (semantic + BM25 keyword matching)
-  - Cross-encoder reranking for precision
-  - Multi-factor confidence scoring
-  - Entity extraction and analytics
-  
-- **`llm_service.py`** — Google Gemini integration:
-  - Context-aware prompt engineering
-  - Entity-focused answer generation
-  - Fallback extraction for robustness
-  - Source attribution and citations
+**Core Services:**
+- **`services/rag_service.py`** — Orchestrates RAG pipeline, manages ChromaDB, coordinates components
+- **`services/llm_service.py`** — Google Gemini integration with context-aware prompting
+
+**Modular RAG Components** (`services/rag/`):
+- **`search_engine.py`** — Hybrid search combining semantic (MPNet 768d), BM25 keyword, and cross-encoder reranking
+- **`confidence.py`** — Multi-factor confidence scoring (retrieval quality, consistency, coverage, entity mentions)
+- **`entity_analyzer.py`** — Entity extraction with sentiment analysis, speech coverage, and co-occurrence analytics
+- **`document_loader.py`** — Document chunking (2048 chars, 150 overlap) with metadata tracking
+- **`models.py`** — Pydantic data models for type-safe RAG operations
 
 **RAG API Endpoints:**
 - `POST /rag/ask` — Ask natural language questions with AI-generated answers
@@ -69,10 +66,15 @@ Production-ready question-answering system over 35 political speeches (300,000+ 
 
 ### 📝 Traditional NLP Endpoints
 
-- **`api.py`** — FastAPI application with RESTful design
-- **`models.py`** — FinBERT sentiment analysis
-- **`preprocessing.py`** — Text cleaning and tokenization
-- **`utils.py`** — Data loading and statistics
+**API Layer** (`api/`):
+- **`routes_chatbot.py`** — RAG question-answering endpoints
+- **`routes_nlp.py`** — Traditional NLP analysis endpoints
+- **`routes_health.py`** — Health checks and system status
+- **`dependencies.py`** — Dependency injection for services
+
+**Core Services:**
+- **`services/nlp_service.py`** — Word frequency, topics, n-gram analysis
+- **`services/sentiment_service.py`** — FinBERT sentiment analysis
 
 **Additional Endpoints:**
 - `POST /analyze/sentiment` — Sentiment analysis
@@ -106,20 +108,22 @@ Jupyter notebooks showcasing statistical NLP and exploratory data analysis techn
 
 ### Backend Engineering
 
-- **API Development**: Production-grade FastAPI with 12+ RESTful endpoints, async request handling
+- **API Development**: Production-grade FastAPI with 12+ RESTful endpoints, async request handling, modular route organization
 - **Vector Databases**: ChromaDB with persistent storage, smart deduplication, efficient querying
+- **Modular Architecture**: Separated concerns with dedicated services for search, confidence, entities, and document loading
 - **Configuration Management**: Pydantic Settings with type validation and environment-based config
 - **Production Logging**: JSON-formatted logs for cloud platforms, colored output for development
 - **Error Handling**: Graceful fallbacks, comprehensive exception handling, structured error responses
 - **Performance**: Efficient chunking (2048 chars), hybrid search, cross-encoder reranking
 - **Type Safety**: Full Pydantic validation, Python 3.11+ type hints throughout
+- **Dependency Injection**: Clean service initialization and testable architecture
 
 ### DevOps & Quality
 
 - **Containerization**: Multi-stage Docker builds, non-root user, health checks
 - **CI/CD**: GitHub Actions with automated testing, security scanning, code quality gates
-- **Testing**: pytest with 50%+ coverage, unit and integration tests, parametrized test cases
-- **Code Quality**: Black, flake8, isort, mypy enforced via pre-commit and CI
+- **Testing**: pytest with 65%+ coverage, unit and integration tests, parametrized test cases, modular component testing
+- **Code Quality**: Black, flake8, isort enforced via CI (mypy for select modules)
 - **Security**: pip-audit for vulnerability scanning, bandit for security analysis
 - **Documentation**: Comprehensive MkDocs site, API docs via Swagger/ReDoc, inline docstrings
 - **Observability**: Structured logging, health endpoints, startup configuration display
@@ -136,6 +140,16 @@ Try asking the system natural language questions like:
 The system retrieves relevant context, analyzes entities, calculates confidence scores, and generates coherent answers with source attribution.
 
 ## 🎯 Recent Improvements (November 2025)
+
+### Modular RAG Architecture (Code Refactoring)
+- **Component Separation**: Extracted RAG functionality into dedicated, testable modules
+  - `SearchEngine`: Hybrid search with semantic, BM25, and cross-encoder reranking
+  - `ConfidenceCalculator`: Multi-factor confidence scoring
+  - `EntityAnalyzer`: Entity extraction, sentiment, and co-occurrence analysis
+  - `DocumentLoader`: Smart chunking with metadata tracking
+- **Improved Testability**: 65%+ test coverage with component-level unit tests
+- **Type Safety**: Pydantic models for all RAG data structures
+- **Maintainability**: Clear separation of concerns, easier to extend and debug
 
 ### Production-Ready Logging
 - **Dual-format logging**: JSON for production/cloud, colored for development

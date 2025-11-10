@@ -116,15 +116,15 @@ jobs:
     
     - name: Run flake8
       run: |
-        uv run python -m flake8 src/ --count --statistics --show-source
+        uv run python -m flake8 src/ tests/ --count --statistics --show-source
     
     - name: Check code formatting with Black
       run: |
-        uv run python -m black --check src/
+        uv run python -m black --check src/ tests/
     
     - name: Check import sorting with isort
       run: |
-        uv run python -m isort --check-only src/
+        uv run python -m isort --check-only src/ tests/
     
     - name: Type checking with mypy
       run: |

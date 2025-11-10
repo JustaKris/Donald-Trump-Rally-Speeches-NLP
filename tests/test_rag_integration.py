@@ -1,7 +1,9 @@
 """
-Unit tests for RAG (Retrieval-Augmented Generation) Service.
+Integration tests for RAG (Retrieval-Augmented Generation) Service.
 
-Tests document loading, chunking, embedding, semantic search, and question answering.
+Tests the complete RAG pipeline including document loading, chunking,
+embedding, semantic search, and question answering with the refactored
+modular architecture.
 """
 
 import os
@@ -12,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from src.rag_service import RAGService
+from src.services.rag_service import RAGService
 
 
 def cleanup_chromadb(persist_dir: str, service=None):
@@ -79,10 +81,10 @@ def rag_service(temp_data_dir):
 
 
 class TestRAGServiceInitialization:
-    """Test RAG service initialization and setup."""
+    """Test RAG service initialization and configuration."""
 
-    def test_service_creation(self):
-        """Test that RAG service can be created."""
+    def test_service_creation_default_params(self):
+        """Test that RAG service can be created with default parameters."""
         persist_dir = tempfile.mkdtemp()
         service = None
         try:
@@ -94,7 +96,7 @@ class TestRAGServiceInitialization:
         finally:
             cleanup_chromadb(persist_dir, service)
 
-    def test_custom_parameters(self):
+    def test_service_creation_custom_params(self):
         """Test RAG service with custom parameters."""
         persist_dir = tempfile.mkdtemp()
         service = None
@@ -112,7 +114,7 @@ class TestRAGServiceInitialization:
             cleanup_chromadb(persist_dir, service)
 
     def test_persistence_directory_creation(self):
-        """Test that persistence directory is created."""
+        """Test that persistence directory is created automatically."""
         tmpdir = tempfile.mkdtemp()
         persist_dir = os.path.join(tmpdir, "chromadb")
         service = None
@@ -123,11 +125,22 @@ class TestRAGServiceInitialization:
             cleanup_chromadb(persist_dir, service)
             shutil.rmtree(tmpdir, ignore_errors=True)
 
+    def test_embedding_model_configuration(self):
+        """Test that embedding model is properly configured."""
+        persist_dir = tempfile.mkdtemp()
+        service = None
+        try:
+            service = RAGService(persist_directory=persist_dir)
+            # Should be using mpnet-base-v2 by default
+            assert "mpnet" in str(service.embedding_model).lower()
+        finally:
+            cleanup_chromadb(persist_dir, service)
+
 
 class TestDocumentLoading:
-    """Test document loading and indexing."""
+    """Test document loading and indexing functionality."""
 
-    def test_load_documents(self, temp_data_dir, rag_service):
+    def test_load_documents_from_directory(self, temp_data_dir, rag_service):
         """Test loading documents from directory."""
         stats = rag_service.get_stats()
         assert stats["total_chunks"] > 0
@@ -137,7 +150,7 @@ class TestDocumentLoading:
         assert "doc3.txt" in stats["sources"]
 
     def test_load_nonexistent_directory(self):
-        """Test loading from non-existent directory raises error."""
+        """Test that loading from non-existent directory raises error."""
         persist_dir = tempfile.mkdtemp()
         service = None
         try:
@@ -147,8 +160,8 @@ class TestDocumentLoading:
         finally:
             cleanup_chromadb(persist_dir, service)
 
-    def test_document_chunking(self, temp_data_dir):
-        """Test that documents are properly chunked."""
+    def test_document_chunking_small_chunks(self, temp_data_dir):
+        """Test that documents are properly chunked with small chunk size."""
         persist_dir = tempfile.mkdtemp()
         service = None
         try:
@@ -182,8 +195,10 @@ class TestSemanticSearch:
         results = rag_service.search("healthcare and medical", top_k=1)
         assert len(results) > 0
         # Should find doc2.txt which is about healthcare
-        assert "healthcare" in results[0]["document"].lower() or \
-               "medical" in results[0]["document"].lower()
+        assert (
+            "healthcare" in results[0]["document"].lower()
+            or "medical" in results[0]["document"].lower()
+        )
 
     def test_search_with_different_top_k(self, rag_service):
         """Test search with different top_k values."""
@@ -193,7 +208,7 @@ class TestSemanticSearch:
         assert len(results_1) == 1
         assert len(results_5) > len(results_1)
 
-    def test_empty_query(self, rag_service):
+    def test_empty_query_handling(self, rag_service):
         """Test search with empty query."""
         results = rag_service.search("", top_k=3)
         # Should still return results (chromadb handles empty queries)
@@ -203,24 +218,32 @@ class TestSemanticSearch:
 class TestQuestionAnswering:
     """Test RAG question answering functionality."""
 
-    def test_ask_question(self, rag_service):
-        """Test asking a question returns answer with context."""
+    def test_ask_returns_complete_response(self, rag_service):
+        """Test asking a question returns all expected fields."""
         result = rag_service.ask("What is happening with the economy?")
 
+        # Check all required fields are present
         assert "answer" in result
         assert "context" in result
         assert "confidence" in result
+        assert "confidence_score" in result
+        assert "confidence_explanation" in result
+        assert "confidence_factors" in result
         assert "sources" in result
+        assert "entities" in result
 
+        # Check field types
         assert isinstance(result["answer"], str)
         assert isinstance(result["context"], list)
         assert result["confidence"] in ["high", "medium", "low"]
         assert isinstance(result["sources"], list)
+        assert isinstance(result["entities"], list)
 
-    def test_answer_confidence_levels(self, rag_service):
+    def test_confidence_levels(self, rag_service):
         """Test that confidence levels are assigned correctly."""
         result = rag_service.ask("economy", top_k=3)
         assert result["confidence"] in ["high", "medium", "low"]
+        assert 0.0 <= result["confidence_score"] <= 1.0
 
     def test_context_structure(self, rag_service):
         """Test that returned context has proper structure."""
@@ -234,8 +257,8 @@ class TestQuestionAnswering:
             assert isinstance(ctx["source"], str)
             assert isinstance(ctx["chunk_index"], int)
 
-    def test_multiple_sources(self, rag_service):
-        """Test that sources are properly aggregated."""
+    def test_sources_are_unique(self, rag_service):
+        """Test that sources list contains unique values."""
         result = rag_service.ask("policies", top_k=3)
 
         assert isinstance(result["sources"], list)
@@ -243,11 +266,28 @@ class TestQuestionAnswering:
         # Sources should be unique
         assert len(result["sources"]) == len(set(result["sources"]))
 
+    def test_confidence_factors_structure(self, rag_service):
+        """Test that confidence factors are properly structured."""
+        result = rag_service.ask("education funding", top_k=3)
+
+        factors = result["confidence_factors"]
+        assert "retrieval_score" in factors
+        assert "consistency" in factors
+        assert "chunk_coverage" in factors
+        assert "entity_coverage" in factors
+
+        # All factors should be numeric (except entity_coverage which can be None)
+        for factor_name, factor_value in factors.items():
+            if factor_name == "entity_coverage" and factor_value is None:
+                continue  # entity_coverage can be None if no entities detected
+            assert isinstance(factor_value, (int, float))
+            assert 0.0 <= factor_value <= 1.0
+
 
 class TestCollectionManagement:
     """Test collection statistics and management."""
 
-    def test_get_stats(self, rag_service):
+    def test_get_stats_structure(self, rag_service):
         """Test getting collection statistics."""
         stats = rag_service.get_stats()
 
@@ -302,6 +342,13 @@ class TestCollectionManagement:
         finally:
             cleanup_chromadb(persist_dir, service2)
 
+    def test_count_method(self, rag_service):
+        """Test the count() method."""
+        count = rag_service.count()
+        assert isinstance(count, int)
+        assert count > 0
+        assert count == rag_service.get_stats()["total_chunks"]
+
 
 class TestEdgeCases:
     """Test edge cases and error handling."""
@@ -327,8 +374,10 @@ class TestEdgeCases:
             result = service.ask("test question")
 
             assert "answer" in result
+            assert "context" in result
             assert result["confidence"] == "low"
             assert len(result["context"]) == 0
+            assert result["confidence_score"] == 0.0
         finally:
             cleanup_chromadb(persist_dir, service)
 
@@ -341,8 +390,8 @@ class TestEdgeCases:
 
 
 @pytest.mark.integration
-class TestRAGIntegration:
-    """Integration tests for RAG system."""
+class TestRAGPipeline:
+    """End-to-end integration tests for complete RAG pipeline."""
 
     def test_end_to_end_workflow(self, temp_data_dir):
         """Test complete workflow from indexing to querying."""
@@ -369,6 +418,7 @@ class TestRAGIntegration:
             answer = service.ask("What are the main topics discussed?")
             assert answer["answer"] is not None
             assert len(answer["context"]) > 0
+            assert "confidence_factors" in answer
 
             # 6. Clear and verify
             service.clear_collection()
@@ -376,3 +426,44 @@ class TestRAGIntegration:
             assert final_stats["total_chunks"] == 0
         finally:
             cleanup_chromadb(persist_dir, service)
+
+    def test_ask_with_entity_extraction(self, rag_service):
+        """Test that entities are extracted from questions."""
+        result = rag_service.ask("What are the economy policies?", top_k=5)
+
+        # Check response structure
+        assert "answer" in result
+        assert "confidence" in result
+        assert "confidence_score" in result
+        assert "confidence_factors" in result
+        assert "entities" in result
+
+        # Entities should be a list
+        assert isinstance(result["entities"], list)
+
+    def test_confidence_calculation_integration(self, rag_service):
+        """Test that confidence metrics are properly calculated."""
+        result = rag_service.ask("What topics are discussed?", top_k=5)
+
+        # Should have confidence fields
+        assert "confidence" in result
+        assert "confidence_score" in result
+        assert "confidence_factors" in result
+        assert "confidence_explanation" in result
+
+        # Validate confidence_factors structure
+        factors = result["confidence_factors"]
+        assert "retrieval_score" in factors
+        assert "consistency" in factors
+        assert "chunk_coverage" in factors
+        assert "entity_coverage" in factors
+
+        # All scores should be in valid range (except entity_coverage which can be None)
+        for factor_name, score in factors.items():
+            if factor_name == "entity_coverage" and score is None:
+                continue  # entity_coverage can be None
+            assert 0.0 <= score <= 1.0
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

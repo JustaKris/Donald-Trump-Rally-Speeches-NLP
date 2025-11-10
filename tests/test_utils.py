@@ -5,10 +5,8 @@ Tests data loading, statistics computation, and topic extraction.
 """
 
 import pytest
-from src.utils import (
-    get_word_frequency_stats,
-    extract_topics,
-)
+
+from src.utils import extract_topics, get_word_frequency_stats
 
 
 class TestWordFrequency:
