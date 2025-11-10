@@ -226,6 +226,12 @@ markers = [
     "requires_model: Tests that require ML model loading",
 ]
 
+# Filter warnings - ignore ChromaDB's Pydantic v2.11 deprecation warnings
+# These are third-party library issues (ChromaDB using model_fields on instances)
+filterwarnings = [
+    "ignore:Accessing the 'model_fields' attribute on the instance is deprecated.*",
+]
+
 # Ignore directories
 norecursedirs = [
     ".git",
