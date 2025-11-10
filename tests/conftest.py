@@ -25,7 +25,7 @@ def pytest_configure(config):
 def pytest_collection_modifyitems(config, items):
     """
     Hook that runs after test collection to suppress ChromaDB warnings.
-    
+
     This runs even when -W error::DeprecationWarning is used, because it modifies
     how warnings are handled for each test item.
     """
@@ -35,8 +35,3 @@ def pytest_collection_modifyitems(config, items):
         message="Accessing the 'model_fields' attribute on the instance is deprecated.*",
         category=DeprecationWarning,
     )
-
-
-
-
-
