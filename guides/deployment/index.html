@@ -907,6 +907,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#environment-variable-parsing-errors-in-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment Variable Parsing Errors in Docker
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#docker-build-fails" class="md-nav__link">
     <span class="md-ellipsis">
       Docker Build Fails
@@ -1648,6 +1657,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#environment-variable-parsing-errors-in-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      Environment Variable Parsing Errors in Docker
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#docker-build-fails" class="md-nav__link">
     <span class="md-ellipsis">
       Docker Build Fails
@@ -1812,10 +1830,10 @@
 <li><strong>Run commands:</strong></li>
 </ol>
 <div class="language-powershell highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c"># Run the API server</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">uv</span> <span class="n">run</span> <span class="n">uvicorn</span> <span class="n">src</span><span class="p">.</span><span class="n">api</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-reload</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">uv</span> <span class="n">run</span> <span class="n">uvicorn</span> <span class="n">src</span><span class="p">.</span><span class="n">main</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-reload</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c"># Run with custom host and port</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">uv</span> <span class="n">run</span> <span class="n">uvicorn</span> <span class="n">src</span><span class="p">.</span><span class="n">api</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-host</span> <span class="n">0</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">0</span> <span class="p">-</span><span class="n">-port</span> <span class="n">8001</span> <span class="p">-</span><span class="n">-reload</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">uv</span> <span class="n">run</span> <span class="n">uvicorn</span> <span class="n">src</span><span class="p">.</span><span class="n">main</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-host</span> <span class="n">0</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">0</span> <span class="p">-</span><span class="n">-port</span> <span class="n">8001</span> <span class="p">-</span><span class="n">-reload</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c"># Run tests</span>
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">uv</span> <span class="n">run</span> <span class="n">pytest</span>
@@ -2483,10 +2501,78 @@
 - <strong>Tip:</strong> Results improve with more indexed documents</p>
 <hr />
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="environment-variable-parsing-errors-in-docker">Environment Variable Parsing Errors in Docker<a class="headerlink" href="#environment-variable-parsing-errors-in-docker" title="Permanent link">&para;</a></h3>
+<p><strong>Error:</strong>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>pydantic_core._pydantic_core.ValidationError: 13 validation errors for Settings
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>  environment
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>    Input should be &#39;development&#39;, &#39;staging&#39; or &#39;production&#39; [type=literal_error, input_value=&#39;&quot;development&quot;  # develop...&#39;, input_type=str]
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>  log_level
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>    Value error, Invalid log level. Must be one of: DEBUG, INFO, WARNING, ERROR, CRITICAL [type=value_error, input_value=&#39;&quot;INFO&quot;  # DEBUG, INFO, WARNING, ERROR, CRITICAL&#39;, input_type=str]
+</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>  ...
+</span></code></pre></div></p>
+<p><strong>Root Cause:</strong>
+Your <code>.env</code> file has quoted values and/or inline comments. When Python-dotenv loads the file, it reads the <strong>entire value including quotes and comments as a literal string</strong>. So <code>"development"</code> becomes a string with quotes, which doesn't match the expected literal value <code>development</code>.</p>
+<p><strong>Solution:</strong></p>
+<p>Edit your <code>.env</code> file and follow these rules:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a># ✅ CORRECT Format
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a># Variables without quotes
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>ENVIRONMENT=development
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>LOG_LEVEL=INFO
+</span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>API_PORT=8000
+</span><span id="__span-28-7"><a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a>
+</span><span id="__span-28-8"><a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a># Booleans as lowercase true/false (no quotes)
+</span><span id="__span-28-9"><a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a>LLM_ENABLED=true
+</span><span id="__span-28-10"><a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a>USE_RERANKING=true
+</span><span id="__span-28-11"><a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a>API_RELOAD=false
+</span><span id="__span-28-12"><a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a>
+</span><span id="__span-28-13"><a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a># Numbers without quotes
+</span><span id="__span-28-14"><a id="__codelineno-28-14" name="__codelineno-28-14" href="#__codelineno-28-14"></a>CHUNK_SIZE=2048
+</span><span id="__span-28-15"><a id="__codelineno-28-15" name="__codelineno-28-15" href="#__codelineno-28-15"></a>GEMINI_TEMPERATURE=0.3
+</span><span id="__span-28-16"><a id="__codelineno-28-16" name="__codelineno-28-16" href="#__codelineno-28-16"></a>
+</span><span id="__span-28-17"><a id="__codelineno-28-17" name="__codelineno-28-17" href="#__codelineno-28-17"></a># Comments on separate lines only
+</span><span id="__span-28-18"><a id="__codelineno-28-18" name="__codelineno-28-18" href="#__codelineno-28-18"></a># Get free key at https://ai.google.dev/
+</span><span id="__span-28-19"><a id="__codelineno-28-19" name="__codelineno-28-19" href="#__codelineno-28-19"></a>GEMINI_API_KEY=your-api-key-here
+</span><span id="__span-28-20"><a id="__codelineno-28-20" name="__codelineno-28-20" href="#__codelineno-28-20"></a>
+</span><span id="__span-28-21"><a id="__codelineno-28-21" name="__codelineno-28-21" href="#__codelineno-28-21"></a># Paths with spaces are fine (no quotes needed)
+</span><span id="__span-28-22"><a id="__codelineno-28-22" name="__codelineno-28-22" href="#__codelineno-28-22"></a>SPEECHES_DIRECTORY=./data/Donald Trump Rally Speeches
+</span></code></pre></div>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a># ❌ INCORRECT Format (DO NOT USE)
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a># Quoted values - Pydantic will see the quotes as part of the value
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>ENVIRONMENT=&quot;development&quot;
+</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>LOG_LEVEL=&quot;INFO&quot;
+</span><span id="__span-29-6"><a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a>
+</span><span id="__span-29-7"><a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a># Inline comments - Will be read as part of the value
+</span><span id="__span-29-8"><a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a>CHUNK_SIZE=&quot;2048&quot;  # Maximum characters per chunk
+</span><span id="__span-29-9"><a id="__codelineno-29-9" name="__codelineno-29-9" href="#__codelineno-29-9"></a>USE_RERANKING=&quot;true&quot;  # Enable reranking
+</span><span id="__span-29-10"><a id="__codelineno-29-10" name="__codelineno-29-10" href="#__codelineno-29-10"></a>
+</span><span id="__span-29-11"><a id="__codelineno-29-11" name="__codelineno-29-11" href="#__codelineno-29-11"></a># Booleans with quotes - Can&#39;t parse as boolean
+</span><span id="__span-29-12"><a id="__codelineno-29-12" name="__codelineno-29-12" href="#__codelineno-29-12"></a>LLM_ENABLED=&quot;true&quot;
+</span></code></pre></div>
+<p><strong>Key Rules for <code>.env</code> files:</strong>
+- ❌ No quotes around values (not needed and causes parsing errors)
+- ❌ No inline comments (use separate lines or comment blocks)
+- ✅ Booleans as <code>true</code> or <code>false</code> (lowercase, no quotes)
+- ✅ Numbers without quotes
+- ✅ Strings can contain spaces without quotes
+- ✅ Comments on their own lines with <code>#</code> prefix</p>
+<p><strong>Test your <code>.env</code> file:</strong></p>
+<p>After fixing, verify it parses correctly:</p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="c"># Run without Docker to test locally first</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="n">uv</span> <span class="n">run</span> <span class="n">uvicorn</span> <span class="n">src</span><span class="p">.</span><span class="n">main</span><span class="p">:</span><span class="n">app</span> <span class="p">-</span><span class="n">-reload</span>
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>
+</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="c"># Or test the config in Python</span>
+</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="n">uv</span> <span class="n">run</span> <span class="n">python</span> <span class="n">-c</span> <span class="s2">&quot;from src.core.config import get_settings; s = get_settings(); print(f&#39;Environment: {s.environment}, Log Level: {s.log_level}&#39;)&quot;</span>
+</span></code></pre></div>
+<p>Then try Docker again:</p>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="n">docker</span> <span class="n">run</span> <span class="p">-</span><span class="n">-rm</span> <span class="n">-it</span> <span class="n">-p</span> <span class="n">8000</span><span class="p">:</span><span class="n">8000</span> <span class="p">-</span><span class="n">-env</span><span class="o">-file</span> <span class="p">.</span><span class="n">env</span> <span class="p">-</span><span class="n">-name</span> <span class="n">nlp-chatbot</span> <span class="n">trump-speeches-nlp-chatbot</span>
+</span></code></pre></div>
+<hr />
 <h3 id="docker-build-fails">Docker Build Fails<a class="headerlink" href="#docker-build-fails" title="Permanent link">&para;</a></h3>
-<div class="language-powershell highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="c"># Clean Docker cache and rebuild</span>
-</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="n">docker</span> <span class="n">system</span> <span class="n">prune</span> <span class="n">-a</span>
-</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="n">docker</span> <span class="n">build</span> <span class="p">-</span><span class="n">-no-cache</span> <span class="n">-t</span> <span class="n">trump-speeches-nlp-api</span> <span class="p">.</span>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="c"># Clean Docker cache and rebuild</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="n">docker</span> <span class="n">system</span> <span class="n">prune</span> <span class="n">-a</span>
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="n">docker</span> <span class="n">build</span> <span class="p">-</span><span class="n">-no-cache</span> <span class="n">-t</span> <span class="n">trump-speeches-nlp-api</span> <span class="p">.</span>
 </span></code></pre></div>
 <h3 id="api-returns-503">API Returns 503<a class="headerlink" href="#api-returns-503" title="Permanent link">&para;</a></h3>
 <ul>
@@ -2495,11 +2581,11 @@
 <li>Ensure sufficient memory (minimum 1GB recommended)</li>
 </ul>
 <h3 id="azure-deployment-issues">Azure Deployment Issues<a class="headerlink" href="#azure-deployment-issues" title="Permanent link">&para;</a></h3>
-<div class="language-powershell highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="c"># Check app logs</span>
-</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="n">az</span> <span class="n">webapp</span> <span class="n">log</span> <span class="n">tail</span> <span class="p">-</span><span class="n">-resource-group</span> <span class="n">trump-nlp-rg</span> <span class="p">-</span><span class="n">-name</span> <span class="n">trump-speeches-nlp</span>
-</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>
-</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="c"># Restart the app</span>
-</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="n">az</span> <span class="n">webapp</span> <span class="n">restart</span> <span class="p">-</span><span class="n">-resource-group</span> <span class="n">trump-nlp-rg</span> <span class="p">-</span><span class="n">-name</span> <span class="n">trump-speeches-nlp</span>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="c"># Check app logs</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="n">az</span> <span class="n">webapp</span> <span class="n">log</span> <span class="n">tail</span> <span class="p">-</span><span class="n">-resource-group</span> <span class="n">trump-nlp-rg</span> <span class="p">-</span><span class="n">-name</span> <span class="n">trump-speeches-nlp</span>
+</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>
+</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="c"># Restart the app</span>
+</span><span id="__span-33-5"><a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="n">az</span> <span class="n">webapp</span> <span class="n">restart</span> <span class="p">-</span><span class="n">-resource-group</span> <span class="n">trump-nlp-rg</span> <span class="p">-</span><span class="n">-name</span> <span class="n">trump-speeches-nlp</span>
 </span></code></pre></div>
 <h3 id="render-deployment-issues">Render Deployment Issues<a class="headerlink" href="#render-deployment-issues" title="Permanent link">&para;</a></h3>
 <ul>

@@ -721,6 +721,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#modular-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      Modular Architecture
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modular Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Components
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#core-architecture" class="md-nav__link">
     <span class="md-ellipsis">
       Core Architecture
@@ -734,6 +758,15 @@
   <a href="#vector-database" class="md-nav__link">
     <span class="md-ellipsis">
       Vector Database
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#search-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      Search Engine
     </span>
   </a>
   
@@ -878,6 +911,15 @@
   <a href="#ragservice-parameters" class="md-nav__link">
     <span class="md-ellipsis">
       RAGService Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#component-initialization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Component Initialization
     </span>
   </a>
   
@@ -1093,6 +1135,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#modular-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      Modular Architecture
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modular Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Components
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#core-architecture" class="md-nav__link">
     <span class="md-ellipsis">
       Core Architecture
@@ -1106,6 +1172,15 @@
   <a href="#vector-database" class="md-nav__link">
     <span class="md-ellipsis">
       Vector Database
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#search-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      Search Engine
     </span>
   </a>
   
@@ -1250,6 +1325,15 @@
   <a href="#ragservice-parameters" class="md-nav__link">
     <span class="md-ellipsis">
       RAGService Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#component-initialization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Component Initialization
     </span>
   </a>
   
@@ -1435,13 +1519,35 @@
 <h1 id="rag-system-features">RAG System Features<a class="headerlink" href="#rag-system-features" title="Permanent link">&para;</a></h1>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
 <p>This project implements a production-grade Retrieval-Augmented Generation (RAG) system for question-answering over a corpus of 35 political speeches (300,000+ words).</p>
+<p><strong>Architectural Highlights:</strong>
+- <strong>Modular Design:</strong> Separated concerns with dedicated components for search, confidence, entities, and document loading
+- <strong>Testable:</strong> 65%+ test coverage with component-level unit tests
+- <strong>Type-Safe:</strong> Pydantic models for all RAG data structures
+- <strong>Maintainable:</strong> Clear separation of concerns, easy to extend and debug</p>
+<h2 id="modular-architecture">Modular Architecture<a class="headerlink" href="#modular-architecture" title="Permanent link">&para;</a></h2>
+<h3 id="core-components">Core Components<a class="headerlink" href="#core-components" title="Permanent link">&para;</a></h3>
+<p><strong>Orchestration:</strong>
+- <strong><code>RAGService</code></strong> (<code>services/rag_service.py</code>) - Manages ChromaDB collection and coordinates components</p>
+<p><strong>Specialized Services</strong> (<code>services/rag/</code>):
+- <strong><code>SearchEngine</code></strong> (<code>search_engine.py</code>) - Hybrid search with semantic, BM25, and cross-encoder reranking
+- <strong><code>ConfidenceCalculator</code></strong> (<code>confidence.py</code>) - Multi-factor confidence scoring
+- <strong><code>EntityAnalyzer</code></strong> (<code>entity_analyzer.py</code>) - Entity extraction, sentiment, co-occurrence analysis
+- <strong><code>DocumentLoader</code></strong> (<code>document_loader.py</code>) - Smart chunking with metadata tracking</p>
+<p><strong>Supporting Services:</strong>
+- <strong><code>GeminiLLM</code></strong> (<code>services/llm_service.py</code>) - Answer generation with Google Gemini</p>
 <h2 id="core-architecture">Core Architecture<a class="headerlink" href="#core-architecture" title="Permanent link">&para;</a></h2>
 <h3 id="vector-database">Vector Database<a class="headerlink" href="#vector-database" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>ChromaDB</strong> with persistent storage</li>
 <li><strong>MPNet embeddings</strong> (768 dimensions) for semantic understanding</li>
+<li><strong>Efficient querying</strong> with smart deduplication</li>
+</ul>
+<h3 id="search-engine">Search Engine<a class="headerlink" href="#search-engine" title="Permanent link">&para;</a></h3>
+<ul>
 <li><strong>Hybrid search</strong> combining dense embeddings with BM25 sparse retrieval</li>
-<li><strong>Cross-encoder reranking</strong> for precision optimization</li>
+<li><strong>Cross-encoder reranking</strong> for precision optimization  </li>
+<li><strong>Configurable weights</strong> for semantic vs keyword balance</li>
+<li><strong>Deduplication</strong> removes duplicate results by ID</li>
 </ul>
 <h3 id="llm-integration">LLM Integration<a class="headerlink" href="#llm-integration" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1471,11 +1577,16 @@
 - Source document attribution
 - Entity statistics (if applicable)</p>
 <h3 id="2-multi-factor-confidence-scoring">2. Multi-Factor Confidence Scoring<a class="headerlink" href="#2-multi-factor-confidence-scoring" title="Permanent link">&para;</a></h3>
-<p>Sophisticated confidence assessment considering:
+<p>Sophisticated confidence assessment handled by <code>ConfidenceCalculator</code> component.</p>
+<p><strong>Confidence Factors (weighted):</strong>
 - <strong>Retrieval Quality (40%)</strong> — Semantic similarity of retrieved chunks
 - <strong>Consistency (25%)</strong> — Low variance in scores = higher confidence
-- <strong>Coverage (20%)</strong> — Number of supporting chunks
+- <strong>Coverage (20%)</strong> — Number of supporting chunks (normalized 0-1)
 - <strong>Entity Coverage (15%)</strong> — For entity queries, mention frequency</p>
+<p><strong>Confidence Levels:</strong>
+- <strong>High:</strong> combined_score ≥ 0.7
+- <strong>Medium:</strong> 0.4 ≤ combined_score &lt; 0.7
+- <strong>Low:</strong> combined_score &lt; 0.4</p>
 <p><strong>Example output:</strong>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;confidence&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;high&quot;</span><span class="p">,</span>
@@ -1490,13 +1601,13 @@
 </span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="p">}</span>
 </span></code></pre></div></p>
 <h3 id="3-entity-analytics">3. Entity Analytics<a class="headerlink" href="#3-entity-analytics" title="Permanent link">&para;</a></h3>
-<p>Automatic entity detection with comprehensive statistics:</p>
-<ul>
-<li><strong>Mention counts</strong> across entire corpus</li>
-<li><strong>Speech coverage</strong> — which documents mention the entity</li>
-<li><strong>Sentiment analysis</strong> — average sentiment toward entity</li>
-<li><strong>Co-occurrence analysis</strong> — most common associated terms</li>
-</ul>
+<p>Automatic entity detection with comprehensive statistics handled by <code>EntityAnalyzer</code> component.</p>
+<p><strong>Features:</strong>
+- <strong>Mention counts</strong> across entire corpus
+- <strong>Speech coverage</strong> — which documents mention the entity<br />
+- <strong>Corpus percentage</strong> — percentage of documents containing entity
+- <strong>Sentiment analysis</strong> — average sentiment toward entity (optional)
+- <strong>Co-occurrence analysis</strong> — most common associated terms (filtered for stopwords)</p>
 <p><strong>Example output:</strong>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&quot;entity_statistics&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -1516,19 +1627,26 @@
 </span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="p">}</span>
 </span></code></pre></div></p>
 <h3 id="4-hybrid-search">4. Hybrid Search<a class="headerlink" href="#4-hybrid-search" title="Permanent link">&para;</a></h3>
-<p>Combines semantic and keyword search for optimal retrieval:</p>
+<p><code>SearchEngine</code> component combines semantic and keyword search for optimal retrieval:</p>
 <ul>
-<li><strong>Semantic search</strong> — Dense embeddings capture meaning and context</li>
+<li><strong>Semantic search</strong> — Dense embeddings capture meaning and context (MPNet 768d)</li>
 <li><strong>BM25 keyword search</strong> — Ensures exact term matches aren't missed</li>
-<li><strong>Cross-encoder reranking</strong> — Final precision optimization</li>
-<li><strong>Configurable weights</strong> — Adjust semantic vs keyword importance</li>
+<li><strong>Score combination</strong> — Configurable weights (default: 0.7 semantic, 0.3 BM25)</li>
+<li><strong>Cross-encoder reranking</strong> — Optional final precision optimization</li>
+<li><strong>Deduplication</strong> — Removes duplicate results by ID</li>
 </ul>
+<p><strong>Search Modes:</strong>
+- <code>semantic</code> - Pure vector similarity
+- <code>hybrid</code> - Combined semantic + BM25 (default)
+- <code>reranking</code> - Adds cross-encoder pass</p>
 <h3 id="5-optimized-chunking">5. Optimized Chunking<a class="headerlink" href="#5-optimized-chunking" title="Permanent link">&para;</a></h3>
+<p><code>DocumentLoader</code> component handles smart document chunking:</p>
 <ul>
 <li><strong>2048 character chunks</strong> (~512-768 tokens) for complete context</li>
-<li><strong>150 character overlap</strong> to preserve continuity</li>
-<li>Smart splitting with RecursiveCharacterTextSplitter</li>
+<li><strong>150 character overlap</strong> to preserve continuity across chunks</li>
+<li>Smart splitting with LangChain's RecursiveCharacterTextSplitter</li>
 <li>Maintains coherent context boundaries</li>
+<li><strong>Metadata tracking:</strong> source filename, chunk index, total chunks</li>
 </ul>
 <h2 id="api-usage">API Usage<a class="headerlink" href="#api-usage" title="Permanent link">&para;</a></h2>
 <h3 id="basic-question">Basic Question<a class="headerlink" href="#basic-question" title="Permanent link">&para;</a></h3>
@@ -1573,7 +1691,7 @@
 </span></code></pre></div>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <h3 id="ragservice-parameters">RAGService Parameters<a class="headerlink" href="#ragservice-parameters" title="Permanent link">&para;</a></h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">src.rag_service</span><span class="w"> </span><span class="kn">import</span> <span class="n">RAGService</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">src.services.rag_service</span><span class="w"> </span><span class="kn">import</span> <span class="n">RAGService</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">rag</span> <span class="o">=</span> <span class="n">RAGService</span><span class="p">(</span>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">collection_name</span><span class="o">=</span><span class="s2">&quot;speeches&quot;</span><span class="p">,</span>
@@ -1584,8 +1702,19 @@
 </span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="n">chunk_overlap</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span>                        <span class="c1"># ~100-150 tokens</span>
 </span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    <span class="n">use_llm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                             <span class="c1"># Enable Gemini</span>
 </span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>    <span class="n">use_reranking</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                       <span class="c1"># Enable cross-encoder</span>
-</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    <span class="n">use_hybrid_search</span><span class="o">=</span><span class="kc">True</span>                    <span class="c1"># Enable BM25 + semantic</span>
-</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="p">)</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    <span class="n">use_hybrid_search</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                   <span class="c1"># Enable BM25 + semantic</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>    <span class="n">semantic_weight</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>                      <span class="c1"># Hybrid search weight for semantic</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>    <span class="n">keyword_weight</span><span class="o">=</span><span class="mf">0.3</span>                        <span class="c1"># Hybrid search weight for BM25</span>
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="component-initialization">Component Initialization<a class="headerlink" href="#component-initialization" title="Permanent link">&para;</a></h3>
+<p>The RAG service automatically initializes all components:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Initialized internally:</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c1"># - DocumentLoader (for chunking)</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="c1"># - SearchEngine (for hybrid retrieval)</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># - ConfidenceCalculator (for scoring)</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="c1"># - EntityAnalyzer (for entity extraction)</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="c1"># - GeminiLLM (for answer generation, if use_llm=True)</span>
 </span></code></pre></div>
 <h3 id="api-endpoint-configuration">API Endpoint Configuration<a class="headerlink" href="#api-endpoint-configuration" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1652,18 +1781,18 @@
 </ul>
 <h2 id="migration">Migration<a class="headerlink" href="#migration" title="Permanent link">&para;</a></h2>
 <p>If you're upgrading from a previous version with different embeddings:</p>
-<div class="language-powershell highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">poetry</span> <span class="n">run</span> <span class="n">python</span> <span class="n">scripts</span><span class="p">/</span><span class="n">migrate_rag_embeddings</span><span class="p">.</span><span class="n">py</span>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">poetry</span> <span class="n">run</span> <span class="n">python</span> <span class="n">scripts</span><span class="p">/</span><span class="n">migrate_rag_embeddings</span><span class="p">.</span><span class="n">py</span>
 </span></code></pre></div>
 <p>This will:
 1. Clear existing ChromaDB collection
 2. Reload documents with new embeddings
 3. Re-index all 35 speeches (~1082 chunks)</p>
 <h2 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h2>
-<div class="language-powershell highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c"># Run RAG tests</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">poetry</span> <span class="n">run</span> <span class="n">pytest</span> <span class="n">tests</span><span class="p">/</span><span class="n">test_rag_service</span><span class="p">.</span><span class="n">py</span> <span class="n">-v</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c"># Run all tests</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">poetry</span> <span class="n">run</span> <span class="n">pytest</span> <span class="n">-v</span>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c"># Run RAG tests</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">poetry</span> <span class="n">run</span> <span class="n">pytest</span> <span class="n">tests</span><span class="p">/</span><span class="n">test_rag_service</span><span class="p">.</span><span class="n">py</span> <span class="n">-v</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c"># Run all tests</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">poetry</span> <span class="n">run</span> <span class="n">pytest</span> <span class="n">-v</span>
 </span></code></pre></div>
 <h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h2>
 <ul>

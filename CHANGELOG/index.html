@@ -715,6 +715,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#added-modular-rag-architecture-code-refactoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added - Modular RAG Architecture (Code Refactoring)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#added-production-logging-system" class="md-nav__link">
     <span class="md-ellipsis">
       Added - Production Logging System
@@ -930,6 +939,38 @@
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
 <p>All notable changes and improvements to the Trump Speeches NLP Chatbot API.</p>
 <h2 id="recent-updates-november-2025">[Recent Updates] - November 2025<a class="headerlink" href="#recent-updates-november-2025" title="Permanent link">&para;</a></h2>
+<h3 id="added-modular-rag-architecture-code-refactoring">Added - Modular RAG Architecture (Code Refactoring)<a class="headerlink" href="#added-modular-rag-architecture-code-refactoring" title="Permanent link">&para;</a></h3>
+<p><strong>New Modules: <code>src/services/rag/</code></strong></p>
+<p>Restructured RAG service into dedicated, testable components:</p>
+<ul>
+<li><strong>Component Separation</strong>:</li>
+<li><code>search_engine.py</code> - Hybrid search with semantic, BM25, and cross-encoder reranking</li>
+<li><code>confidence.py</code> - Multi-factor confidence scoring (retrieval quality, consistency, coverage, entity mentions)</li>
+<li><code>entity_analyzer.py</code> - Entity extraction, sentiment analysis, co-occurrence analytics</li>
+<li><code>document_loader.py</code> - Smart chunking with metadata tracking</li>
+<li>
+<p><code>models.py</code> - Pydantic data models for type-safe RAG operations</p>
+</li>
+<li>
+<p><strong>Improved Testability</strong>:</p>
+</li>
+<li>65%+ overall test coverage, 90%+ for core RAG components</li>
+<li>Component-level unit tests with mocked dependencies</li>
+<li>Integration tests for full RAG pipeline</li>
+<li>
+<p>108 tests total (28 integration, 80 component/unit)</p>
+</li>
+<li>
+<p><strong>Type Safety</strong>: Pydantic models for all RAG data structures</p>
+</li>
+<li><strong>Maintainability</strong>: Clear separation of concerns, easier to extend and debug</li>
+<li><strong>Performance</strong>: Unchanged - modular design maintains original efficiency</li>
+</ul>
+<p><strong>Benefits</strong>:
+- Each component testable in isolation
+- Easier to understand and modify individual features
+- Better error tracking and debugging
+- Foundation for future enhancements</p>
 <h3 id="added-production-logging-system">Added - Production Logging System<a class="headerlink" href="#added-production-logging-system" title="Permanent link">&para;</a></h3>
 <p><strong>New Module: <code>src/logging_config.py</code></strong></p>
 <p>Implemented professional logging with automatic environment detection:</p>

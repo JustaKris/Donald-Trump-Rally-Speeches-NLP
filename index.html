@@ -1050,11 +1050,12 @@
 <h2 id="project-overview">Project Overview<a class="headerlink" href="#project-overview" title="Permanent link">&para;</a></h2>
 <p>This portfolio project demonstrates expertise in:</p>
 <ul>
-<li><strong>Advanced RAG Architecture</strong> — ChromaDB vector database, MPNet embeddings (768-dim), Google Gemini LLM integration</li>
-<li><strong>Hybrid Retrieval Systems</strong> — Semantic search combined with BM25 keyword matching and cross-encoder reranking</li>
-<li><strong>Production API Development</strong> — FastAPI with 12+ RESTful endpoints, type-safe Pydantic models, comprehensive error handling</li>
+<li><strong>Advanced RAG Architecture</strong> — Modular design with dedicated components for search, confidence scoring, entity analytics, and document loading</li>
+<li><strong>Hybrid Retrieval Systems</strong> — Semantic search (MPNet 768d) combined with BM25 keyword matching and cross-encoder reranking</li>
+<li><strong>Production API Development</strong> — FastAPI with 12+ RESTful endpoints, modular route organization, type-safe Pydantic models</li>
 <li><strong>Entity Analytics</strong> — Automated entity extraction with sentiment analysis and contextual associations</li>
-<li><strong>Professional DevOps</strong> — Docker containerization, CI/CD pipelines, automated testing, code quality enforcement</li>
+<li><strong>Professional DevOps</strong> — Docker containerization, CI/CD pipelines, automated testing (65%+ coverage), code quality enforcement</li>
+<li><strong>LLM Integration</strong> — Google Gemini for context-aware answer generation with fallback extraction</li>
 </ul>
 <h2 id="documentation-structure">Documentation Structure<a class="headerlink" href="#documentation-structure" title="Permanent link">&para;</a></h2>
 <h3 id="getting-started-guides">Getting Started Guides<a class="headerlink" href="#getting-started-guides" title="Permanent link">&para;</a></h3>
@@ -1097,11 +1098,12 @@
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;question&quot;: &quot;What economic policies were discussed?&quot;, &quot;top_k&quot;: 5}&#39;</span>
 </span></code></pre></div>
 <p><strong>Features:</strong>
+- Modular RAG components: SearchEngine, ConfidenceCalculator, EntityAnalyzer, DocumentLoader
 - Semantic search using MPNet embeddings (768-dimensional)
 - Hybrid search combining vector similarity and BM25 keyword matching
 - Cross-encoder reranking for improved precision
-- Multi-factor confidence scoring
-- Entity extraction and analytics
+- Multi-factor confidence scoring (retrieval quality, consistency, coverage, entity mentions)
+- Entity extraction and analytics with sentiment analysis
 - Google Gemini LLM for answer generation</p>
 <h3 id="nlp-endpoints">NLP Endpoints<a class="headerlink" href="#nlp-endpoints" title="Permanent link">&para;</a></h3>
 <p>Traditional NLP analysis:
