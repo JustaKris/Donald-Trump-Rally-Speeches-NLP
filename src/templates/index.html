@@ -441,7 +441,7 @@
                 </p>
                 <p style="margin: 10px 0 20px 0; color: #555; font-size: 14px; line-height: 1.6;">
                     <strong>💡 Try asking:</strong>
-                    "What economic policies are discussed?" • "What are Trump's views on Joe Biden?" • "What is the sentiment toward immigration?" • "What locations are mentioned?"
+                    "What are Trump's views on Joe Biden?" • "What is the sentiment toward immigration?" • "What are Trump's views on the news networks?" • "What's the deal with the economy?"
                 </p>
                 <textarea id="ragQuestion" placeholder="Ask a question about the documents... (e.g., 'What are the main economic policies discussed?')" style="min-height: 120px; font-size: 16px;"></textarea>
                 <button class="analyze" onclick="askRAG()">🚀 Ask AI</button>
@@ -773,7 +773,7 @@
             showLoading('statsLoading');
             
             try {
-                const response = await fetch('/speeches/stats');
+                const response = await fetch('/analyze/speeches/stats');
                 
                 if (!response.ok) {
                     throw new Error(`API error: ${response.statusText}`);

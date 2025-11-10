@@ -167,6 +167,9 @@ This guide covers deploying the Trump Speeches NLP Chatbot API to various platfo
    
    # Run in detached mode (background)
    docker run -d -p 8000:8000 --env-file .env --name nlp-chatbot trump-speeches-nlp-chatbot
+
+   # Run in remote interactive mode
+   docker run --rm -it -p 8000:8000 --env-file .env --name nlp-chatbot trump-speeches-nlp-chatbot
    
    # Run with persistent ChromaDB volume
    docker run --rm -it -p 8000:8000 -v "${PWD}/data/chromadb:/app/data/chromadb" --env-file .env --name nlp-chatbot trump-speeches-nlp-chatbot

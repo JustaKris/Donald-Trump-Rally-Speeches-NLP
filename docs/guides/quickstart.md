@@ -28,7 +28,7 @@ Get the Trump Speeches NLP Chatbot API running locally in minutes.
 3. **Run the API**
 
    ```powershell
-   uv run uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
+   uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
    ```
 
    The API will automatically:

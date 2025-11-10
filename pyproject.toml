@@ -68,8 +68,8 @@ dependencies = [
     # Data Processing - NumPy <2 for compatibility with PyTorch 2.6 CPU builds
     "numpy (>=1.26.0,<2.0.0)",
     "pandas (>=2.2.0,<3.0.0)",
-    "scipy (>=1.14.0,<2.0.0)",
-    "tqdm (>=4.67.1,<5.0.0)",
+    # "scipy (>=1.14.0,<2.0.0)",
+    # "tqdm (>=4.67.1,<5.0.0)",
     
     # Security
     "certifi (>=2025.10.5,<2026.0.0)"
@@ -117,7 +117,7 @@ docs = [
 
 # PyTorch CPU-only (for Docker/production - much smaller)
 # torch-cpu = [
-#     "torch (==2.4.0)"  # Will be overridden by Docker to install +cpu variant
+#     "torch (>=2.6.0,<3.0.0)"
 # ]
 
 # Black configuration
