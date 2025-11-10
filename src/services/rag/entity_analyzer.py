@@ -265,7 +265,7 @@ class EntityAnalyzer:
         percentage = (speech_count / total_doc_count * 100) if total_doc_count > 0 else 0
 
         # Build base statistics
-        entity_data = {
+        entity_data: Dict[str, Any] = {
             "mention_count": mentions,
             "speech_count": len(speeches_with_entity),
             "corpus_percentage": round(percentage, 2),

@@ -6,6 +6,7 @@ Tests the API routes using FastAPI's TestClient.
 
 import pytest
 from fastapi.testclient import TestClient
+
 from src.main import app
 
 
@@ -163,7 +164,7 @@ class TestStatisticsEndpoint:
     @pytest.mark.integration
     def test_dataset_statistics(self, client):
         """Test getting dataset statistics."""
-        response = client.get("/speeches/stats")
+        response = client.get("/analyze/speeches/stats")
 
         assert response.status_code == 200
         data = response.json()
@@ -179,7 +180,7 @@ class TestSpeechListEndpoint:
     @pytest.mark.integration
     def test_list_speeches(self, client):
         """Test listing all speeches."""
-        response = client.get("/speeches/list")
+        response = client.get("/analyze/speeches/list")
 
         assert response.status_code == 200
         data = response.json()
@@ -195,7 +196,7 @@ class TestTextCleanEndpoint:
     def test_clean_text_basic(self, client):
         """Test text cleaning endpoint."""
         payload = {"text": "Hello World! https://example.com"}
-        response = client.post("/text/clean", json=payload)
+        response = client.post("/analyze/clean", json=payload)
 
         assert response.status_code == 200
         data = response.json()
@@ -207,7 +208,7 @@ class TestTextCleanEndpoint:
     def test_clean_text_with_stopwords_param(self, client):
         """Test text cleaning with remove_stopwords parameter."""
         payload = {"text": "This is a test"}
-        response = client.post("/text/clean?remove_stopwords=true", json=payload)
+        response = client.post("/analyze/clean?remove_stopwords=true", json=payload)
 
         assert response.status_code == 200
         data = response.json()

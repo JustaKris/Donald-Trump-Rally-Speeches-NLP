@@ -12,7 +12,7 @@ uv sync            # sync all default groups
 uv sync --group dev  # sync only dev dependencies (if grouped)
 
 # Run a command inside the project's environment
-uv run <command>   # e.g. `uv run pytest` or `uv run black src/`
+uv run <command>   # e.g. `uv run pytest` or `uv run black src/ tests/`
 ```
 
 If you prefer to use Poetry directly, the original Poetry commands are still valid and left as alternatives in this document.
@@ -44,6 +44,12 @@ uv run pytest -v
 
 # Run specific test file
 uv run pytest tests/test_preprocessing.py
+
+# Run test with details on warnings
+pytest -W default::Warning
+
+# Run tests with enforced warnings
+pytest -W error::DeprecationWarning
 ```
 
 ### Code Coverage
@@ -62,41 +68,41 @@ start htmlcov/index.html  # Windows
 
 ```powershell
 # Format code with Black (via uv)
-uv run black src/
+uv run black src/ tests/
 
 # Check formatting without changes
-uv run black --check src/
+uv run black --check src/ tests/
 
 # Sort imports with isort
-uv run isort src/
+uv run isort src/ tests/
 
 # Check imports without changes
-uv run isort --check-only src/
+uv run isort --check-only src/ tests/
 ```
 
 ### Linting
 
 ```powershell
 # Run flake8
-uv run flake8 src/
+uv run flake8 src/ tests/
 
 # Show detailed statistics
-uv run flake8 src/ --count --statistics --show-source
+uv run flake8 src/ tests/ --count --statistics --show-source
 ```
 
 ### Type Checking
 
 ```powershell
 # Run mypy type checker
-uv run mypy src/
+uv run mypy src/ tests/
 ```
 
 ### Run All Quality Checks
 
 ```powershell
 # Run everything at once (uv wrapper)
-uv run black src/ && uv run isort src/ && uv run flake8 src/ && uv run mypy src/ && uv run pytest
-uv run black src/ ; uv run isort src/ ; uv run flake8 src/ ; uv run mypy src/ ; uv run pytest
+uv run black src/ tests/ && uv run isort src/ tests/ && uv run flake8 src/ tests/ && uv run mypy src/ tests/ && uv run pytest
+uv run black src/ tests/ ; uv run isort src/ tests/ ; uv run flake8 src/ tests/ ; uv run mypy src/ tests/ ; uv run pytest
 ```
 
 ## Pre-commit Setup (Optional)
@@ -194,7 +200,7 @@ def test_health_check():
 ## Coverage Goals
 
 - **Target**: 70%+ overall coverage
-- **Focus**: Core logic in `src/`
+- **Focus**: Core logic in `src/ tests/`
 - **Exclude**: ML model internals, notebooks
 
 ## Troubleshooting

@@ -5,12 +5,8 @@ Tests the text cleaning, tokenization, and n-gram extraction functions.
 """
 
 import pytest
-from src.utils.text_preprocessing import (
-    clean_text,
-    tokenize_text,
-    extract_ngrams,
-    get_stopwords,
-)
+
+from src.utils.text_preprocessing import clean_text, extract_ngrams, get_stopwords, tokenize_text
 
 
 class TestTextCleaning:

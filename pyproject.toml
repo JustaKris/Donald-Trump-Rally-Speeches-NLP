@@ -155,7 +155,7 @@ skip_glob = ["notebooks/*", ".venv/*", "venv/*"]
 
 # mypy configuration
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.13"
 warn_return_any = false
 warn_unused_configs = true
 disallow_untyped_defs = false
@@ -210,7 +210,7 @@ addopts = [
     "--cov-report=term-missing",
     "--cov-report=html:reports/coverage/html",
     "--cov-report=xml:reports/coverage/coverage.xml",
-    "--cov-fail-under=40",
+    "--cov-fail-under=60",
     "--strict-markers",
     "--disable-warnings",
 ]
