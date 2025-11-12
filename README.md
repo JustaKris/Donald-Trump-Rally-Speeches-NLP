@@ -73,13 +73,14 @@ Production-ready question-answering system over 35 political speeches (300,000+ 
 - **`dependencies.py`** — Dependency injection for services
 
 **Core Services:**
-- **`services/nlp_service.py`** — Word frequency, topics, n-gram analysis
+- **`services/nlp_service.py`** — Word frequency, n-gram analysis
 - **`services/sentiment_service.py`** — FinBERT sentiment analysis
+- **`services/topic_service.py`** — AI-powered topic extraction with semantic clustering
 
 **Additional Endpoints:**
 - `POST /analyze/sentiment` — Sentiment analysis
 - `POST /analyze/words` — Word frequency
-- `POST /analyze/topics` — Topic extraction
+- `POST /analyze/topics` — AI-powered topic extraction with semantic clustering and contextual analysis
 - `POST /analyze/ngrams` — N-gram analysis
 
 ### 📊 Demo Dataset

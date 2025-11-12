@@ -9,6 +9,7 @@ from .llm_service import GeminiLLM
 from .nlp_service import NLPService
 from .rag_service import RAGService
 from .sentiment_service import SentimentAnalyzer, get_sentiment_analyzer
+from .topic_service import TopicExtractionService
 
 __all__ = [
     # LLM Service
@@ -20,4 +21,6 @@ __all__ = [
     "get_sentiment_analyzer",
     # NLP Service
     "NLPService",
+    # Topic Extraction
+    "TopicExtractionService",
 ]

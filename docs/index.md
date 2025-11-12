@@ -27,8 +27,7 @@ Quick setup and deployment:
 Implementation details for specific features:
 
 - **[Testing & CI/CD](howto/testing.md)** — Testing strategy, code quality tools, continuous integration
-- **[Logging](howto/logging.md)** — Production logging with JSON formatting and cloud integration
-- **[Configuration](reference/configuration.md)** — Environment-based configuration management
+- **[Topic Analysis](howto/topic-extraction.md)** — Using AI-powered topic extraction with semantic clustering
 - **[Entity Analytics](howto/entity-analytics.md)** — Entity extraction and sentiment analysis
 - **[Documentation](howto/documentation.md)** — Contributing to project documentation
 
@@ -72,9 +71,9 @@ curl -X POST http://localhost:8000/rag/ask \
 
 ### NLP Endpoints
 
-Traditional NLP analysis:
+Traditional and AI-powered NLP analysis:
 - **Sentiment Analysis** — FinBERT transformer model
-- **Topic Extraction** — TF-IDF based topic modeling
+- **Topic Analysis** — AI-powered semantic clustering with contextual snippets and LLM-generated insights
 - **Word Frequency** — Statistical text analysis
 - **N-gram Analysis** — Bigram and trigram extraction
 

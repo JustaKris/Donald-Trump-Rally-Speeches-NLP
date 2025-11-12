@@ -11,7 +11,7 @@ from typing import Optional
 from fastapi import Depends
 
 from ..core import Settings, get_settings
-from ..services import GeminiLLM, NLPService, RAGService, SentimentAnalyzer
+from ..services import GeminiLLM, NLPService, RAGService, SentimentAnalyzer, TopicExtractionService
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +20,7 @@ _sentiment_analyzer: Optional[SentimentAnalyzer] = None
 _rag_service: Optional[RAGService] = None
 _llm_service: Optional[GeminiLLM] = None
 _nlp_service: Optional[NLPService] = None
+_topic_service: Optional[TopicExtractionService] = None
 
 
 def set_sentiment_analyzer(analyzer: SentimentAnalyzer) -> None:
@@ -44,6 +45,12 @@ def set_nlp_service(service: NLPService) -> None:
     """Set the global NLP service instance."""
     global _nlp_service
     _nlp_service = service
+
+
+def set_topic_service(service: TopicExtractionService) -> None:
+    """Set the global topic extraction service instance."""
+    global _topic_service
+    _topic_service = service
 
 
 def get_settings_dep() -> Settings:
@@ -97,3 +104,13 @@ def get_nlp_service() -> NLPService:
         # Create on demand if not initialized
         return NLPService()
     return _nlp_service
+
+
+def get_topic_service() -> Optional[TopicExtractionService]:
+    """
+    Dependency to get topic extraction service.
+
+    Returns:
+        TopicExtractionService instance or None if not initialized
+    """
+    return _topic_service

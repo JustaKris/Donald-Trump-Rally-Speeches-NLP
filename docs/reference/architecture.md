@@ -26,7 +26,7 @@ graph TB
     subgraph "NLP Services"
         Sentiment[Sentiment Analyzer<br/>FinBERT]
         Preprocessing[Text Preprocessing<br/>NLTK]
-        Topics[Topic Extraction<br/>TF-IDF]
+        Topics[AI Topic Analysis<br/>Semantic Clustering + LLM]
         RAG[RAG Service<br/>ChromaDB + Embeddings]
     end
     
@@ -79,7 +79,7 @@ FastAPI application with modular route organization.
 - `/rag/index` - Document indexing
 - `/analyze/sentiment` - Sentiment analysis
 - `/analyze/words` - Word frequency analysis
-- `/analyze/topics` - Topic extraction
+- `/analyze/topics` - AI-powered topic extraction with semantic clustering
 - `/analyze/ngrams` - N-gram analysis
 - `/health` - Health check
 
@@ -234,7 +234,37 @@ Data loading and analysis helpers.
 **Modules:**
 - `io_helpers.py` - Speech loading from directory
 - `formatters.py` - Word frequency statistics
-- `text_preprocessing.py` - Topic extraction (TF-IDF) and dataset statistics
+- `text_preprocessing.py` - Basic topic extraction (TF-IDF) and dataset statistics
+
+### 6. **AI-Powered Topic Analysis** (`src/services/topic_service.py`)
+
+Advanced topic extraction with semantic clustering and LLM-generated insights.
+
+**Features:**
+- **Semantic Clustering:** Groups related keywords using sentence embeddings (MPNet) and KMeans
+- **AI-Generated Labels:** Uses Gemini LLM to create meaningful cluster labels (e.g., "Border Security" instead of just "wall")
+- **Contextual Snippets:** Extracts text passages showing keywords in use with highlighting
+- **Topic Summaries:** LLM-generated interpretation of main themes and patterns
+- **Smart Filtering:** Excludes common verbs and low-relevance clusters (< 50% avg relevance)
+
+**Processing Pipeline:**
+```mermaid
+graph LR
+    Text[Input Text] --> Extract[Extract Keywords<br/>TF-IDF + Filtering]
+    Extract --> Embed[Generate Embeddings<br/>MPNet]
+    Embed --> Cluster[Semantic Clustering<br/>KMeans]
+    Cluster --> Label[Generate Labels<br/>Gemini LLM]
+    Label --> Snippets[Extract Snippets<br/>Context Windows]
+    Snippets --> Summary[Generate Summary<br/>Gemini LLM]
+    Summary --> Output[Clustered Topics<br/>+ Snippets + Summary]
+```
+
+**Key Advantages:**
+- Groups synonyms and related concepts automatically (e.g., "economy", "jobs", "employment" → "Economic Policy")
+- Provides real-world context with highlighted examples
+- Ranks by semantic relevance, not just frequency
+- Offers human-readable interpretation via AI
+- Filters out generic verbs and weak clusters
 
 ---
 

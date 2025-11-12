@@ -62,6 +62,7 @@ nav:
   
   - How-To Guides:
       - Testing: howto/testing.md
+      - AI Topic Analysis: howto/topic-extraction.md
       - Entity Analytics: howto/entity-analytics.md
       - Documentation: howto/documentation.md
   

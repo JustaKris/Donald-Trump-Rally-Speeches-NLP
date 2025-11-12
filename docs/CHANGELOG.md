@@ -2,6 +2,62 @@
 
 All notable changes and improvements to the Trump Speeches NLP Chatbot API.
 
+## [Latest] - November 2025
+
+### Added - AI-Powered Topic Analysis with Semantic Clustering 🎯
+
+**New Module: `src/services/topic_service.py`**
+
+Revolutionary upgrade to topic extraction using semantic clustering and AI-generated insights:
+
+- **Semantic Clustering**:
+  - Groups related keywords using MPNet embeddings (768d)
+  - KMeans clustering (3-6 auto-determined clusters)
+  - Ranks by total semantic relevance, not just raw frequency
+  - Example: "economy", "jobs", "employment" → clustered as "Economic Policy"
+
+- **AI-Generated Labels**:
+  - Uses Gemini LLM to create meaningful cluster labels
+  - Transforms ["border", "wall", "immigration"] → "Border Security"
+  - Falls back to top keyword if LLM unavailable
+
+- **Contextual Snippets**:
+  - Extracts text passages showing keywords in actual use
+  - ±100 character context windows around keywords
+  - Highlights keywords with markdown bold formatting
+  - Deduplicates nearby occurrences for variety
+
+- **AI-Generated Summaries**:
+  - Gemini provides 2-3 sentence interpretation of main themes
+  - Identifies dominant topics and interesting patterns
+  - Objective, analytical perspective on content
+
+- **Smart Filtering** (NEW):
+  - Excludes common verbs (want, think, know, etc.) from keywords
+  - Filters clusters with avg relevance < 50%
+  - Ensures high-quality, meaningful topics
+
+**API Endpoint**: `POST /analyze/topics` (replaced old frequency-based version)
+
+**Frontend Updates**:
+- Moved to second position in UI (right after RAG)
+- Renamed to "AI Topic Analysis"
+- Enhanced description explaining semantic clustering and LLM usage
+- Shows AI-generated labels and summaries
+- Contextual snippets with keyword highlighting
+
+**Documentation**:
+- Guide: `docs/howto/topic-extraction.md` updated with current endpoint
+- Updated architecture documentation
+- Removed "enhanced" terminology throughout
+
+**Benefits**:
+- Goes beyond word frequency to understand semantic relationships
+- Provides human-interpretable topic labels
+- Shows real-world context with highlighted examples
+- Offers AI-powered analytical insights
+- Filters out noise for cleaner results
+
 ## [Recent Updates] - November 2025
 
 ### Added - Modular RAG Architecture (Code Refactoring)

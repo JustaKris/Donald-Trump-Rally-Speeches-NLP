@@ -83,6 +83,19 @@ class TopicResponse(BaseModel):
     topics: List[Dict[str, Any]]
 
 
+class EnhancedTopicResponse(BaseModel):
+    """Response model for enhanced topic extraction with clustering and snippets."""
+
+    clustered_topics: List[Dict[str, Any]] = Field(
+        ..., description="Semantically clustered topic groups with labels"
+    )
+    snippets: List[Dict[str, Any]] = Field(
+        ..., description="Contextual text snippets for each topic cluster"
+    )
+    summary: Optional[str] = Field(None, description="AI-generated interpretation of main themes")
+    metadata: Dict[str, Any] = Field(..., description="Analysis metadata")
+
+
 class StatsResponse(BaseModel):
     """Response model for dataset statistics."""
 

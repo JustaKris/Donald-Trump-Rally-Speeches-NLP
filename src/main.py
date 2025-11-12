@@ -22,9 +22,10 @@ from .api.dependencies import (
     set_nlp_service,
     set_rag_service,
     set_sentiment_analyzer,
+    set_topic_service,
 )
 from .core import get_settings
-from .services import GeminiLLM, NLPService, RAGService, SentimentAnalyzer
+from .services import GeminiLLM, NLPService, RAGService, SentimentAnalyzer, TopicExtractionService
 
 # Get configuration
 settings = get_settings()
@@ -116,6 +117,19 @@ async def lifespan(app: FastAPI):
             logger.info(f"✓ RAG service initialized with {chunk_count} existing chunks")
 
         set_rag_service(rag_service)
+
+        # Initialize enhanced topic extraction service with shared embedding model and LLM
+        logger.info("Initializing enhanced topic extraction service...")
+        try:
+            topic_service = TopicExtractionService(
+                embedding_model=rag_service.embedding_model,  # Reuse RAG embeddings
+                llm_service=llm_service,  # Reuse Gemini LLM
+            )
+            set_topic_service(topic_service)
+            logger.info("✓ Enhanced topic extraction service initialized")
+        except Exception as e:
+            logger.error(f"✗ Failed to initialize topic service: {e}")
+
     except Exception as e:
         logger.error(f"✗ Failed to initialize RAG service: {e}", exc_info=True)
         # Continue without RAG - endpoints will return errors

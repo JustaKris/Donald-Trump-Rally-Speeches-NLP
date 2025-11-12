@@ -426,9 +426,9 @@
         <div class="content">
             <div class="tabs">
                 <button class="tab active" data-tab="rag">🧠 AI Q&A (RAG)</button>
+                <button class="tab" data-tab="topics">🏷️ AI Topic Analysis</button>
                 <button class="tab" data-tab="sentiment">😊 Sentiment Analysis</button>
                 <button class="tab" data-tab="words">📝 Word Frequency</button>
-                <button class="tab" data-tab="topics">🏷️ Topic Extraction</button>
                 <button class="tab" data-tab="stats">📊 Demo Dataset</button>
             </div>
             
@@ -536,21 +536,35 @@
             
             <!-- Topic Extraction Tab -->
             <div class="tab-content" id="topics">
-                <h2>🏷️ Topic Extraction</h2>
-                <p style="margin: 15px 0; color: #666;">Discover key themes and topics based on word frequency and relevance.</p>
+                <h2>🏷️ AI-Powered Topic Analysis</h2>
+                <p style="margin: 15px 0; color: #666; font-size: 15px; line-height: 1.6;">
+                    Advanced topic extraction using <strong>AI semantic clustering</strong> and <strong>Google Gemini LLM</strong>. 
+                    This system groups related keywords into meaningful themes, shows them in context, and provides an analytical summary.
+                </p>
+                <p style="margin: 10px 0 20px 0; color: #555; font-size: 14px;">
+                    <strong>💡 How it works:</strong> Uses embeddings to cluster related terms (e.g., "economy", "jobs" → "Economic Policy"), 
+                    extracts contextual examples with highlighting, and generates AI insights about the main themes.
+                </p>
                 <textarea id="topicsText" placeholder="Enter text to analyze..."></textarea>
                 <button class="analyze" onclick="analyzeTopics()">Extract Topics</button>
                 
                 <div class="loading" id="topicsLoading">
                     <div class="spinner"></div>
-                    <p style="margin-top: 15px; color: #666;">Extracting topics...</p>
+                    <p style="margin-top: 15px; color: #666;">Analyzing topics with AI...</p>
                 </div>
                 
                 <div class="error" id="topicsError"></div>
                 
                 <div class="results" id="topicsResults">
+                    <!-- AI Summary Section -->
+                    <div class="result-card" id="topicSummaryCard" style="display: none;">
+                        <div class="result-title">🧩 AI Analysis Summary</div>
+                        <div id="topicSummary" style="line-height: 1.6; color: #333;"></div>
+                    </div>
+                    
+                    <!-- Clustered Topics Section -->
                     <div class="result-card">
-                        <div class="result-title">Key Topics</div>
+                        <div class="result-title">🔍 Topic Clusters</div>
                         <div id="topicsList"></div>
                     </div>
                 </div>
@@ -750,20 +764,77 @@
         }
         
         function displayTopicResults(data) {
+            // Display AI summary if available
+            const summaryCard = document.getElementById('topicSummaryCard');
+            const summaryDiv = document.getElementById('topicSummary');
+            if (data.summary) {
+                summaryDiv.innerHTML = `<p style="margin: 0;">${escapeHtml(data.summary)}</p>`;
+                summaryCard.style.display = 'block';
+            } else {
+                summaryCard.style.display = 'none';
+            }
+            
+            // Display clustered topics with snippets
             const list = document.getElementById('topicsList');
-            list.innerHTML = data.topics
-                .map(t => `
-                    <div style="margin-bottom: 15px;">
-                        <strong>${t.topic}</strong> (${t.mentions} mentions)
+            if (!data.clustered_topics || data.clustered_topics.length === 0) {
+                list.innerHTML = '<p style="color: #666;">No topics found.</p>';
+                showResults('topicsResults');
+                return;
+            }
+            
+            list.innerHTML = data.clustered_topics.map((cluster, idx) => {
+                const snippetData = data.snippets[idx] || { snippets: [] };
+                const keywords = cluster.keywords.slice(0, 5).map(kw => kw.word).join(', ');
+                const avgRelevance = (cluster.avg_relevance * 100).toFixed(0);
+                
+                // Build snippets HTML
+                let snippetsHtml = '';
+                if (snippetData.snippets && snippetData.snippets.length > 0) {
+                    snippetsHtml = `
+                        <div style="margin-top: 12px; padding: 10px; background: #f8f9fa; border-radius: 6px; border-left: 3px solid #667eea;">
+                            <div style="font-size: 12px; font-weight: 600; color: #555; margin-bottom: 8px;">📝 EXAMPLES IN CONTEXT:</div>
+                            ${snippetData.snippets.map(snippet => `
+                                <div style="margin-bottom: 8px; padding: 8px; background: white; border-radius: 4px; font-size: 13px; line-height: 1.5; color: #444;">
+                                    ${formatSnippet(snippet)}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                
+                return `
+                    <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; background: white;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <strong style="color: #667eea; font-size: 16px;">${escapeHtml(cluster.label)}</strong>
+                            <span style="background: #667eea; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                                ${cluster.total_mentions} mentions
+                            </span>
+                        </div>
+                        <div style="margin-bottom: 10px; color: #666; font-size: 14px;">
+                            <strong>Keywords:</strong> ${escapeHtml(keywords)}
+                        </div>
                         <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${t.relevance * 100}%;">
-                                ${(t.relevance * 100).toFixed(0)}% relevance
+                            <div class="progress-fill" style="width: ${avgRelevance}%;">
+                                ${avgRelevance}% relevance
                             </div>
                         </div>
+                        ${snippetsHtml}
                     </div>
-                `).join('');
+                `;
+            }).join('');
             
             showResults('topicsResults');
+        }
+        
+        function formatSnippet(snippet) {
+            // Convert markdown-style **bold** to HTML <strong>
+            return escapeHtml(snippet).replace(/\*\*(.*?)\*\*/g, '<strong style="color: #667eea; background: #f0f3ff; padding: 2px 4px; border-radius: 3px;">$1</strong>');
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
         
         // Dataset Statistics

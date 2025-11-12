@@ -6,6 +6,7 @@ and domain-specific datatypes.
 """
 
 from .schemas import (
+    EnhancedTopicResponse,
     NGramRequest,
     RAGAnswerResponse,
     RAGQueryRequest,
@@ -28,6 +29,7 @@ __all__ = [
     "SentimentResponse",
     "WordFrequencyResponse",
     "TopicResponse",
+    "EnhancedTopicResponse",
     "StatsResponse",
     "RAGAnswerResponse",
     "RAGStatsResponse",

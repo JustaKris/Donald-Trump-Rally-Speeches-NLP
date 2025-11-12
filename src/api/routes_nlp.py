@@ -11,6 +11,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..models import (
+    EnhancedTopicResponse,
     NGramRequest,
     SentimentResponse,
     StatsResponse,
@@ -20,7 +21,7 @@ from ..models import (
 )
 from ..services import NLPService, SentimentAnalyzer
 from ..utils import clean_text
-from .dependencies import get_nlp_service, get_sentiment_analyzer_dep
+from .dependencies import get_nlp_service, get_sentiment_analyzer_dep, get_topic_service
 
 logger = logging.getLogger(__name__)
 
@@ -88,22 +89,41 @@ async def analyze_word_frequency(
         )
 
 
-@router.post("/topics", response_model=TopicResponse)
+@router.post("/topics", response_model=EnhancedTopicResponse)
 async def analyze_topics(
     input: TextInput,
     top_n: int = 10,
-    nlp_service: NLPService = Depends(get_nlp_service),
+    num_clusters: Optional[int] = None,
+    snippets_per_topic: int = 3,
+    topic_service=Depends(get_topic_service),
 ):
     """
-    Extract key topics/themes from the input text.
+    Extract topics with AI-powered semantic clustering and contextual analysis.
 
-    Returns topics ranked by relevance with mention counts.
+    This advanced topic extraction system provides:
+    - **Semantic Clustering**: Groups related keywords using AI embeddings (e.g., "economy", "jobs" → "Economic Policy")
+    - **Contextual Snippets**: Shows keywords in actual use with highlighting
+    - **AI-Generated Summary**: Provides interpretive analysis of main themes via Gemini LLM
+    - **Smart Filtering**: Excludes common verbs and low-relevance topics
+
+    Returns structured topic clusters with labels, example snippets, and analytical summary.
     """
+    if topic_service is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Topic extraction not available. Service not initialized.",
+        )
+
     try:
-        topics = nlp_service.extract_topics(input.text, top_n=top_n)
-        return TopicResponse(topics=topics)
+        result = topic_service.extract_topics_enhanced(
+            text=input.text,
+            top_n=top_n,
+            num_clusters=num_clusters,
+            snippets_per_topic=snippets_per_topic,
+        )
+        return EnhancedTopicResponse(**result)
     except Exception as e:
-        logger.error(f"Topic extraction error: {e}")
+        logger.error(f"Topic extraction error: {e}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Analysis failed: {str(e)}"
         )
