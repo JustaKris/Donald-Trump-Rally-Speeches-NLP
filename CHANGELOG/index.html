@@ -534,6 +534,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../howto/topic-extraction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    AI Topic Analysis
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../howto/entity-analytics/" class="md-nav__link">
         
   
@@ -703,6 +726,30 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#latest-november-2025" class="md-nav__link">
+    <span class="md-ellipsis">
+      [Latest] - November 2025
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[Latest] - November 2025">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#added-ai-powered-topic-analysis-with-semantic-clustering" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added - AI-Powered Topic Analysis with Semantic Clustering 🎯
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#recent-updates-november-2025" class="md-nav__link">
@@ -938,6 +985,67 @@
 
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
 <p>All notable changes and improvements to the Trump Speeches NLP Chatbot API.</p>
+<h2 id="latest-november-2025">[Latest] - November 2025<a class="headerlink" href="#latest-november-2025" title="Permanent link">&para;</a></h2>
+<h3 id="added-ai-powered-topic-analysis-with-semantic-clustering">Added - AI-Powered Topic Analysis with Semantic Clustering 🎯<a class="headerlink" href="#added-ai-powered-topic-analysis-with-semantic-clustering" title="Permanent link">&para;</a></h3>
+<p><strong>New Module: <code>src/services/topic_service.py</code></strong></p>
+<p>Revolutionary upgrade to topic extraction using semantic clustering and AI-generated insights:</p>
+<ul>
+<li><strong>Semantic Clustering</strong>:</li>
+<li>Groups related keywords using MPNet embeddings (768d)</li>
+<li>KMeans clustering (3-6 auto-determined clusters)</li>
+<li>Ranks by total semantic relevance, not just raw frequency</li>
+<li>
+<p>Example: "economy", "jobs", "employment" → clustered as "Economic Policy"</p>
+</li>
+<li>
+<p><strong>AI-Generated Labels</strong>:</p>
+</li>
+<li>Uses Gemini LLM to create meaningful cluster labels</li>
+<li>Transforms ["border", "wall", "immigration"] → "Border Security"</li>
+<li>
+<p>Falls back to top keyword if LLM unavailable</p>
+</li>
+<li>
+<p><strong>Contextual Snippets</strong>:</p>
+</li>
+<li>Extracts text passages showing keywords in actual use</li>
+<li>±100 character context windows around keywords</li>
+<li>Highlights keywords with markdown bold formatting</li>
+<li>
+<p>Deduplicates nearby occurrences for variety</p>
+</li>
+<li>
+<p><strong>AI-Generated Summaries</strong>:</p>
+</li>
+<li>Gemini provides 2-3 sentence interpretation of main themes</li>
+<li>Identifies dominant topics and interesting patterns</li>
+<li>
+<p>Objective, analytical perspective on content</p>
+</li>
+<li>
+<p><strong>Smart Filtering</strong> (NEW):</p>
+</li>
+<li>Excludes common verbs (want, think, know, etc.) from keywords</li>
+<li>Filters clusters with avg relevance &lt; 50%</li>
+<li>Ensures high-quality, meaningful topics</li>
+</ul>
+<p><strong>API Endpoint</strong>: <code>POST /analyze/topics</code> (replaced old frequency-based version)</p>
+<p><strong>Frontend Updates</strong>:
+- Moved to second position in UI (right after RAG)
+- Renamed to "AI Topic Analysis"
+- Enhanced description explaining semantic clustering and LLM usage
+- Shows AI-generated labels and summaries
+- Contextual snippets with keyword highlighting</p>
+<p><strong>Documentation</strong>:
+- Guide: <code>docs/howto/topic-extraction.md</code> updated with current endpoint
+- Updated architecture documentation
+- Removed "enhanced" terminology throughout</p>
+<p><strong>Benefits</strong>:
+- Goes beyond word frequency to understand semantic relationships
+- Provides human-interpretable topic labels
+- Shows real-world context with highlighted examples
+- Offers AI-powered analytical insights
+- Filters out noise for cleaner results</p>
 <h2 id="recent-updates-november-2025">[Recent Updates] - November 2025<a class="headerlink" href="#recent-updates-november-2025" title="Permanent link">&para;</a></h2>
 <h3 id="added-modular-rag-architecture-code-refactoring">Added - Modular RAG Architecture (Code Refactoring)<a class="headerlink" href="#added-modular-rag-architecture-code-refactoring" title="Permanent link">&para;</a></h3>
 <p><strong>New Modules: <code>src/services/rag/</code></strong></p>

@@ -540,6 +540,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../howto/topic-extraction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    AI Topic Analysis
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../howto/entity-analytics/" class="md-nav__link">
         
   
@@ -776,6 +799,15 @@
   <a href="#5-utilities-srcutils" class="md-nav__link">
     <span class="md-ellipsis">
       5. Utilities (src/utils/)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-ai-powered-topic-analysis-srcservicestopic_servicepy" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. AI-Powered Topic Analysis (src/services/topic_service.py)
     </span>
   </a>
   
@@ -1344,6 +1376,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#6-ai-powered-topic-analysis-srcservicestopic_servicepy" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. AI-Powered Topic Analysis (src/services/topic_service.py)
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1793,7 +1834,7 @@
     subgraph "NLP Services"
         Sentiment[Sentiment Analyzer&lt;br/&gt;FinBERT]
         Preprocessing[Text Preprocessing&lt;br/&gt;NLTK]
-        Topics[Topic Extraction&lt;br/&gt;TF-IDF]
+        Topics[AI Topic Analysis&lt;br/&gt;Semantic Clustering + LLM]
         RAG[RAG Service&lt;br/&gt;ChromaDB + Embeddings]
     end
 
@@ -1838,7 +1879,7 @@
 - <code>/rag/index</code> - Document indexing
 - <code>/analyze/sentiment</code> - Sentiment analysis
 - <code>/analyze/words</code> - Word frequency analysis
-- <code>/analyze/topics</code> - Topic extraction
+- <code>/analyze/topics</code> - AI-powered topic extraction with semantic clustering
 - <code>/analyze/ngrams</code> - N-gram analysis
 - <code>/health</code> - Health check</p>
 <h3 id="2-sentiment-analysis-srcservicessentiment_servicepy">2. <strong>Sentiment Analysis</strong> (<code>src/services/sentiment_service.py</code>)<a class="headerlink" href="#2-sentiment-analysis-srcservicessentiment_servicepy" title="Permanent link">&para;</a></h3>
@@ -1953,7 +1994,30 @@ The RAG service now uses a modular design with dedicated components:
 <p><strong>Modules:</strong>
 - <code>io_helpers.py</code> - Speech loading from directory
 - <code>formatters.py</code> - Word frequency statistics
-- <code>text_preprocessing.py</code> - Topic extraction (TF-IDF) and dataset statistics</p>
+- <code>text_preprocessing.py</code> - Basic topic extraction (TF-IDF) and dataset statistics</p>
+<h3 id="6-ai-powered-topic-analysis-srcservicestopic_servicepy">6. <strong>AI-Powered Topic Analysis</strong> (<code>src/services/topic_service.py</code>)<a class="headerlink" href="#6-ai-powered-topic-analysis-srcservicestopic_servicepy" title="Permanent link">&para;</a></h3>
+<p>Advanced topic extraction with semantic clustering and LLM-generated insights.</p>
+<p><strong>Features:</strong>
+- <strong>Semantic Clustering:</strong> Groups related keywords using sentence embeddings (MPNet) and KMeans
+- <strong>AI-Generated Labels:</strong> Uses Gemini LLM to create meaningful cluster labels (e.g., "Border Security" instead of just "wall")
+- <strong>Contextual Snippets:</strong> Extracts text passages showing keywords in use with highlighting
+- <strong>Topic Summaries:</strong> LLM-generated interpretation of main themes and patterns
+- <strong>Smart Filtering:</strong> Excludes common verbs and low-relevance clusters (&lt; 50% avg relevance)</p>
+<p><strong>Processing Pipeline:</strong>
+<pre class="mermaid"><code>graph LR
+    Text[Input Text] --&gt; Extract[Extract Keywords&lt;br/&gt;TF-IDF + Filtering]
+    Extract --&gt; Embed[Generate Embeddings&lt;br/&gt;MPNet]
+    Embed --&gt; Cluster[Semantic Clustering&lt;br/&gt;KMeans]
+    Cluster --&gt; Label[Generate Labels&lt;br/&gt;Gemini LLM]
+    Label --&gt; Snippets[Extract Snippets&lt;br/&gt;Context Windows]
+    Snippets --&gt; Summary[Generate Summary&lt;br/&gt;Gemini LLM]
+    Summary --&gt; Output[Clustered Topics&lt;br/&gt;+ Snippets + Summary]</code></pre></p>
+<p><strong>Key Advantages:</strong>
+- Groups synonyms and related concepts automatically (e.g., "economy", "jobs", "employment" → "Economic Policy")
+- Provides real-world context with highlighted examples
+- Ranks by semantic relevance, not just frequency
+- Offers human-readable interpretation via AI
+- Filters out generic verbs and weak clusters</p>
 <hr />
 <h2 id="rag-pipeline">RAG Pipeline<a class="headerlink" href="#rag-pipeline" title="Permanent link">&para;</a></h2>
 <p>Modular architecture for Retrieval-Augmented Generation.</p>
