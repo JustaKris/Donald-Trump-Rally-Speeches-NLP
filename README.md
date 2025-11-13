@@ -12,11 +12,13 @@ A production-ready NLP API showcasing natural language processing and retrieval-
 
 ### 🤖 Core AI Features
 
-- **RAG (Retrieval-Augmented Generation)** — Ask questions about 300,000+ words of political speeches using semantic search + Google Gemini LLM
+- **RAG (Retrieval-Augmented Generation)** — Ask questions about 300,000+ words of political speeches using semantic search + state-of-the-art LLMs (Gemini, OpenAI GPT, Anthropic Claude)
 - **Intelligent Q&A System** — ChromaDB vector database + MPNet embeddings (768d) + cross-encoder reranking for accurate context retrieval
 - **Multi-Factor Confidence Scoring** — Sophisticated confidence calculation considering semantic similarity, consistency, coverage, and entity mentions
 - **Entity Analytics** — Automatic entity detection with sentiment analysis and contextual associations
-- **Transformer-based Sentiment Analysis** — FinBERT model for accurate sentiment classification
+- **AI-Powered Sentiment Analysis** — Multi-model approach using FinBERT (sentiment), RoBERTa (emotion detection), and LLM (contextual interpretation)
+- **Semantic Topic Extraction** — AI-powered topic clustering with sentence embeddings, semantic grouping, and contextual summaries
+- **Flexible LLM Integration** — Model-agnostic architecture supporting multiple providers with easy switching
 
 ### 🛠️ Engineering Excellence
 
@@ -49,7 +51,12 @@ Production-ready question-answering system over 35 political speeches (300,000+ 
 
 **Core Services:**
 - **`services/rag_service.py`** — Orchestrates RAG pipeline, manages ChromaDB, coordinates components
-- **`services/llm_service.py`** — Google Gemini integration with context-aware prompting
+- **`services/llm/`** — Pluggable LLM abstraction layer supporting multiple providers (Gemini, OpenAI, Anthropic)
+  - **`base.py`** — Abstract LLMProvider interface
+  - **`factory.py`** — Factory pattern with lazy imports for optional providers
+  - **`gemini.py`** — Google Gemini implementation
+  - **`openai.py`** — OpenAI GPT models (optional dependency)
+  - **`anthropic.py`** — Anthropic Claude models (optional dependency)
 
 **Modular RAG Components** (`services/rag/`):
 - **`search_engine.py`** — Hybrid search combining semantic (MPNet 768d), BM25 keyword, and cross-encoder reranking
@@ -74,11 +81,11 @@ Production-ready question-answering system over 35 political speeches (300,000+ 
 
 **Core Services:**
 - **`services/nlp_service.py`** — Word frequency, n-gram analysis
-- **`services/sentiment_service.py`** — FinBERT sentiment analysis
-- **`services/topic_service.py`** — AI-powered topic extraction with semantic clustering
+- **`services/sentiment_service.py`** — Enhanced AI-powered sentiment analysis with emotion detection and contextual interpretation
+- **`services/topic_service.py`** — AI-powered topic extraction with semantic clustering and LLM-generated summaries
 
 **Additional Endpoints:**
-- `POST /analyze/sentiment` — Sentiment analysis
+- `POST /analyze/sentiment` — Multi-model sentiment analysis (FinBERT + RoBERTa emotions + Gemini interpretation)
 - `POST /analyze/words` — Word frequency
 - `POST /analyze/topics` — AI-powered topic extraction with semantic clustering and contextual analysis
 - `POST /analyze/ngrams` — N-gram analysis
@@ -100,7 +107,8 @@ Jupyter notebooks showcasing statistical NLP and exploratory data analysis techn
 ### AI/ML Engineering
 
 - **RAG Systems**: End-to-end retrieval-augmented generation with ChromaDB vector database
-- **LLM Integration**: Google Gemini API integration with context-aware prompting
+- **LLM Integration**: Multi-provider abstraction layer with Gemini, OpenAI GPT, and Anthropic Claude support
+- **Design Patterns**: Factory pattern with lazy imports, abstract base classes, dependency injection
 - **Semantic Search**: Hybrid search combining dense embeddings (MPNet) and sparse retrieval (BM25)
 - **Model Selection**: Cross-encoder reranking for precision optimization
 - **Confidence Scoring**: Multi-factor confidence calculation for answer quality assessment
@@ -140,7 +148,27 @@ Try asking the system natural language questions like:
 
 The system retrieves relevant context, analyzes entities, calculates confidence scores, and generates coherent answers with source attribution.
 
-## 🎯 Recent Improvements (November 2025)
+### 🎯 Recent Improvements (November 2025)
+
+### LLM Provider Abstraction
+- **Multi-Provider Support**: Pluggable architecture supporting Gemini, OpenAI GPT, and Anthropic Claude
+- **Model-Agnostic Configuration**: Single configuration interface for all providers (`LLM_API_KEY`, `LLM_MODEL_NAME`)
+- **Factory Pattern**: Lazy imports with optional dependencies for clean provider switching
+- **Type-Safe Interface**: Abstract base class ensuring consistent LLM behavior across providers
+- **Easy Extension**: Add new providers by implementing the `LLMProvider` interface
+
+### Enhanced AI-Powered NLP Features
+- **Multi-Model Sentiment Analysis**:
+  - FinBERT for sentiment classification (positive/negative/neutral)
+  - RoBERTa emotion detection (anger, joy, fear, sadness, surprise, disgust)
+  - Gemini LLM for contextual interpretation explaining WHY the models produced their results
+  - Clean UI with AI interpretation as the focal point, compact score visualization
+- **Semantic Topic Extraction**:
+  - Sentence-transformer embeddings for semantic similarity
+  - DBSCAN clustering for intelligent topic grouping
+  - LLM-generated cluster labels and comprehensive topic summaries
+  - Interactive snippets showing topic occurrences in context
+- **Centralized Configuration**: All NLP parameters (thresholds, model names, excluded verbs) configurable via environment variables
 
 ### Modular RAG Architecture (Code Refactoring)
 - **Component Separation**: Extracted RAG functionality into dedicated, testable modules
@@ -178,7 +206,10 @@ The system retrieves relevant context, analyzes entities, calculates confidence 
 
 - Python 3.11+
 - uv ([install guide](https://docs.astral.sh/uv/getting-started/installation/))
-- Google Gemini API key ([get one free](https://ai.google.dev/))
+- LLM API key from one of the supported providers:
+  - **Google Gemini** ([get one free](https://ai.google.dev/)) — Default provider
+  - **OpenAI** ([get API key](https://platform.openai.com/api-keys)) — Optional
+  - **Anthropic** ([get API key](https://console.anthropic.com/)) — Optional
 
 ### Setup
 
@@ -188,11 +219,59 @@ The system retrieves relevant context, analyzes entities, calculates confidence 
    uv sync
    ```
 
-2. **Configure environment variables**
+2. **Configure LLM Provider**
+
+   The project supports multiple LLM providers with a model-agnostic configuration approach.
+
+   **Option A: Google Gemini (Default)**
 
    Create a `.env` file in the project root:
    ```bash
-   GEMINI_API_KEY=your_api_key_here
+   # LLM Provider Configuration
+   LLM_PROVIDER=gemini
+   LLM_API_KEY=your_gemini_api_key_here
+   LLM_MODEL_NAME=gemini-2.0-flash-exp
+   
+   # Optional: Adjust LLM parameters
+   LLM_TEMPERATURE=0.7
+   LLM_MAX_OUTPUT_TOKENS=2048
+   ```
+
+   **Option B: OpenAI**
+
+   ```powershell
+   # Install OpenAI support
+   uv sync --group llm-openai
+   ```
+
+   Update `.env`:
+   ```bash
+   LLM_PROVIDER=openai
+   LLM_API_KEY=sk-your_openai_api_key_here
+   LLM_MODEL_NAME=gpt-4o-mini
+   LLM_TEMPERATURE=0.7
+   LLM_MAX_OUTPUT_TOKENS=2048
+   ```
+
+   **Option C: Anthropic (Claude)**
+
+   ```powershell
+   # Install Anthropic support
+   uv sync --group llm-anthropic
+   ```
+
+   Update `.env`:
+   ```bash
+   LLM_PROVIDER=anthropic
+   LLM_API_KEY=sk-ant-your_anthropic_api_key_here
+   LLM_MODEL_NAME=claude-3-5-sonnet-20241022
+   LLM_TEMPERATURE=0.7
+   LLM_MAX_OUTPUT_TOKENS=2048
+   ```
+
+   **Install All Providers:**
+   ```powershell
+   uv sync --group llm-all
    ```
 
 3. **Start the FastAPI server**
@@ -343,15 +422,17 @@ For detailed testing documentation, see [`docs/howto/testing.md`](docs/howto/tes
 
 **RAG & LLM:**
 - `chromadb` — Vector database for embeddings
-- `google-generativeai` — Gemini LLM integration
+- `google-generativeai` — Gemini LLM integration (default provider)
+- `openai` — OpenAI GPT models (optional: `uv sync --group llm-openai`)
+- `anthropic` — Anthropic Claude models (optional: `uv sync --group llm-anthropic`)
 - `sentence-transformers` — MPNet embeddings (768d)
 - `rank-bm25` — Keyword search for hybrid retrieval
 - `langchain` — Text splitting utilities
 
 **NLP & ML:**
-- `transformers` + `tensorflow` — FinBERT sentiment analysis
+- `transformers` + `torch` — FinBERT sentiment analysis, RoBERTa emotion detection
 - `nltk` — Text preprocessing
-- `scikit-learn` — ML utilities
+- `scikit-learn` — DBSCAN clustering, cosine similarity
 
 **API & Infrastructure:**
 - `fastapi` — REST API framework
@@ -367,8 +448,21 @@ Trump-Rally-Speeches-NLP-Chatbot/
 │
 ├── src/                          # Production API code
 │   ├── api.py                   # FastAPI with RAG & NLP endpoints
-│   ├── rag_service.py           # ⭐ RAG implementation (ChromaDB + hybrid search)
-│   ├── llm_service.py           # ⭐ Gemini LLM integration
+│   ├── services/
+│   │   ├── rag_service.py       # ⭐ RAG orchestration
+│   │   ├── llm/                 # ⭐ Pluggable LLM providers
+│   │   │   ├── base.py          #    Abstract LLMProvider interface
+│   │   │   ├── factory.py       #    Factory pattern with lazy imports
+│   │   │   ├── gemini.py        #    Google Gemini implementation
+│   │   │   ├── openai.py        #    OpenAI GPT (optional)
+│   │   │   └── anthropic.py     #    Anthropic Claude (optional)
+│   │   ├── rag/                 # Modular RAG components
+│   │   │   ├── search_engine.py #    Hybrid search
+│   │   │   ├── confidence.py    #    Confidence scoring
+│   │   │   ├── entity_analyzer.py #  Entity extraction
+│   │   │   └── document_loader.py #  Document chunking
+│   │   ├── sentiment_service.py # Multi-model sentiment
+│   │   └── topic_service.py     # Semantic topic extraction
 │   ├── models.py                # FinBERT sentiment analysis
 │   ├── preprocessing.py         # Text preprocessing
 │   └── utils.py                 # Data loading utilities

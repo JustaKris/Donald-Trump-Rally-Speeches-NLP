@@ -56,7 +56,7 @@ dependencies = [
     "langchain-community (>=0.3.0,<0.4.0)",
     "rank-bm25 (>=0.2.2,<0.3.0)",
     
-    # LLM Integration
+    # LLM Integration - Only Gemini by default
     "google-generativeai (>=0.8.0,<0.9.0)",
     
     # NLP & ML (Core)
@@ -88,6 +88,16 @@ dev = [
     "mypy (>=1.13.0,<2.0.0)",
     "isort (>=5.13.0,<6.0.0)",
     "pip-audit (>=2.9.0,<3.0.0)"
+]
+
+# LLM Providers (optional - install only what you need)
+# By default, only Gemini is included in base dependencies
+llm-openai = [
+    "openai (>=1.0.0,<2.0.0)"
+]
+
+llm-anthropic = [
+    "anthropic (>=0.40.0,<1.0.0)"
 ]
 
 # Jupyter notebook execution (not needed for API)

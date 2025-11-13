@@ -28,7 +28,7 @@ build/
 # Local development settings
 .env
 .env.local
-.env.*
+# .env.*
 
 # Data files
 ./data/input/*

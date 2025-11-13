@@ -4,6 +4,57 @@ All notable changes and improvements to the Trump Speeches NLP Chatbot API.
 
 ## [Latest] - November 2025
 
+### Added - Enhanced AI-Powered Sentiment Analysis 🎭
+
+**Enhanced Module: `src/services/sentiment_service.py`**
+
+Major upgrade to sentiment analysis using multi-model AI approach with contextual interpretation:
+
+- **Multi-Model Architecture**:
+  - **FinBERT**: Financial/political sentiment classification (positive/negative/neutral)
+  - **RoBERTa-Emotion**: Six-emotion detection (anger, joy, fear, sadness, surprise, disgust)
+  - **Gemini LLM**: Contextual interpretation explaining WHY the models produced their results
+
+- **Enhanced Response Schema**:
+  - Sentiment scores (positive/negative/neutral) with confidence
+  - Individual emotion probabilities for all 6 emotions
+  - AI-generated contextual interpretation (2-3 sentences)
+  - Number of chunks processed for long documents
+
+- **Contextual Interpretation**:
+  - Gemini analyzes WHY text received specific sentiment scores
+  - Explains dominant emotions in context of content
+  - Provides specific, insightful analysis (not just emotion labels)
+  - Example: "The text expresses strong positive sentiment about economic achievements, with joy emerging from pride in policy success. However, underlying anger surfaces when discussing immigration, creating emotional complexity that explains the mixed sentiment profile."
+
+- **Clean UI Design**:
+  - AI interpretation as focal point with prominent card display
+  - Compact 2-column grid for sentiment/emotion scores (secondary)
+  - Shows top 3 emotions only to reduce visual clutter
+  - Tab emoji changed to 🎭 for better alignment
+  - Fixed tab wrapping issue with `flex-wrap: nowrap`
+
+- **Configuration Support**:
+  - Configurable via environment variables in `.env`
+  - `SENTIMENT_MODEL_NAME`, `EMOTION_MODEL_NAME`
+  - `SENTIMENT_INTERPRETATION_TEMPERATURE`, `SENTIMENT_INTERPRETATION_MAX_TOKENS`
+  - All settings in centralized `config.py`
+
+**API Endpoint**: `POST /analyze/sentiment` (enhanced with emotions and contextual fields)
+
+**Frontend Updates**:
+- Prominent AI interpretation card with gradient background
+- Compact sentiment breakdown (3 bars)
+- Top 3 emotions display with progress bars
+- Clean, focused layout emphasizing AI insights
+
+**Benefits**:
+- Goes beyond binary positive/negative to understand emotional nuance
+- Provides explainable AI with clear reasoning
+- Detects emotional complexity and mixed sentiments
+- Human-readable interpretation via advanced LLM
+- Professional, interview-worthy feature showcasing multi-model AI
+
 ### Added - AI-Powered Topic Analysis with Semantic Clustering 🎯
 
 **New Module: `src/services/topic_service.py`**

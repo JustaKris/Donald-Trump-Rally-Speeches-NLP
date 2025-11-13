@@ -24,10 +24,11 @@ graph TB
     API[FastAPI Application<br/>REST API]
     
     subgraph "NLP Services"
-        Sentiment[Sentiment Analyzer<br/>FinBERT]
+        Sentiment[Enhanced Sentiment<br/>FinBERT + RoBERTa + LLM]
         Preprocessing[Text Preprocessing<br/>NLTK]
         Topics[AI Topic Analysis<br/>Semantic Clustering + LLM]
         RAG[RAG Service<br/>ChromaDB + Embeddings]
+        LLM[LLM Providers<br/>Gemini/OpenAI/Claude]
     end
     
     subgraph "Data Layer"
@@ -43,7 +44,10 @@ graph TB
     API --> Topics
     API --> RAG
     
+    Sentiment --> LLM
     Sentiment --> Models
+    Topics --> LLM
+    RAG --> LLM
     RAG --> VectorDB
     RAG --> Models
     Preprocessing --> Speeches
@@ -85,22 +89,52 @@ FastAPI application with modular route organization.
 
 ### 2. **Sentiment Analysis** (`src/services/sentiment_service.py`)
 
-Transformer-based sentiment classification using FinBERT.
+AI-powered multi-model sentiment analysis with emotion detection and contextual interpretation.
+
+**Architecture:**
+- **FinBERT Model**: Financial/political sentiment classification (positive/negative/neutral)
+- **RoBERTa Emotion Model**: Six-emotion detection (anger, joy, fear, sadness, surprise, disgust)
+- **LLM Integration**: Contextual interpretation explaining WHY the models produced their results (supports Gemini, OpenAI, Anthropic)
 
 **Key Features:**
-- Pre-trained FinBERT model (ProsusAI/finbert)
+- Three-class sentiment classification with confidence scores
+- Six-emotion detection with individual probabilities
+- AI-generated contextual interpretation (2-3 sentences)
 - Automatic text chunking for long documents
-- Confidence scoring
-- Three-class classification (positive/negative/neutral)
+- Configurable via environment variables (model names, temperature, max tokens)
 
 **Processing Flow:**
 ```mermaid
 graph LR
-    Input[Raw Text] --> Chunk[Text Chunking<br/>512 tokens max]
-    Chunk --> Tokenize[Tokenization<br/>BERT Tokenizer]
-    Tokenize --> Model[FinBERT Model<br/>Inference]
-    Model --> Aggregate[Score Aggregation<br/>Mean Pooling]
-    Aggregate --> Output[Sentiment + Confidence]
+    Input[Raw Text] --> Chunk[Text Chunking<br/>510 tokens max]
+    Chunk --> Sentiment[FinBERT<br/>Sentiment Scores]
+    Chunk --> Emotion[RoBERTa<br/>Emotion Scores]
+    Sentiment --> LLM[LLM Provider<br/>Contextual Analysis]
+    Emotion --> LLM
+    LLM --> Output[Sentiment + Emotions<br/>+ Interpretation]
+```
+
+**Response Schema:**
+```python
+{
+    "sentiment": "positive",
+    "confidence": 0.85,
+    "scores": {
+        "positive": 0.85,
+        "negative": 0.08,
+        "neutral": 0.07
+    },
+    "emotions": {
+        "joy": 0.62,
+        "anger": 0.15,
+        "neutral": 0.12,
+        "fear": 0.05,
+        "sadness": 0.04,
+        "surprise": 0.02
+    },
+    "contextual_sentiment": "The text expresses strong positive sentiment about economic achievements, with joy emerging from pride in policy success. However, underlying anger surfaces when discussing immigration, creating emotional complexity that explains the mixed sentiment profile.",
+    "num_chunks": 3
+}
 ```
 
 ### 3. **RAG Service** (`src/services/rag_service.py`)
@@ -117,7 +151,63 @@ The RAG service now uses a modular design with dedicated components:
 - `ConfidenceCalculator` (from `services/rag/confidence.py`)
 - `EntityAnalyzer` (from `services/rag/entity_analyzer.py`)
 - `DocumentLoader` (from `services/rag/document_loader.py`)
-- `GeminiLLM` (from `services/llm_service.py`)
+- `LLMProvider` (from `services/llm/`) - Pluggable provider abstraction
+
+### 5. **LLM Service** (`src/services/llm/`)
+
+Pluggable LLM provider abstraction with support for multiple AI models.
+
+**Architecture:**
+- **Abstract Base Class** (`base.py`): Defines the `LLMProvider` interface
+- **Factory Pattern** (`factory.py`): Creates providers with lazy imports for optional dependencies
+- **Provider Implementations**:
+  - `gemini.py` - Google Gemini (default, always available)
+  - `openai.py` - OpenAI GPT models (optional: `uv sync --group llm-openai`)
+  - `anthropic.py` - Anthropic Claude models (optional: `uv sync --group llm-anthropic`)
+
+**Features:**
+- **Model-Agnostic Configuration**: Single config interface (`LLM_API_KEY`, `LLM_MODEL_NAME`)
+- **Easy Provider Switching**: Change providers via `LLM_PROVIDER` environment variable
+- **Optional Dependencies**: Only install providers you need
+- **Type-Safe Interface**: All providers implement the same `LLMProvider` interface
+- **Context-Aware Prompting**: Builds prompts with retrieved context
+- **Entity-Focused Generation**: Emphasizes entity mentions when applicable
+- **Fallback Extraction**: Returns context snippets if LLM fails
+- **Source Attribution**: Tracks and cites source documents
+- **Error Handling**: Graceful degradation with informative fallbacks
+
+**Provider Interface:**
+```python
+class LLMProvider(ABC):
+    @abstractmethod
+    def generate_content(
+        self,
+        prompt: str,
+        temperature: Optional[float] = None,
+        max_output_tokens: Optional[int] = None
+    ) -> str:
+        """Generate text based on the given prompt."""
+        pass
+```
+
+**Usage Example:**
+```python
+from src.services.llm import create_llm_provider
+
+# Create provider based on LLM_PROVIDER env variable
+llm = create_llm_provider()
+
+# Generate content (works with any provider)
+response = llm.generate_content(
+    prompt="Explain the economic policies mentioned...",
+    temperature=0.7,
+    max_output_tokens=2048
+)
+```
+
+### 6. **Text Preprocessing** (`src/utils/text_preprocessing.py`)
+
+Modular, testable components for RAG functionality.
 
 ### 4. **RAG Components** (`src/services/rag/`)
 
@@ -227,7 +317,7 @@ Text cleaning and normalization utilities.
 - URL removal
 - N-gram extraction
 
-### 5. **Utilities** (`src/utils/`)
+### 7. **Utilities** (`src/utils/`)
 
 Data loading and analysis helpers.
 
@@ -236,13 +326,13 @@ Data loading and analysis helpers.
 - `formatters.py` - Word frequency statistics
 - `text_preprocessing.py` - Basic topic extraction (TF-IDF) and dataset statistics
 
-### 6. **AI-Powered Topic Analysis** (`src/services/topic_service.py`)
+### 8. **AI-Powered Topic Analysis** (`src/services/topic_service.py`)
 
 Advanced topic extraction with semantic clustering and LLM-generated insights.
 
 **Features:**
 - **Semantic Clustering:** Groups related keywords using sentence embeddings (MPNet) and KMeans
-- **AI-Generated Labels:** Uses Gemini LLM to create meaningful cluster labels (e.g., "Border Security" instead of just "wall")
+- **AI-Generated Labels:** Uses LLM to create meaningful cluster labels (e.g., "Border Security" instead of just "wall")
 - **Contextual Snippets:** Extracts text passages showing keywords in use with highlighting
 - **Topic Summaries:** LLM-generated interpretation of main themes and patterns
 - **Smart Filtering:** Excludes common verbs and low-relevance clusters (< 50% avg relevance)
@@ -253,9 +343,9 @@ graph LR
     Text[Input Text] --> Extract[Extract Keywords<br/>TF-IDF + Filtering]
     Extract --> Embed[Generate Embeddings<br/>MPNet]
     Embed --> Cluster[Semantic Clustering<br/>KMeans]
-    Cluster --> Label[Generate Labels<br/>Gemini LLM]
+    Cluster --> Label[Generate Labels<br/>LLM Provider]
     Label --> Snippets[Extract Snippets<br/>Context Windows]
-    Snippets --> Summary[Generate Summary<br/>Gemini LLM]
+    Snippets --> Summary[Generate Summary<br/>LLM Provider]
     Summary --> Output[Clustered Topics<br/>+ Snippets + Summary]
 ```
 
@@ -288,7 +378,7 @@ graph TB
         Search[SearchEngine<br/>Hybrid Retrieval]
         Entities[EntityAnalyzer<br/>Extraction & Stats]
         Confidence[ConfidenceCalculator<br/>Multi-factor Scoring]
-        LLM[GeminiLLM<br/>Answer Generation]
+        LLM[LLMProvider<br/>Answer Generation]
     end
     
     Orchestrator --> Loader
@@ -343,7 +433,7 @@ graph TB
    - Speech coverage percentage
    - Sentiment analysis (optional)
    - Co-occurrence analysis
-6. GeminiLLM generates answer:
+6. LLMProvider generates answer:
    - Build context-aware prompt
    - Include entity focus if applicable
    - Fallback to context extraction if LLM fails
@@ -568,6 +658,159 @@ graph TB
 
 ---
 
+## LLM Provider Architecture
+
+The system uses a pluggable LLM provider abstraction that allows switching between different AI models without changing application code.
+
+### Architecture Pattern
+
+```mermaid
+graph TB
+    Config[Environment Config<br/>LLM_PROVIDER, LLM_API_KEY]
+    Factory[LLM Factory<br/>create_llm_provider]
+    Base[LLMProvider<br/>Abstract Interface]
+    
+    subgraph "Providers"
+        Gemini[GeminiLLM<br/>Always Available]
+        OpenAI[OpenAILLM<br/>Optional]
+        Anthropic[AnthropicLLM<br/>Optional]
+    end
+    
+    subgraph "Services"
+        RAG[RAG Service]
+        Sentiment[Sentiment Analysis]
+        Topics[Topic Analysis]
+    end
+    
+    Config --> Factory
+    Factory --> Base
+    Base --> Gemini
+    Base --> OpenAI
+    Base --> Anthropic
+    
+    Gemini -.->|Implements| Base
+    OpenAI -.->|Implements| Base
+    Anthropic -.->|Implements| Base
+    
+    RAG --> Factory
+    Sentiment --> Factory
+    Topics --> Factory
+```
+
+### Provider Interface
+
+All LLM providers implement the same interface:
+
+```python
+class LLMProvider(ABC):
+    """Abstract base class for LLM providers."""
+    
+    @abstractmethod
+    def generate_content(
+        self,
+        prompt: str,
+        temperature: Optional[float] = None,
+        max_output_tokens: Optional[int] = None
+    ) -> str:
+        """Generate text based on the given prompt."""
+        pass
+```
+
+### Factory Pattern
+
+The factory creates providers with lazy imports for optional dependencies:
+
+```python
+def create_llm_provider() -> LLMProvider:
+    """Create LLM provider based on configuration."""
+    provider = settings.llm_provider.lower()
+    
+    if provider == "gemini":
+        return GeminiLLM()
+    elif provider == "openai":
+        if not OPENAI_AVAILABLE:
+            raise ImportError("Install: uv sync --group llm-openai")
+        return OpenAILLM()
+    elif provider == "anthropic":
+        if not ANTHROPIC_AVAILABLE:
+            raise ImportError("Install: uv sync --group llm-anthropic")
+        return AnthropicLLM()
+```
+
+### Provider Implementations
+
+**Gemini Provider** (Default):
+- Always available (base dependency)
+- Uses `google-generativeai` package
+- Supports Gemini 1.5/2.0 models
+- Provider-specific: Safety settings configuration
+
+**OpenAI Provider** (Optional):
+- Requires: `uv sync --group llm-openai`
+- Uses `openai` package
+- Supports GPT-3.5/GPT-4/GPT-4o models
+- Provider-specific: None (pure API)
+
+**Anthropic Provider** (Optional):
+- Requires: `uv sync --group llm-anthropic`
+- Uses `anthropic` package
+- Supports Claude 3/3.5 models
+- Provider-specific: None (pure API)
+
+### Model-Agnostic Configuration
+
+All providers use the same configuration interface:
+
+```bash
+# Environment Variables
+LLM_PROVIDER=gemini          # gemini | openai | anthropic
+LLM_API_KEY=your_api_key     # Single key for active provider
+LLM_MODEL_NAME=gemini-2.0-flash-exp
+LLM_TEMPERATURE=0.7
+LLM_MAX_OUTPUT_TOKENS=2048
+```
+
+### Switching Providers
+
+**From Gemini to OpenAI:**
+```bash
+# 1. Install OpenAI support
+uv sync --group llm-openai
+
+# 2. Update .env
+LLM_PROVIDER=openai
+LLM_API_KEY=sk-your_openai_key
+LLM_MODEL_NAME=gpt-4o-mini
+
+# 3. Restart application
+uv run uvicorn src.api:app --reload
+```
+
+**From Gemini to Anthropic:**
+```bash
+# 1. Install Anthropic support
+uv sync --group llm-anthropic
+
+# 2. Update .env
+LLM_PROVIDER=anthropic
+LLM_API_KEY=sk-ant-your_anthropic_key
+LLM_MODEL_NAME=claude-3-5-sonnet-20241022
+
+# 3. Restart application
+uv run uvicorn src.api:app --reload
+```
+
+### Benefits
+
+1. **Flexibility**: Switch providers without code changes
+2. **Cost Optimization**: Choose cost-effective models per use case
+3. **Vendor Independence**: No lock-in to single LLM provider
+4. **Easy Testing**: Compare results across different models
+5. **Graceful Fallbacks**: Degrade to context extraction if LLM fails
+6. **Minimal Dependencies**: Only install providers you use
+
+---
+
 ## Technology Stack
 
 ### Core Technologies
@@ -576,7 +819,7 @@ graph TB
 |-------|-----------|---------|
 | **API Framework** | FastAPI 0.116+ | High-performance async API |
 | **Web Server** | Uvicorn | ASGI server |
-| **LLM Integration** | Google Gemini 2.5 Flash | Answer generation |
+| **LLM Integration** | Gemini/OpenAI/Claude | Pluggable LLM providers |
 | **ML Framework** | PyTorch 2.5+ | Deep learning backend |
 | **NLP Library** | Transformers 4.57+ | Pre-trained models |
 | **Text Processing** | NLTK 3.9+ | Tokenization, stopwords |
@@ -607,9 +850,12 @@ graph TB
 
 | Model | Task | Source | Size |
 |-------|------|--------|------|
-| **Gemini 2.5 Flash** | Answer Generation | Google AI | API-based |
-| **FinBERT** | Sentiment Analysis | ProsusAI/finbert | ~440MB |
-| **all-mpnet-base-v2** | Embeddings (768d) | sentence-transformers | ~420MB |
+| **Gemini 2.5 Flash** | Answer Generation, Topic Summaries, Sentiment Interpretation | Google AI | API-based |
+| **GPT-4o/GPT-4o-mini** | Answer Generation (Optional) | OpenAI | API-based |
+| **Claude 3.5 Sonnet** | Answer Generation (Optional) | Anthropic | API-based |
+| **FinBERT** | Sentiment Classification | ProsusAI/finbert | ~440MB |
+| **RoBERTa-Emotion** | Emotion Detection | j-hartmann/emotion-english-distilroberta-base | ~330MB |
+| **all-mpnet-base-v2** | Embeddings (768d), Topic Clustering | sentence-transformers | ~420MB |
 | **ms-marco-MiniLM** | Reranking | cross-encoder | ~80MB |
 
 ---
@@ -651,9 +897,9 @@ graph TB
 #### 2. Vertical Scaling
 
 **Current Requirements:**
-- RAM: ~2GB (models + API)
+- RAM: ~2.5GB (models + API)
 - CPU: 1-2 cores
-- Storage: ~1GB (models + data)
+- Storage: ~1.5GB (models + data)
 
 **Optimized for:**
 - RAM: 4-8GB for concurrent requests
@@ -682,10 +928,12 @@ graph TB
 |-----------|-----|-----|---------|
 | FastAPI | ~100MB | Low | - |
 | FinBERT | ~1GB | Medium | 440MB |
-| all-MiniLM-L6-v2 | ~200MB | Low | 80MB |
+| RoBERTa-Emotion | ~800MB | Medium | 330MB |
+| all-mpnet-base-v2 | ~400MB | Low | 420MB |
+| ms-marco-MiniLM | ~100MB | Low | 80MB |
 | ChromaDB | ~100MB | Low | Variable |
 | NLTK Data | ~50MB | Low | 50MB |
-| **Total** | **~2GB** | **1-2 cores** | **~1GB** |
+| **Total** | **~2.5GB** | **1-2 cores** | **~1.5GB** |
 
 ---
 
@@ -748,6 +996,9 @@ request_duration = Histogram('api_request_duration_seconds', 'Request duration')
 
 ### Recently Completed (November 2025)
 
+- ✅ **LLM Provider Abstraction:** Pluggable architecture supporting Gemini, OpenAI, and Anthropic
+- ✅ **Model-Agnostic Configuration:** Single config interface for all LLM providers
+- ✅ **Factory Pattern:** Lazy imports with optional dependencies for clean provider switching
 - ✅ **Modular RAG Architecture:** Separated RAG functionality into dedicated, testable components
 - ✅ **Component Testing:** Achieved 65%+ test coverage with component-level unit tests
 - ✅ **Type Safety:** Pydantic models for all RAG data structures

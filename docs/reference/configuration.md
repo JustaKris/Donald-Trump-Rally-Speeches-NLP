@@ -28,15 +28,42 @@ Copy the example file:
 cp .env.example .env
 ```
 
-### 2. Set Your API Key
+### 2. Set Your LLM Provider
 
-Edit `.env` and add your Gemini API key:
+Edit `.env` and configure your preferred LLM provider:
 
+**Option A: Google Gemini (Default)**
 ```env
-GEMINI_API_KEY=your_actual_api_key_here
+LLM_PROVIDER=gemini
+LLM_API_KEY=your_gemini_api_key_here
+LLM_MODEL_NAME=gemini-2.0-flash-exp
 ```
 
 Get a free key at: https://ai.google.dev/
+
+**Option B: OpenAI**
+```bash
+# Install OpenAI support
+uv sync --group llm-openai
+```
+
+```env
+LLM_PROVIDER=openai
+LLM_API_KEY=sk-your_openai_api_key_here
+LLM_MODEL_NAME=gpt-4o-mini
+```
+
+**Option C: Anthropic (Claude)**
+```bash
+# Install Anthropic support
+uv sync --group llm-anthropic
+```
+
+```env
+LLM_PROVIDER=anthropic
+LLM_API_KEY=sk-ant-your_anthropic_api_key_here
+LLM_MODEL_NAME=claude-3-5-sonnet-20241022
+```
 
 ### 3. Run the Application
 
@@ -61,30 +88,73 @@ ENVIRONMENT="development"  # development, staging, production
 LOG_LEVEL="INFO"           # DEBUG, INFO, WARNING, ERROR, CRITICAL
 ```
 
-### LLM Provider
+### LLM Provider (Multi-Provider Support)
 
-Configure which LLM to use for answer generation:
+Configure which LLM provider to use for answer generation, sentiment interpretation, and topic analysis.
 
-```env
-LLM_PROVIDER="gemini"      # gemini, openai, anthropic, none
-LLM_ENABLED="true"
-```
-
-#### Gemini Configuration
+#### General LLM Settings
 
 ```env
-GEMINI_API_KEY="your_key"
-GEMINI_MODEL_NAME="gemini-2.5-flash"  # or gemini-1.5-pro
-GEMINI_TEMPERATURE="0.3"              # 0.0-1.0 (lower = more focused)
-GEMINI_MAX_OUTPUT_TOKENS="1024"
+LLM_PROVIDER="gemini"          # gemini | openai | anthropic | none
+LLM_API_KEY="your_api_key"     # Single API key for active provider
+LLM_MODEL_NAME="model-name"    # Model identifier
+LLM_TEMPERATURE="0.7"          # 0.0-1.0 (lower = more focused, higher = more creative)
+LLM_MAX_OUTPUT_TOKENS="2048"   # Maximum response length
+LLM_ENABLED="true"             # Enable/disable LLM features
 ```
 
-#### OpenAI Configuration (Future)
+#### Provider-Specific Examples
 
+**Gemini (Default - Always Available):**
 ```env
-OPENAI_API_KEY="your_key"
-OPENAI_MODEL_NAME="gpt-4o-mini"
+LLM_PROVIDER="gemini"
+LLM_API_KEY="your_gemini_api_key"
+LLM_MODEL_NAME="gemini-2.0-flash-exp"  # or gemini-1.5-pro
+LLM_TEMPERATURE="0.7"
+LLM_MAX_OUTPUT_TOKENS="2048"
 ```
+
+**OpenAI (Optional - Install with `uv sync --group llm-openai`):**
+```env
+LLM_PROVIDER="openai"
+LLM_API_KEY="sk-your_openai_api_key"
+LLM_MODEL_NAME="gpt-4o-mini"  # or gpt-4o, gpt-4-turbo
+LLM_TEMPERATURE="0.7"
+LLM_MAX_OUTPUT_TOKENS="2048"
+```
+
+**Anthropic (Optional - Install with `uv sync --group llm-anthropic`):**
+```env
+LLM_PROVIDER="anthropic"
+LLM_API_KEY="sk-ant-your_anthropic_api_key"
+LLM_MODEL_NAME="claude-3-5-sonnet-20241022"  # or claude-3-opus-20240229
+LLM_TEMPERATURE="0.7"
+LLM_MAX_OUTPUT_TOKENS="2048"
+```
+
+**Disable LLM:**
+```env
+LLM_PROVIDER="none"
+LLM_ENABLED="false"
+```
+
+#### Switching Providers
+
+1. **Install optional provider** (if not already installed):
+   ```bash
+   uv sync --group llm-openai      # For OpenAI
+   uv sync --group llm-anthropic   # For Anthropic
+   uv sync --group llm-all         # For all providers
+   ```
+
+2. **Update `.env` file** with new provider settings
+
+3. **Restart application**:
+   ```bash
+   uv run uvicorn src.api:app --reload
+   ```
+
+The application will automatically use the new provider without code changes.
 
 ### ML Models
 
@@ -186,6 +256,10 @@ settings.llm_provider  # Literal["gemini", "openai", "anthropic", "none"]
 if settings.is_llm_configured():
     api_key = settings.get_llm_api_key()
     model = settings.get_llm_model_name()
+    
+# Create LLM provider
+from src.services.llm import create_llm_provider
+llm = create_llm_provider()  # Automatically uses LLM_PROVIDER setting
 
 # Get Path objects
 speeches_path = settings.get_speeches_path()

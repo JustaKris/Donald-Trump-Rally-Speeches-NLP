@@ -88,6 +88,8 @@
             margin-bottom: 30px;
             border-bottom: 3px solid #e0e0e0;
             flex-wrap: wrap;
+            justify-content: center;
+            padding: 10px 0;
         }
         
         .tab {
@@ -101,6 +103,7 @@
             transition: all 0.3s;
             border-bottom: 4px solid transparent;
             position: relative;
+            white-space: nowrap;
         }
         
         .tab:hover {
@@ -420,14 +423,14 @@
     <div class="container">
         <header>
             <h1>🤖 Trump Speeches NLP Chatbot API</h1>
-            <p class="subtitle">AI-Powered Q&A with Gemini • Sentiment Analysis • Semantic Search • Advanced NLP</p>
+            <p class="subtitle">AI-Powered Q&A • Sentiment Analysis • Semantic Search • Advanced NLP</p>
         </header>
         
         <div class="content">
             <div class="tabs">
                 <button class="tab active" data-tab="rag">🧠 AI Q&A (RAG)</button>
                 <button class="tab" data-tab="topics">🏷️ AI Topic Analysis</button>
-                <button class="tab" data-tab="sentiment">😊 Sentiment Analysis</button>
+                <button class="tab" data-tab="sentiment">🎭 Sentiment Analysis</button>
                 <button class="tab" data-tab="words">📝 Word Frequency</button>
                 <button class="tab" data-tab="stats">📊 Demo Dataset</button>
             </div>
@@ -436,7 +439,7 @@
             <div class="tab-content active" id="rag">
                 <h2>🧠 AI-Powered Question Answering</h2>
                 <p style="margin: 15px 0; color: #666; font-size: 16px; line-height: 1.6;">
-                    Ask questions about the indexed documents and get intelligent answers powered by <strong>Google Gemini 2.5 Flash</strong> and <strong>ChromaDB vector search</strong>. 
+                    Ask questions about the indexed documents and get intelligent answers powered by <strong>state-of-the-art LLMs</strong> and <strong>ChromaDB vector search</strong>. 
                     The system uses semantic search to find relevant context, then generates comprehensive answers with confidence scoring and entity analytics.
                 </p>
                 <p style="margin: 10px 0 20px 0; color: #555; font-size: 14px; line-height: 1.6;">
@@ -482,8 +485,8 @@
             
             <!-- Sentiment Analysis Tab -->
             <div class="tab-content" id="sentiment">
-                <h2>😊 Sentiment Analysis</h2>
-                <p style="margin: 15px 0; color: #666;">Analyze the emotional tone of any text using <strong>FinBERT</strong>, a specialized BERT model fine-tuned for financial sentiment. Works with political speeches, news articles, social media posts, and any text where sentiment matters.</p>
+                <h2>🎭 AI-Powered Sentiment Analysis</h2>
+                <p style="margin: 15px 0; color: #666;">Comprehensive emotional analysis combining <strong>FinBERT</strong> sentiment, <strong>RoBERTa</strong> emotion detection, and <strong>AI-powered</strong> interpretation.</p>
                 <textarea id="sentimentText" placeholder="Enter any text to analyze... (e.g., 'This product exceeded my expectations! The quality is amazing and delivery was fast.')"></textarea>
                 <button class="analyze" onclick="analyzeSentiment()">Analyze Sentiment</button>
                 
@@ -495,14 +498,27 @@
                 <div class="error" id="sentimentError"></div>
                 
                 <div class="results" id="sentimentResults">
+                    <!-- AI Interpretation - The Star of the Show -->
                     <div class="result-card">
-                        <div class="result-title">Dominant Sentiment</div>
-                        <div id="sentimentBadge"></div>
+                        <div class="result-title">✨ AI Sentiment Interpretation</div>
+                        <div id="aiInterpretation" style="padding: 25px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 12px; border-left: 5px solid #667eea; line-height: 1.8; font-size: 17px; color: #333; font-weight: 500;"></div>
                     </div>
                     
-                    <div class="result-card">
-                        <div class="result-title">Confidence Scores</div>
-                        <div id="sentimentScores"></div>
+                    <!-- Compact Scores Section -->
+                    <div class="result-card" style="background: #f8f9fa;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <!-- Sentiment Scores -->
+                            <div>
+                                <div style="font-weight: 600; font-size: 14px; color: #666; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">📊 Sentiment Breakdown</div>
+                                <div id="sentimentScores"></div>
+                            </div>
+                            
+                            <!-- Emotion Scores -->
+                            <div>
+                                <div style="font-weight: 600; font-size: 14px; color: #666; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">🎭 Top Emotions</div>
+                                <div id="emotionScores"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -538,7 +554,7 @@
             <div class="tab-content" id="topics">
                 <h2>🏷️ AI-Powered Topic Analysis</h2>
                 <p style="margin: 15px 0; color: #666; font-size: 15px; line-height: 1.6;">
-                    Advanced topic extraction using <strong>AI semantic clustering</strong> and <strong>Google Gemini LLM</strong>. 
+                    Advanced topic extraction using <strong>AI semantic clustering</strong> and <strong>LLM-powered analysis</strong>. 
                     This system groups related keywords into meaningful themes, shows them in context, and provides an analytical summary.
                 </p>
                 <p style="margin: 10px 0 20px 0; color: #555; font-size: 14px;">
@@ -646,36 +662,77 @@
         }
         
         function displaySentimentResults(data) {
-            const badge = document.getElementById('sentimentBadge');
-            badge.innerHTML = `<span class="sentiment-badge sentiment-${data.sentiment}">${data.sentiment}</span>`;
+            // Display AI interpretation prominently
+            const aiInterpretation = document.getElementById('aiInterpretation');
+            aiInterpretation.innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <span style="display: inline-block; padding: 8px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 20px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
+                        ${data.sentiment.toUpperCase()} (${(data.confidence * 100).toFixed(0)}%)
+                    </span>
+                </div>
+                <p style="margin: 0; font-size: 17px; line-height: 1.8;">
+                    ${data.contextual_sentiment}
+                </p>
+            `;
             
+            // Display compact sentiment scores
             const scores = document.getElementById('sentimentScores');
-            scores.innerHTML = `
-                <div style="margin-bottom: 10px;">
-                    <strong>Positive:</strong> ${(data.scores.positive * 100).toFixed(1)}%
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${data.scores.positive * 100}%; background: #28a745;">
-                            ${(data.scores.positive * 100).toFixed(1)}%
+            const sentimentScoresHtml = Object.entries(data.scores)
+                .sort((a, b) => b[1] - a[1])
+                .map(([sentiment, score]) => {
+                    const percentage = (score * 100).toFixed(0);
+                    const colors = {
+                        'positive': '#28a745',
+                        'negative': '#dc3545',
+                        'neutral': '#17a2b8'
+                    };
+                    return `
+                        <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 13px; font-weight: 600; text-transform: capitalize; min-width: 70px; color: #555;">${sentiment}</span>
+                            <div style="flex: 1; background: #e9ecef; border-radius: 10px; height: 22px; overflow: hidden;">
+                                <div style="width: ${percentage}%; background: ${colors[sentiment]}; height: 100%; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
+                                    ${percentage > 15 ? percentage + '%' : ''}
+                                </div>
+                            </div>
+                            <span style="font-size: 13px; font-weight: 600; min-width: 40px; text-align: right; color: #333;">${percentage}%</span>
                         </div>
-                    </div>
-                </div>
-                <div style="margin-bottom: 10px;">
-                    <strong>Negative:</strong> ${(data.scores.negative * 100).toFixed(1)}%
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${data.scores.negative * 100}%; background: #dc3545;">
-                            ${(data.scores.negative * 100).toFixed(1)}%
+                    `;
+                }).join('');
+            scores.innerHTML = sentimentScoresHtml;
+            
+            // Display top 3 emotions compactly
+            const emotions = document.getElementById('emotionScores');
+            const sortedEmotions = Object.entries(data.emotions)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3); // Only top 3
+            
+            const emotionIcons = {
+                'anger': '😠',
+                'joy': '😊',
+                'fear': '😨',
+                'sadness': '😢',
+                'surprise': '😲',
+                'disgust': '🤢'
+            };
+            
+            const emotionScoresHtml = sortedEmotions.map(([emotion, score]) => {
+                const percentage = (score * 100).toFixed(0);
+                const icon = emotionIcons[emotion] || '🎭';
+                return `
+                    <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 13px; font-weight: 600; text-transform: capitalize; min-width: 70px; color: #555;">${icon} ${emotion}</span>
+                        <div style="flex: 1; background: #e9ecef; border-radius: 10px; height: 22px; overflow: hidden;">
+                            <div style="width: ${percentage}%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); height: 100%; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">
+                                ${percentage > 15 ? percentage + '%' : ''}
+                            </div>
                         </div>
+                        <span style="font-size: 13px; font-weight: 600; min-width: 40px; text-align: right; color: #333;">${percentage}%</span>
                     </div>
-                </div>
-                <div style="margin-bottom: 10px;">
-                    <strong>Neutral:</strong> ${(data.scores.neutral * 100).toFixed(1)}%
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${data.scores.neutral * 100}%; background: #17a2b8;">
-                            ${(data.scores.neutral * 100).toFixed(1)}%
-                        </div>
-                    </div>
-                </div>
-                <p style="color: #666; font-size: 14px; margin-top: 15px;">
+                `;
+            }).join('');
+            
+            emotions.innerHTML = emotionScoresHtml + `
+                <p style="font-size: 12px; color: #999; margin-top: 10px; font-style: italic;">
                     Analyzed in ${data.num_chunks} chunk(s)
                 </p>
             `;
