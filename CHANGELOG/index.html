@@ -738,6 +738,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#added-enhanced-ai-powered-sentiment-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      Added - Enhanced AI-Powered Sentiment Analysis 🎭
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#added-ai-powered-topic-analysis-with-semantic-clustering" class="md-nav__link">
     <span class="md-ellipsis">
       Added - AI-Powered Topic Analysis with Semantic Clustering 🎯
@@ -986,6 +995,64 @@
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
 <p>All notable changes and improvements to the Trump Speeches NLP Chatbot API.</p>
 <h2 id="latest-november-2025">[Latest] - November 2025<a class="headerlink" href="#latest-november-2025" title="Permanent link">&para;</a></h2>
+<h3 id="added-enhanced-ai-powered-sentiment-analysis">Added - Enhanced AI-Powered Sentiment Analysis 🎭<a class="headerlink" href="#added-enhanced-ai-powered-sentiment-analysis" title="Permanent link">&para;</a></h3>
+<p><strong>Enhanced Module: <code>src/services/sentiment_service.py</code></strong></p>
+<p>Major upgrade to sentiment analysis using multi-model AI approach with contextual interpretation:</p>
+<ul>
+<li><strong>Multi-Model Architecture</strong>:</li>
+<li><strong>FinBERT</strong>: Financial/political sentiment classification (positive/negative/neutral)</li>
+<li><strong>RoBERTa-Emotion</strong>: Six-emotion detection (anger, joy, fear, sadness, surprise, disgust)</li>
+<li>
+<p><strong>Gemini LLM</strong>: Contextual interpretation explaining WHY the models produced their results</p>
+</li>
+<li>
+<p><strong>Enhanced Response Schema</strong>:</p>
+</li>
+<li>Sentiment scores (positive/negative/neutral) with confidence</li>
+<li>Individual emotion probabilities for all 6 emotions</li>
+<li>AI-generated contextual interpretation (2-3 sentences)</li>
+<li>
+<p>Number of chunks processed for long documents</p>
+</li>
+<li>
+<p><strong>Contextual Interpretation</strong>:</p>
+</li>
+<li>Gemini analyzes WHY text received specific sentiment scores</li>
+<li>Explains dominant emotions in context of content</li>
+<li>Provides specific, insightful analysis (not just emotion labels)</li>
+<li>
+<p>Example: "The text expresses strong positive sentiment about economic achievements, with joy emerging from pride in policy success. However, underlying anger surfaces when discussing immigration, creating emotional complexity that explains the mixed sentiment profile."</p>
+</li>
+<li>
+<p><strong>Clean UI Design</strong>:</p>
+</li>
+<li>AI interpretation as focal point with prominent card display</li>
+<li>Compact 2-column grid for sentiment/emotion scores (secondary)</li>
+<li>Shows top 3 emotions only to reduce visual clutter</li>
+<li>Tab emoji changed to 🎭 for better alignment</li>
+<li>
+<p>Fixed tab wrapping issue with <code>flex-wrap: nowrap</code></p>
+</li>
+<li>
+<p><strong>Configuration Support</strong>:</p>
+</li>
+<li>Configurable via environment variables in <code>.env</code></li>
+<li><code>SENTIMENT_MODEL_NAME</code>, <code>EMOTION_MODEL_NAME</code></li>
+<li><code>SENTIMENT_INTERPRETATION_TEMPERATURE</code>, <code>SENTIMENT_INTERPRETATION_MAX_TOKENS</code></li>
+<li>All settings in centralized <code>config.py</code></li>
+</ul>
+<p><strong>API Endpoint</strong>: <code>POST /analyze/sentiment</code> (enhanced with emotions and contextual fields)</p>
+<p><strong>Frontend Updates</strong>:
+- Prominent AI interpretation card with gradient background
+- Compact sentiment breakdown (3 bars)
+- Top 3 emotions display with progress bars
+- Clean, focused layout emphasizing AI insights</p>
+<p><strong>Benefits</strong>:
+- Goes beyond binary positive/negative to understand emotional nuance
+- Provides explainable AI with clear reasoning
+- Detects emotional complexity and mixed sentiments
+- Human-readable interpretation via advanced LLM
+- Professional, interview-worthy feature showcasing multi-model AI</p>
 <h3 id="added-ai-powered-topic-analysis-with-semantic-clustering">Added - AI-Powered Topic Analysis with Semantic Clustering 🎯<a class="headerlink" href="#added-ai-powered-topic-analysis-with-semantic-clustering" title="Permanent link">&para;</a></h3>
 <p><strong>New Module: <code>src/services/topic_service.py</code></strong></p>
 <p>Revolutionary upgrade to topic extraction using semantic clustering and AI-generated insights:</p>
