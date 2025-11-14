@@ -1,5 +1,5 @@
 """
-LLM Service for answer generation in RAG system.
+Google Gemini LLM provider implementation.
 
 Provides integration with Google Gemini for high-quality answer synthesis
 from retrieved context chunks.
@@ -10,12 +10,23 @@ from typing import Any, Dict, List, Optional
 
 import google.generativeai as genai
 
+from .base import LLMProvider
+
 logger = logging.getLogger(__name__)
 
+# Gemini Safety Settings - Disabled for political speech analysis
+# Allows analysis of controversial political content without blocking
+GEMINI_SAFETY_SETTINGS = [
+    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+]
 
-class GeminiLLM:
+
+class GeminiLLM(LLMProvider):
     """
-    Service for generating answers using Google Gemini.
+    Google Gemini LLM provider.
 
     Uses Gemini to synthesize high-quality answers from retrieved context,
     with proper citations and confidence assessment.
@@ -50,16 +61,10 @@ class GeminiLLM:
         # Configure Gemini
         genai.configure(api_key=self.api_key)  # type: ignore[attr-defined]
 
-        # Configure safety settings to allow political content
-        # Type ignore needed as the library accepts dict but type hints don't reflect this
-        safety_settings = [
-            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_ONLY_HIGH"},
-            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_ONLY_HIGH"},
-            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_ONLY_HIGH"},
-            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_ONLY_HIGH"},
-        ]
-
-        self.model = genai.GenerativeModel(model_name, safety_settings=safety_settings)  # type: ignore[arg-type]
+        # Use centralized safety settings from constants
+        self.model = genai.GenerativeModel(  # type: ignore[arg-type]
+            model_name, safety_settings=GEMINI_SAFETY_SETTINGS
+        )
 
         # Generation config
         self.generation_config = genai.GenerationConfig(  # type: ignore[attr-defined]
@@ -70,6 +75,38 @@ class GeminiLLM:
         )
 
         logger.info(f"Gemini LLM initialized: model={model_name}, temp={temperature}")
+
+    def generate_content(
+        self,
+        prompt: str,
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+        **kwargs,
+    ) -> Any:
+        """
+        Generate content from a prompt (implements LLMProvider interface).
+
+        Args:
+            prompt: Text prompt for generation
+            temperature: Override default temperature
+            max_tokens: Override default max tokens
+            **kwargs: Additional Gemini-specific arguments
+
+        Returns:
+            Gemini response object with .text attribute
+        """
+        # Build generation config with overrides
+        gen_config = genai.GenerationConfig(  # type: ignore[attr-defined]
+            temperature=temperature if temperature is not None else self.temperature,
+            max_output_tokens=max_tokens if max_tokens is not None else self.max_output_tokens,
+            top_p=0.95,
+            top_k=40,
+        )
+
+        # Pass safety settings directly to generate_content for reliability
+        return self.model.generate_content(
+            prompt, generation_config=gen_config, safety_settings=GEMINI_SAFETY_SETTINGS
+        )
 
     def generate_answer(
         self,
@@ -117,8 +154,8 @@ class GeminiLLM:
 
         context_text = "\n\n".join(context_parts)
 
-        # Build prompt with entity awareness
-        prompt = self._build_prompt(question, context_text, list(sources_used), entities)
+        # Use inherited _build_rag_prompt from base class
+        prompt = self._build_rag_prompt(question, context_text, list(sources_used), entities)
 
         try:
             # Generate answer
@@ -151,73 +188,6 @@ class GeminiLLM:
                 "reasoning": f"Gemini error (fallback to extraction): {str(e)}",
                 "sources_used": list(sources_used),
             }
-
-    def _build_prompt(
-        self, question: str, context: str, sources: List[str], entities: Optional[List[str]] = None
-    ) -> str:
-        """
-        Build the prompt for Gemini with optional entity-focused instructions.
-
-        Args:
-            question: User's question
-            context: Retrieved context with source attribution
-            sources: List of source document names
-            entities: Optional list of entities to focus on
-
-        Returns:
-            Formatted prompt string
-        """
-        # Base prompt
-        prompt = f"""You are an expert research assistant analyzing political speech documents.
-
-CONTEXT from {len(sources)} document(s): {', '.join(sources)}
-
-{context}
-
-QUESTION: {question}
-
-INSTRUCTIONS:
-1. Provide a direct, concise answer (2-4 sentences maximum)
-2. Base your answer ONLY on the context provided above
-3. If the context doesn't contain the information, clearly state: "The available documents don't contain information about this topic"
-4. Cite sources naturally (e.g., "In the rally speech from [location/date]...")
-5. Don't repeat the same information multiple times
-6. Focus on answering the specific question asked"""
-
-        # Add entity-specific instructions if entities detected
-        if entities:
-            entity_instruction = f"""
-7. IMPORTANT: The question is about {', '.join(entities)}. Focus specifically on direct mentions, quotes, and references to these entities. Prioritize exact quotes and specific statements."""
-            prompt += entity_instruction
-
-        prompt += "\n\nYour answer:"
-
-        return prompt
-
-    def _extraction_fallback(self, question: str, context_chunks: List[Dict[str, Any]]) -> str:
-        """
-        Fallback to extraction-based answer if Gemini fails.
-
-        Args:
-            question: User's question
-            context_chunks: Context chunks
-
-        Returns:
-            Simple extracted answer
-        """
-        if not context_chunks:
-            return "Unable to generate answer due to technical issues."
-
-        # Return the most relevant chunk with source
-        first_chunk = context_chunks[0]
-        text = first_chunk.get("text", "")
-        source = first_chunk.get("source", "unknown")
-
-        # Truncate if too long
-        if len(text) > 300:
-            text = text[:300] + "..."
-
-        return f"Based on {source}: {text}"
 
     def test_connection(self) -> bool:
         """

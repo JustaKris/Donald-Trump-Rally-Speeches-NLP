@@ -11,19 +11,25 @@ from typing import Optional
 from fastapi import Depends
 
 from ..core import Settings, get_settings
-from ..services import GeminiLLM, NLPService, RAGService, SentimentAnalyzer, TopicExtractionService
+from ..services import (
+    EnhancedSentimentAnalyzer,
+    LLMProvider,
+    NLPService,
+    RAGService,
+    TopicExtractionService,
+)
 
 logger = logging.getLogger(__name__)
 
 # Global service instances (initialized on startup)
-_sentiment_analyzer: Optional[SentimentAnalyzer] = None
+_sentiment_analyzer: Optional[EnhancedSentimentAnalyzer] = None
 _rag_service: Optional[RAGService] = None
-_llm_service: Optional[GeminiLLM] = None
+_llm_service: Optional[LLMProvider] = None
 _nlp_service: Optional[NLPService] = None
 _topic_service: Optional[TopicExtractionService] = None
 
 
-def set_sentiment_analyzer(analyzer: SentimentAnalyzer) -> None:
+def set_sentiment_analyzer(analyzer: EnhancedSentimentAnalyzer) -> None:
     """Set the global sentiment analyzer instance."""
     global _sentiment_analyzer
     _sentiment_analyzer = analyzer
@@ -35,7 +41,7 @@ def set_rag_service(service: RAGService) -> None:
     _rag_service = service
 
 
-def set_llm_service(service: Optional[GeminiLLM]) -> None:
+def set_llm_service(service: Optional[LLMProvider]) -> None:
     """Set the global LLM service instance."""
     global _llm_service
     _llm_service = service
@@ -63,12 +69,12 @@ def get_settings_dep() -> Settings:
     return get_settings()
 
 
-def get_sentiment_analyzer_dep() -> Optional[SentimentAnalyzer]:
+def get_sentiment_analyzer_dep() -> Optional[EnhancedSentimentAnalyzer]:
     """
     Dependency to get sentiment analyzer.
 
     Returns:
-        SentimentAnalyzer instance or None if not loaded
+        EnhancedSentimentAnalyzer instance or None if not loaded
     """
     return _sentiment_analyzer
 
@@ -83,12 +89,12 @@ def get_rag_service() -> Optional[RAGService]:
     return _rag_service
 
 
-def get_llm_service() -> Optional[GeminiLLM]:
+def get_llm_service() -> Optional[LLMProvider]:
     """
     Dependency to get LLM service.
 
     Returns:
-        GeminiLLM instance or None if not configured
+        LLMProvider instance or None if not configured
     """
     return _llm_service
 

@@ -17,63 +17,11 @@ from sentence_transformers import SentenceTransformer
 from sklearn.cluster import KMeans
 from sklearn.metrics.pairwise import cosine_similarity
 
-from ..services.llm_service import GeminiLLM
+from ..core.config import get_settings
+from ..services.llm.base import LLMProvider
 from ..utils.text_preprocessing import clean_text, tokenize_text
 
 logger = logging.getLogger(__name__)
-
-# Common verbs to exclude from topic extraction (too generic)
-EXCLUDED_VERBS = {
-    "want",
-    "think",
-    "know",
-    "get",
-    "make",
-    "take",
-    "come",
-    "go",
-    "see",
-    "tell",
-    "give",
-    "need",
-    "use",
-    "find",
-    "say",
-    "work",
-    "call",
-    "try",
-    "ask",
-    "feel",
-    "leave",
-    "put",
-    "mean",
-    "keep",
-    "let",
-    "begin",
-    "seem",
-    "help",
-    "talk",
-    "turn",
-    "start",
-    "show",
-    "hear",
-    "play",
-    "run",
-    "move",
-    "like",
-    "live",
-    "believe",
-    "hold",
-    "bring",
-    "happen",
-    "write",
-    "provide",
-    "sit",
-    "stand",
-    "lose",
-    "pay",
-    "meet",
-}
 
 
 class TopicExtractionService:
@@ -89,7 +37,7 @@ class TopicExtractionService:
     def __init__(
         self,
         embedding_model: Optional[SentenceTransformer] = None,
-        llm_service: Optional[GeminiLLM] = None,
+        llm_service: Optional[LLMProvider] = None,
     ):
         """
         Initialize topic extraction service.
@@ -100,7 +48,11 @@ class TopicExtractionService:
         """
         self.embedding_model = embedding_model or SentenceTransformer("all-mpnet-base-v2")
         self.llm_service = llm_service
+        self.settings = get_settings()
+        self.excluded_verbs = self.settings.get_excluded_verbs()
+
         logger.info("TopicExtractionService initialized")
+        logger.debug(f"Excluded {len(self.excluded_verbs)} common verbs from topic extraction")
 
     def extract_topics_enhanced(
         self,
@@ -155,12 +107,19 @@ class TopicExtractionService:
         # Step 5: Generate AI summary
         summary = self._generate_topic_summary(text, labeled_clusters)
 
-        # Filter clusters by relevance (remove clusters with avg relevance < 0.5)
-        filtered_clusters = [c for c in labeled_clusters if c["avg_relevance"] >= 0.5]
+        # Filter clusters by relevance threshold from config
+        filtered_clusters = [
+            c
+            for c in labeled_clusters
+            if c["avg_relevance"] >= self.settings.topic_relevance_threshold
+        ]
 
-        # If filtering removed too many, keep at least top 3
-        if len(filtered_clusters) < 3 and len(labeled_clusters) >= 3:
-            filtered_clusters = labeled_clusters[:3]
+        # If filtering removed too many, keep at least minimum from config
+        if (
+            len(filtered_clusters) < self.settings.topic_min_clusters
+            and len(labeled_clusters) >= self.settings.topic_min_clusters
+        ):
+            filtered_clusters = labeled_clusters[: self.settings.topic_min_clusters]
         elif len(filtered_clusters) == 0:
             filtered_clusters = labeled_clusters
 
@@ -199,7 +158,7 @@ class TopicExtractionService:
 
         # Filter alphabetic tokens and exclude common verbs
         tokens = [
-            t for t in tokens if t.isalpha() and len(t) > 2 and t.lower() not in EXCLUDED_VERBS
+            t for t in tokens if t.isalpha() and len(t) > 2 and t.lower() not in self.excluded_verbs
         ]
 
         if not tokens:
@@ -337,7 +296,7 @@ class TopicExtractionService:
         if not self.llm_service:
             return keywords[0].title()
 
-        prompt = f"""Given these related keywords from a political speech: {', '.join(keywords)}
+        prompt = f"""Given these related keywords: {', '.join(keywords)}
 
 Generate a concise 2-4 word label that captures the main theme these keywords represent.
 
@@ -349,9 +308,12 @@ Examples:
 Respond with ONLY the label, nothing else."""
 
         try:
-            response = self.llm_service.model.generate_content(
-                prompt, generation_config=self.llm_service.generation_config
-            )
+            response = self.llm_service.generate_content(prompt)
+            # Check if response is valid (not blocked by safety filters)
+            if not response or not hasattr(response, "text") or not response.text:
+                logger.debug("LLM response blocked or empty for cluster label, using fallback")
+                return keywords[0].title()
+
             label = response.text.strip().strip('"').strip("'")
             # Limit length
             if len(label) > 50:
@@ -504,7 +466,7 @@ Respond with ONLY the label, nothing else."""
         # Get a sample of the text
         text_sample = text[:2000] if len(text) > 2000 else text
 
-        prompt = f"""Analyze the following topic extraction from a political speech and provide a brief 2-3 sentence interpretation of the main themes.
+        prompt = f"""Analyze these extracted topics and provide a brief 2-3 sentence summary of the main themes in the text.
 
 EXTRACTED TOPICS:
 {topics_text}
@@ -521,9 +483,12 @@ Summary:"""
 
         try:
             logger.debug("Generating topic summary with LLM")
-            response = self.llm_service.model.generate_content(
-                prompt, generation_config=self.llm_service.generation_config
-            )
+            response = self.llm_service.generate_content(prompt)
+            # Check if response is valid (not blocked by safety filters)
+            if not response or not hasattr(response, "text") or not response.text:
+                logger.debug("LLM response blocked or empty for topic summary")
+                return None
+
             summary = response.text.strip()
             logger.info(f"Generated topic summary (length: {len(summary)} chars)")
             return summary

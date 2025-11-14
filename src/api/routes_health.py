@@ -14,7 +14,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 
 from ..core import Settings
-from ..services import RAGService, SentimentAnalyzer
+from ..services import EnhancedSentimentAnalyzer, RAGService
 from .dependencies import get_rag_service, get_sentiment_analyzer_dep, get_settings_dep
 
 logger = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ async def root(request: Request):
 @router.get("/health")
 async def health_check(
     settings: Settings = Depends(get_settings_dep),
-    sentiment_analyzer: Optional[SentimentAnalyzer] = Depends(get_sentiment_analyzer_dep),
+    sentiment_analyzer: Optional[EnhancedSentimentAnalyzer] = Depends(get_sentiment_analyzer_dep),
     rag_service: Optional[RAGService] = Depends(get_rag_service),
 ):
     """

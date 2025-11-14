@@ -12,6 +12,7 @@ from typing import Any, Dict, List, Optional
 
 from chromadb.api.types import IncludeEnum
 
+from ...core.constants import ENTITY_QUESTION_WORDS, ENTITY_STOPWORDS
 from .models import EntitySentiment, EntityStatistics
 
 logger = logging.getLogger(__name__)
@@ -36,104 +37,8 @@ class EntityAnalyzer:
         self.collection = collection
         self.sentiment_analyzer = sentiment_analyzer
 
-        # Common stopwords to exclude from associations
-        self.stopwords = {
-            "the",
-            "a",
-            "an",
-            "and",
-            "or",
-            "but",
-            "in",
-            "on",
-            "at",
-            "to",
-            "for",
-            "of",
-            "with",
-            "by",
-            "from",
-            "as",
-            "is",
-            "was",
-            "are",
-            "were",
-            "been",
-            "be",
-            "have",
-            "has",
-            "had",
-            "do",
-            "does",
-            "did",
-            "will",
-            "would",
-            "could",
-            "should",
-            "may",
-            "might",
-            "can",
-            "this",
-            "that",
-            "these",
-            "those",
-            "i",
-            "you",
-            "he",
-            "she",
-            "it",
-            "we",
-            "they",
-            "what",
-            "which",
-            "who",
-            "when",
-            "where",
-            "why",
-            "how",
-            "all",
-            "each",
-            "every",
-            "both",
-            "few",
-            "more",
-            "most",
-            "other",
-            "some",
-            "such",
-            "no",
-            "not",
-            "only",
-            "own",
-            "same",
-            "so",
-            "than",
-            "too",
-            "very",
-            "s",
-            "t",
-            "just",
-            "now",
-            "said",
-            "says",
-            "going",
-            "go",
-            "get",
-            "got",
-            "know",
-            "think",
-            "see",
-            "make",
-            "made",
-            "like",
-            "ve",
-            "re",
-            "ll",
-            "m",
-            "don",
-            "didn",
-            "wasn",
-        }
+        # Use centralized stopwords from constants
+        self.stopwords = ENTITY_STOPWORDS
 
         logger.debug("EntityAnalyzer initialized")
 
@@ -160,15 +65,7 @@ class EntityAnalyzer:
             # Check if capitalized and longer than 2 chars
             if clean_word and clean_word[0].isupper() and len(clean_word) > 2:
                 # Skip common question words
-                if clean_word.lower() not in [
-                    "what",
-                    "when",
-                    "where",
-                    "who",
-                    "why",
-                    "how",
-                    "which",
-                ]:
+                if clean_word.lower() not in ENTITY_QUESTION_WORDS:
                     entities.append(clean_word)
 
         # Remove duplicates and return

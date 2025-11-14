@@ -4,7 +4,7 @@ RAG (Retrieval-Augmented Generation) Service - Refactored Version.
 This is the streamlined version that delegates to modular components.
 Provides semantic search and question-answering capabilities over text documents
 using ChromaDB for vector storage, sentence-transformers for embeddings,
-Gemini for answer generation, and hybrid search for improved retrieval.
+LLM providers for answer generation, and hybrid search for improved retrieval.
 """
 
 import logging
@@ -15,7 +15,7 @@ import chromadb
 from chromadb.config import Settings as ChromaSettings
 from sentence_transformers import SentenceTransformer
 
-from ..services.llm_service import GeminiLLM
+from ..services.llm.base import LLMProvider
 from .rag.confidence import ConfidenceCalculator
 from .rag.document_loader import DocumentLoader
 from .rag.entity_analyzer import EntityAnalyzer
@@ -44,7 +44,7 @@ class RAGService:
         reranker_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2",
         chunk_size: int = 2048,
         chunk_overlap: int = 150,
-        llm_service: Optional[GeminiLLM] = None,
+        llm_service: Optional[LLMProvider] = None,
         use_reranking: bool = True,
         use_hybrid_search: bool = True,
     ):

@@ -2,8 +2,9 @@
 Trump Speeches NLP Chatbot API - Production-Ready AI Platform
 
 Comprehensive NLP and RAG platform for analyzing Trump rally speeches (2019-2020).
-Features AI-powered Q&A with Gemini, sentiment analysis with FinBERT, semantic search,
-and advanced text analytics. Built with FastAPI, ChromaDB, and LangChain.
+Features AI-powered Q&A with multiple LLM providers (Gemini, OpenAI, Claude), sentiment
+analysis with FinBERT, semantic search, and advanced text analytics. Built with FastAPI,
+ChromaDB, and LangChain.
 
 Run with: uvicorn src.main:app --reload
 """
@@ -25,7 +26,13 @@ from .api.dependencies import (
     set_topic_service,
 )
 from .core import get_settings
-from .services import GeminiLLM, NLPService, RAGService, SentimentAnalyzer, TopicExtractionService
+from .services import (
+    EnhancedSentimentAnalyzer,
+    NLPService,
+    RAGService,
+    TopicExtractionService,
+    create_llm_provider,
+)
 
 # Get configuration
 settings = get_settings()
@@ -47,39 +54,15 @@ async def lifespan(app: FastAPI):
     settings.log_startup_info(logger)
     logger.info("=" * 70)
 
-    # Load sentiment analysis model
-    logger.info(f"Loading sentiment analysis model: {settings.sentiment_model_name}")
-    try:
-        sentiment_analyzer = SentimentAnalyzer(model_name=settings.sentiment_model_name)
-        set_sentiment_analyzer(sentiment_analyzer)
-        logger.info("✓ Sentiment analysis model loaded successfully")
-    except Exception as e:
-        logger.error(f"✗ Failed to load sentiment model: {e}")
-        # Continue without model - endpoints will return errors
-
-    # Initialize NLP service
-    logger.info("Initializing NLP service...")
-    try:
-        nlp_service = NLPService()
-        set_nlp_service(nlp_service)
-        logger.info("✓ NLP service initialized")
-    except Exception as e:
-        logger.error(f"✗ Failed to initialize NLP service: {e}")
-
     # Initialize LLM service if configured
     llm_service = None
     if settings.is_llm_configured():
         try:
             logger.info(f"Initializing {settings.llm_provider.upper()} LLM service...")
-            llm_service = GeminiLLM(
-                api_key=settings.get_llm_api_key(),  # type: ignore[arg-type]
-                model_name=settings.get_llm_model_name(),
-                temperature=settings.gemini_temperature,
-                max_output_tokens=settings.gemini_max_output_tokens,
-            )
+            llm_service = create_llm_provider(settings)
 
             # Test connection
-            if llm_service.test_connection():
+            if llm_service and llm_service.test_connection():
                 logger.info("✓ LLM service initialized and tested successfully")
                 set_llm_service(llm_service)
             else:
@@ -90,7 +73,30 @@ async def lifespan(app: FastAPI):
             llm_service = None
     else:
         logger.warning("⚠️  LLM not configured - RAG will use extraction-based answers")
-        logger.warning("   Set GEMINI_API_KEY in .env file for AI-powered answers")
+        logger.warning("   Set LLM_API_KEY in .env file for AI-powered answers")
+
+    # Load sentiment analysis model with LLM for contextual interpretation
+    logger.info("Loading AI-powered sentiment analysis models...")
+    try:
+        sentiment_analyzer = EnhancedSentimentAnalyzer(
+            sentiment_model=settings.sentiment_model_name,
+            emotion_model=settings.emotion_model_name,
+            llm_service=llm_service,
+        )
+        set_sentiment_analyzer(sentiment_analyzer)
+        logger.info("✓ Sentiment analysis models loaded successfully")
+    except Exception as e:
+        logger.error(f"✗ Failed to load sentiment models: {e}")
+        # Continue without model - endpoints will return errors
+
+    # Initialize NLP service
+    logger.info("Initializing NLP service...")
+    try:
+        nlp_service = NLPService()
+        set_nlp_service(nlp_service)
+        logger.info("✓ NLP service initialized")
+    except Exception as e:
+        logger.error(f"✗ Failed to initialize NLP service: {e}")
 
     # Initialize RAG service
     logger.info("Initializing RAG service...")

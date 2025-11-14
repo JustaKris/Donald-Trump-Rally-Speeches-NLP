@@ -70,42 +70,28 @@ class Settings(BaseSettings):
         description="Enable/disable LLM-powered answer generation",
     )
 
-    # Gemini Configuration
-    gemini_api_key: Optional[str] = Field(
+    llm_api_key: Optional[str] = Field(
         default=None,
-        description="Google Gemini API key",
-        alias="GEMINI_API_KEY",
+        description="API key for LLM provider (works with any provider)",
     )
 
-    gemini_model_name: str = Field(
+    llm_model_name: str = Field(
         default="gemini-2.5-flash",
-        description="Gemini model to use (gemini-2.5-flash, gemini-1.5-pro, etc.)",
+        description="Model name for LLM provider (e.g., gemini-2.5-flash, gpt-4o-mini, claude-3-5-sonnet-20241022)",
     )
 
-    gemini_temperature: float = Field(
+    llm_temperature: float = Field(
         default=0.3,
         ge=0.0,
         le=1.0,
         description="Generation temperature (0.0-1.0, lower = more focused)",
     )
 
-    gemini_max_output_tokens: int = Field(
+    llm_max_output_tokens: int = Field(
         default=1024,
         ge=1,
         le=8192,
         description="Maximum tokens in generated responses",
-    )
-
-    # OpenAI Configuration (for future use)
-    openai_api_key: Optional[str] = Field(
-        default=None,
-        description="OpenAI API key",
-        alias="OPENAI_API_KEY",
-    )
-
-    openai_model_name: str = Field(
-        default="gpt-4o-mini",
-        description="OpenAI model to use",
     )
 
     # ============================================================================
@@ -179,6 +165,55 @@ class Settings(BaseSettings):
     )
 
     # ============================================================================
+    # NLP Analysis Configuration
+    # ============================================================================
+
+    # Topic Extraction Settings
+    topic_relevance_threshold: float = Field(
+        default=0.5,
+        ge=0.0,
+        le=1.0,
+        description="Minimum relevance score for topic clusters (0.0-1.0)",
+    )
+
+    topic_min_clusters: int = Field(
+        default=3,
+        ge=1,
+        le=10,
+        description="Minimum number of topic clusters to keep",
+    )
+
+    topic_excluded_verbs: str = Field(
+        default="want,think,know,make,get,go,see,come,take,give,say,tell,ask,use,find,work,call,try,feel,leave,put,mean,keep,let,begin,seem,help,talk,turn,start,show,hear,play,run,move,like,live,believe,bring,happen,write,sit,stand,lose,pay,meet,include,continue,learn,change,lead,understand,watch,follow,stop,create,speak,read,allow,add,spend,grow,open,walk,win,offer,remember,love,consider",
+        description="Comma-separated list of common verbs to exclude from topics",
+    )
+
+    # Sentiment Analysis Settings
+    sentiment_model_name: str = Field(
+        default="ProsusAI/finbert",
+        description="HuggingFace model for sentiment classification",
+    )
+
+    emotion_model_name: str = Field(
+        default="j-hartmann/emotion-english-distilroberta-base",
+        description="HuggingFace model for emotion detection",
+    )
+
+    sentiment_interpretation_temperature: float = Field(
+        default=0.4,
+        ge=0.0,
+        le=1.0,
+        description="LLM temperature for sentiment interpretation (0.0-1.0)",
+    )
+
+    sentiment_interpretation_max_tokens: int = Field(
+        default=200,
+        ge=50,
+        le=500,
+        description="Max tokens for sentiment interpretation",
+    )
+
+    # ============================================================================
     # Data Directories
     # ============================================================================
 
@@ -224,7 +259,7 @@ class Settings(BaseSettings):
             raise ValueError(f"Invalid log level. Must be one of: {', '.join(valid_levels)}")
         return v_upper
 
-    @field_validator("gemini_api_key", "openai_api_key")
+    @field_validator("llm_api_key")
     @classmethod
     def validate_api_key(cls, v: Optional[str]) -> Optional[str]:
         """Validate API keys (don't log them)."""
@@ -237,20 +272,22 @@ class Settings(BaseSettings):
     # ============================================================================
 
     def get_llm_api_key(self) -> Optional[str]:
-        """Get the appropriate API key based on the selected LLM provider."""
-        if self.llm_provider == "gemini":
-            return self.gemini_api_key
-        elif self.llm_provider == "openai":
-            return self.openai_api_key
-        return None
+        """
+        Get the API key for the selected LLM provider.
+
+        Returns:
+            API key string, or None if not configured
+        """
+        return self.llm_api_key
 
     def get_llm_model_name(self) -> str:
-        """Get the appropriate model name based on the selected LLM provider."""
-        if self.llm_provider == "gemini":
-            return self.gemini_model_name
-        elif self.llm_provider == "openai":
-            return self.openai_model_name
-        return "unknown"
+        """
+        Get the model name for the selected LLM provider.
+
+        Returns:
+            Model name string
+        """
+        return self.llm_model_name
 
     def is_llm_configured(self) -> bool:
         """Check if LLM is properly configured."""
@@ -275,6 +312,12 @@ class Settings(BaseSettings):
         if self.cors_origins == "*":
             return ["*"]
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+
+    def get_excluded_verbs(self) -> set[str]:
+        """Parse excluded verbs string into a set."""
+        return {
+            verb.strip().lower() for verb in self.topic_excluded_verbs.split(",") if verb.strip()
+        }
 
     def setup_logging(self) -> None:
         """Configure application-wide logging based on settings."""

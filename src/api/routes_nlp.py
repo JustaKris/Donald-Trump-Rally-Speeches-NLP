@@ -19,7 +19,7 @@ from ..models import (
     TopicResponse,
     WordFrequencyResponse,
 )
-from ..services import NLPService, SentimentAnalyzer
+from ..services import EnhancedSentimentAnalyzer, NLPService
 from ..utils import clean_text
 from .dependencies import get_nlp_service, get_sentiment_analyzer_dep, get_topic_service
 
@@ -31,34 +31,34 @@ router = APIRouter(prefix="/analyze", tags=["nlp"])
 @router.post("/sentiment", response_model=SentimentResponse)
 async def analyze_sentiment(
     input: TextInput,
-    sentiment_analyzer: Optional[SentimentAnalyzer] = Depends(get_sentiment_analyzer_dep),
+    sentiment_analyzer: Optional[EnhancedSentimentAnalyzer] = Depends(get_sentiment_analyzer_dep),
 ):
     """
-    Analyze sentiment of any input text using FinBERT transformer model.
+    AI-powered sentiment analysis with emotion detection and contextual interpretation.
 
-    This endpoint uses a pre-trained BERT-based model fine-tuned for sentiment analysis.
-    Works with any type of text: social media posts, product reviews, news articles, etc.
+    This endpoint uses multiple AI models to provide comprehensive sentiment analysis:
+    - **FinBERT**: Financial/political sentiment classification (positive/negative/neutral)
+    - **RoBERTa-Emotion**: Multi-emotion detection (anger, joy, fear, sadness, surprise, disgust)
+    - **Gemini LLM**: Contextual sentiment interpretation explaining emotional tone in context
 
-    Returns the dominant sentiment (positive/negative/neutral) with confidence scores.
-    For longer texts, automatically chunks and averages predictions for accuracy.
+    Returns dominant sentiment, confidence scores, detailed emotion breakdown,
+    and an AI-generated interpretation of what the speaker expresses emotion about.
     """
     if sentiment_analyzer is None:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Sentiment model not loaded. Please try again later.",
+            detail="Sentiment models not loaded. Please try again later.",
         )
 
     try:
-        result = sentiment_analyzer.analyze_sentiment(input.text, return_all_scores=True)
+        result = sentiment_analyzer.analyze_sentiment(input.text)
 
         return SentimentResponse(
-            sentiment=result["dominant"],
-            confidence=result[result["dominant"]],
-            scores={
-                "positive": result["positive"],
-                "negative": result["negative"],
-                "neutral": result["neutral"],
-            },
+            sentiment=result["sentiment"],
+            confidence=result["confidence"],
+            scores=result["scores"],
+            emotions=result["emotions"],
+            contextual_sentiment=result["contextual_sentiment"],
             num_chunks=result["num_chunks"],
         )
     except Exception as e:

@@ -61,11 +61,15 @@ class RAGSearchRequest(BaseModel):
 
 
 class SentimentResponse(BaseModel):
-    """Response model for sentiment analysis."""
+    """Response model for AI-powered sentiment analysis with emotion detection."""
 
     sentiment: str = Field(..., description="Dominant sentiment (positive/negative/neutral)")
     confidence: float = Field(..., description="Confidence score (0-1)")
-    scores: Optional[Dict[str, float]] = Field(None, description="All sentiment scores")
+    scores: Dict[str, float] = Field(..., description="All sentiment scores")
+    emotions: Dict[str, float] = Field(..., description="Emotion classification scores")
+    contextual_sentiment: str = Field(
+        ..., description="AI-generated contextual interpretation of emotional tone"
+    )
     num_chunks: int = Field(..., description="Number of text chunks analyzed")
 
 

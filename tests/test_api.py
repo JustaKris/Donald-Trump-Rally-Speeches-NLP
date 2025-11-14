@@ -30,24 +30,45 @@ class TestHealthEndpoint:
 
 
 class TestSentimentEndpoint:
-    """Test suite for sentiment analysis endpoint."""
+    """Test suite for AI-powered sentiment analysis endpoint."""
 
     @pytest.mark.integration
     @pytest.mark.requires_model
     def test_sentiment_analysis_valid_input(self, client):
-        """Test sentiment analysis with valid input."""
+        """Test enhanced sentiment analysis with valid input."""
         payload = {"text": "This is a great day! I love it!"}
         response = client.post("/analyze/sentiment", json=payload)
 
-        # Should succeed or return 503 if model not loaded
+        # Should succeed or return 503 if models not loaded
         assert response.status_code in [200, 503]
 
         if response.status_code == 200:
             data = response.json()
+            # Check basic sentiment fields
             assert "sentiment" in data
             assert "confidence" in data
             assert data["sentiment"] in ["positive", "negative", "neutral"]
             assert 0 <= data["confidence"] <= 1
+
+            # Check enhanced fields
+            assert "scores" in data
+            assert "positive" in data["scores"]
+            assert "negative" in data["scores"]
+            assert "neutral" in data["scores"]
+
+            # Check emotion detection
+            assert "emotions" in data
+            assert isinstance(data["emotions"], dict)
+            assert len(data["emotions"]) > 0
+
+            # Check contextual interpretation
+            assert "contextual_sentiment" in data
+            assert isinstance(data["contextual_sentiment"], str)
+            assert len(data["contextual_sentiment"]) > 0
+
+            # Check metadata
+            assert "num_chunks" in data
+            assert data["num_chunks"] >= 1
 
     @pytest.mark.integration
     def test_sentiment_analysis_empty_text(self, client):
