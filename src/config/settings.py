@@ -169,7 +169,6 @@ class Settings(BaseSettings):
         description="Minimum number of topic clusters to keep",
     )
 
-
     @field_validator("log_level")
     @classmethod
     def validate_log_level(cls, v: str) -> str:
@@ -322,4 +321,3 @@ def reload_settings() -> Settings:
     """
     get_settings.cache_clear()
     return get_settings()
-
