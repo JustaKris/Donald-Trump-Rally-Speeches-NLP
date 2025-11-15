@@ -13,7 +13,6 @@ from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 
-from ..core import Settings
 from ..services import EnhancedSentimentAnalyzer, RAGService
 from .dependencies import get_rag_service, get_sentiment_analyzer_dep, get_settings_dep
 
@@ -52,7 +51,7 @@ async def root(request: Request):
 
 @router.get("/health")
 async def health_check(
-    settings: Settings = Depends(get_settings_dep),
+    settings=Depends(get_settings_dep),
     sentiment_analyzer: Optional[EnhancedSentimentAnalyzer] = Depends(get_sentiment_analyzer_dep),
     rag_service: Optional[RAGService] = Depends(get_rag_service),
 ):
@@ -74,7 +73,7 @@ async def health_check(
 
 
 @router.get("/config")
-async def get_config(settings: Settings = Depends(get_settings_dep)):
+async def get_config(settings=Depends(get_settings_dep)):
     """
     Get public configuration information.
 
@@ -89,7 +88,7 @@ async def get_config(settings: Settings = Depends(get_settings_dep)):
         "sentiment_model": settings.sentiment_model_name,
         "embedding_model": settings.embedding_model_name,
         "features": {
-            "llm_enabled": settings.llm_enabled and settings.is_llm_configured(),
+            "llm_enabled": settings.llm.enabled and settings.is_llm_configured(),
             "hybrid_search": settings.use_hybrid_search,
             "reranking": settings.use_reranking,
         },

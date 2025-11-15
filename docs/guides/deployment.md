@@ -832,7 +832,7 @@ After fixing, verify it parses correctly:
 uv run uvicorn src.main:app --reload
 
 # Or test the config in Python
-uv run python -c "from src.core.config import get_settings; s = get_settings(); print(f'Environment: {s.environment}, Log Level: {s.log_level}')"
+uv run python -c "from src.config.settings import get_settings; s = get_settings(); print(f'Environment: {s.environment}, Log Level: {s.log_level}')"
 ```
 
 Then try Docker again:

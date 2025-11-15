@@ -1,14 +1,15 @@
 # Configuration Guide
 
-This project uses **Pydantic Settings** for type-safe, environment-based configuration. This is the industry-standard approach for modern Python applications, especially those deployed to cloud platforms like Azure.
+This project uses **Pydantic Settings v2** for type-safe configuration, combining YAML config files with environment variable overrides. This is a modern, cloud-friendly pattern that works well for local development and deployments on AWS or other platforms.
 
 ## Configuration Architecture
 
 ### Core Components
 
-1. **`src/config.py`** - Central configuration module with `Settings` class
-2. **`.env` file** - Environment variables for local/cloud deployment
-3. **Validation** - Automatic type checking and validation via Pydantic
+1. **`src/config/settings.py`** - Central configuration module with `Settings` class
+2. **YAML config files** in `configs/` (e.g., `configs/development.yaml`, `configs/production.yaml`)
+3. **`.env` file** - Environment variables for sensitive values and overrides
+4. **Validation** - Automatic type checking and validation via Pydantic
 
 ### Benefits
 
@@ -20,7 +21,22 @@ This project uses **Pydantic Settings** for type-safe, environment-based configu
 
 ## Quick Start
 
-### 1. Create Your `.env` File
+### 1. Choose Your Environment (YAML)
+
+Configuration defaults live in YAML files under `configs/`:
+
+- `configs/development.yaml` – for local development
+- `configs/production.yaml` – for production deployments (AWS, Azure, etc.)
+
+By default, the app uses the `development` environment. You can override this via the `ENVIRONMENT` environment variable:
+
+```bash
+ENVIRONMENT=production
+```
+
+The active environment name is used to pick `configs/<environment>.yaml`.
+
+### 2. Create Your `.env` File
 
 Copy the example file:
 
@@ -28,9 +44,11 @@ Copy the example file:
 cp .env.example .env
 ```
 
-### 2. Set Your LLM Provider
+Use `.env` for **secrets and overrides only** (API keys, tokens, one-off tweaks). All non-sensitive defaults should live in YAML.
 
-Edit `.env` and configure your preferred LLM provider:
+### 3. Set Your LLM Provider
+
+Edit `.env` and configure your preferred LLM provider (sensitive values like API keys stay here):
 
 **Option A: Google Gemini (Default)**
 ```env
@@ -65,14 +83,16 @@ LLM_API_KEY=sk-ant-your_anthropic_api_key_here
 LLM_MODEL_NAME=claude-3-5-sonnet-20241022
 ```
 
-### 3. Run the Application
+### 4. Run the Application
 
 ```bash
 uv run uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 The app will automatically:
-- Load settings from `.env`
+- Load base defaults from `configs/<ENVIRONMENT>.yaml`
+- Apply Pydantic model defaults for any missing values
+- Override with environment variables / `.env` values
 - Validate all configuration values
 - Initialize services with configured parameters
 - Display startup configuration in logs
@@ -81,11 +101,22 @@ The app will automatically:
 
 ### Application Settings
 
+Core metadata and logging live primarily in YAML:
+
+```yaml
+# configs/development.yaml
+environment: development
+log_level: DEBUG
+app_name: "Trump Speeches NLP Chatbot API (Development)"
+app_version: "0.1.0"
+```
+
+You can still override via `.env` or environment variables if needed:
+
 ```env
-APP_NAME="Trump Speeches NLP Chatbot API"
-APP_VERSION="0.1.0"
-ENVIRONMENT="development"  # development, staging, production
-LOG_LEVEL="INFO"           # DEBUG, INFO, WARNING, ERROR, CRITICAL
+ENVIRONMENT="production"   # selects configs/production.yaml
+LOG_LEVEL="INFO"           # overrides YAML
+APP_NAME="Custom Name"     # overrides YAML
 ```
 
 ### LLM Provider (Multi-Provider Support)
@@ -94,13 +125,26 @@ Configure which LLM provider to use for answer generation, sentiment interpretat
 
 #### General LLM Settings
 
+In YAML we configure non-sensitive defaults under the `llm` section:
+
+```yaml
+llm:
+  provider: "gemini"          # gemini | openai | anthropic | none
+  enabled: true
+  model_name: "gemini-2.5-flash"
+  temperature: 0.3
+  max_output_tokens: 1024
+```
+
+Sensitive values like API keys are supplied via environment variables / `.env`:
+
 ```env
-LLM_PROVIDER="gemini"          # gemini | openai | anthropic | none
+LLM_PROVIDER="gemini"          # optional override for provider
 LLM_API_KEY="your_api_key"     # Single API key for active provider
-LLM_MODEL_NAME="model-name"    # Model identifier
-LLM_TEMPERATURE="0.7"          # 0.0-1.0 (lower = more focused, higher = more creative)
-LLM_MAX_OUTPUT_TOKENS="2048"   # Maximum response length
-LLM_ENABLED="true"             # Enable/disable LLM features
+LLM_MODEL_NAME="model-name"    # optional override for model
+LLM_TEMPERATURE="0.7"          # optional override for temperature
+LLM_MAX_OUTPUT_TOKENS="2048"   # optional override for max tokens
+LLM_ENABLED="true"             # optional override
 ```
 
 #### Provider-Specific Examples
@@ -158,31 +202,47 @@ The application will automatically use the new provider without code changes.
 
 ### ML Models
 
-Configure which models to use for different tasks:
+Configure which models to use for different tasks via YAML:
+
+```yaml
+models:
+  sentiment_model_name: "ProsusAI/finbert"
+  embedding_model_name: "all-mpnet-base-v2"
+  reranker_model_name: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+  emotion_model_name: "j-hartmann/emotion-english-distilroberta-base"
+```
+
+You can override any of them via environment variables if needed:
 
 ```env
-# Sentiment Analysis
 SENTIMENT_MODEL_NAME="ProsusAI/finbert"
-
-# Embeddings for RAG
 EMBEDDING_MODEL_NAME="all-mpnet-base-v2"
-
-# Re-ranking
 RERANKER_MODEL_NAME="cross-encoder/ms-marco-MiniLM-L-6-v2"
+EMOTION_MODEL_NAME="j-hartmann/emotion-english-distilroberta-base"
 ```
 
 ### RAG Configuration
 
+These live under the `rag` section in YAML:
+
+```yaml
+rag:
+  chromadb_persist_directory: "./data/chromadb"
+  chromadb_collection_name: "speeches"
+  chunk_size: 2048
+  chunk_overlap: 150
+  default_top_k: 5
+  use_reranking: true
+  use_hybrid_search: true
+```
+
+Environment variables can override them if necessary (e.g. for a one-off deployment):
+
 ```env
-# ChromaDB
 CHROMADB_PERSIST_DIRECTORY="./data/chromadb"
 CHROMADB_COLLECTION_NAME="speeches"
-
-# Text Chunking
 CHUNK_SIZE="2048"
 CHUNK_OVERLAP="150"
-
-# Search
 DEFAULT_TOP_K="5"
 USE_RERANKING="true"
 USE_HYBRID_SEARCH="true"
@@ -190,38 +250,69 @@ USE_HYBRID_SEARCH="true"
 
 ### Data Directories
 
-```env
-DATA_ROOT_DIRECTORY="./data"
-SPEECHES_DIRECTORY="./data/Donald Trump Rally Speeches"
+Configured under `paths` in YAML:
+
+```yaml
+paths:
+  data_root_directory: "./data"
+  speeches_directory: "./data/Donald Trump Rally Speeches"
 ```
 
 ### API Settings
 
-```env
-API_HOST="0.0.0.0"
-API_PORT="8000"
-API_RELOAD="false"  # true in development
-CORS_ORIGINS="*"    # comma-separated list in production
+These are grouped under the `api` section in YAML:
+
+```yaml
+api:
+  host: "0.0.0.0"
+  port: 8000
+  reload: true
+  cors_origins:
+    - "*"
+```
+
+In production (e.g. AWS) you might use something like:
+
+```yaml
+# configs/production.yaml
+api:
+  host: "0.0.0.0"
+  port: 8000
+  reload: false
+  cors_origins:
+    - "https://your-domain.com"
 ```
 
 ## Environment-Specific Configs
 
 ### Development
 
-```env
-ENVIRONMENT="development"
-LOG_LEVEL="DEBUG"
-API_RELOAD="true"
-CORS_ORIGINS="*"
+```yaml
+# configs/development.yaml
+environment: development
+log_level: DEBUG
+api:
+  host: "0.0.0.0"
+  port: 8000
+  reload: true
+  cors_origins:
+    - "*"
 ```
 
-### Production (Azure)
+### Production example
 
-```env
-ENVIRONMENT="production"
-LOG_LEVEL="INFO"
-API_RELOAD="false"
-CORS_ORIGINS="https://yourdomain.com"
+```yaml
+# configs/production.yaml
+environment: production
+log_level: INFO
+app_name: "Trump Speeches NLP Chatbot API"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  reload: false
+  cors_origins:
+    - "https://your-domain.com"
 ```
 
 ## Using Configuration in Code
@@ -229,13 +320,13 @@ CORS_ORIGINS="https://yourdomain.com"
 ### Accessing Settings
 
 ```python
-from src.config import get_settings
+from src.config.settings import get_settings
 
 settings = get_settings()
 
-# Access values
-print(settings.gemini_api_key)
-print(settings.chunk_size)
+# Access values from nested sections
+print(settings.llm.provider)
+print(settings.rag.chunk_size)
 print(settings.log_level)
 ```
 
@@ -243,10 +334,10 @@ print(settings.log_level)
 
 ```python
 # All settings are type-checked
-settings.chunk_size  # int
-settings.gemini_temperature  # float
-settings.use_reranking  # bool
-settings.llm_provider  # Literal["gemini", "openai", "anthropic", "none"]
+settings.rag.chunk_size              # int
+settings.llm.temperature             # float
+settings.rag.use_reranking           # bool
+settings.llm.provider                # Literal["gemini", "openai", "anthropic", "none"]
 ```
 
 ### Helper Methods
@@ -254,12 +345,8 @@ settings.llm_provider  # Literal["gemini", "openai", "anthropic", "none"]
 ```python
 # Check if LLM is configured
 if settings.is_llm_configured():
-    api_key = settings.get_llm_api_key()
-    model = settings.get_llm_model_name()
-    
-# Create LLM provider
-from src.services.llm import create_llm_provider
-llm = create_llm_provider()  # Automatically uses LLM_PROVIDER setting
+  api_key = settings.get_llm_api_key()
+  model = settings.get_llm_model_name()
 
 # Get Path objects
 speeches_path = settings.get_speeches_path()
@@ -410,9 +497,10 @@ GEMINI_API_KEY=""
 ### Settings not loading
 
 Check:
-1. `.env` file exists in project root
-2. File encoding is UTF-8
-3. No syntax errors in `.env`
+1. `.env` file exists in project root (for secrets/overrides)
+2. A YAML config exists at `configs/<ENVIRONMENT>.yaml` (or `configs/development.yaml` by default)
+3. File encoding is UTF-8
+4. No syntax errors in `.env` or YAML files
 
 ### Invalid configuration
 
@@ -426,7 +514,7 @@ ERROR: ValidationError: 1 validation error for Settings
 
 ```bash
 # Check if API key is set
-python -c "from src.config import get_settings; print(get_settings().gemini_api_key)"
+python -c "from src.config.settings import get_settings; print(get_settings().get_llm_api_key())"
 ```
 
 ## Migration from Old Code

@@ -17,7 +17,7 @@ import numpy as np
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-from ..core.config import get_settings
+from ..config.settings import get_settings
 from ..utils.text_preprocessing import chunk_text_for_bert
 from .llm.base import LLMProvider
 

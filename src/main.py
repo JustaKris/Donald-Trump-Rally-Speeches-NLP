@@ -25,7 +25,7 @@ from .api.dependencies import (
     set_sentiment_analyzer,
     set_topic_service,
 )
-from .core import get_settings
+from .config.settings import get_settings
 from .services import (
     EnhancedSentimentAnalyzer,
     NLPService,
@@ -58,7 +58,7 @@ async def lifespan(app: FastAPI):
     llm_service = None
     if settings.is_llm_configured():
         try:
-            logger.info(f"Initializing {settings.llm_provider.upper()} LLM service...")
+            logger.info(f"Initializing {settings.llm.provider.upper()} LLM service...")
             llm_service = create_llm_provider(settings)
 
             # Test connection
@@ -79,8 +79,8 @@ async def lifespan(app: FastAPI):
     logger.info("Loading AI-powered sentiment analysis models...")
     try:
         sentiment_analyzer = EnhancedSentimentAnalyzer(
-            sentiment_model=settings.sentiment_model_name,
-            emotion_model=settings.emotion_model_name,
+            sentiment_model=settings.models.sentiment_model_name,
+            emotion_model=settings.models.emotion_model_name,
             llm_service=llm_service,
         )
         set_sentiment_analyzer(sentiment_analyzer)
@@ -102,21 +102,21 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing RAG service...")
     try:
         rag_service = RAGService(
-            collection_name=settings.chromadb_collection_name,
-            persist_directory=settings.chromadb_persist_directory,
-            embedding_model=settings.embedding_model_name,
-            reranker_model=settings.reranker_model_name,
-            chunk_size=settings.chunk_size,
-            chunk_overlap=settings.chunk_overlap,
+            collection_name=settings.rag.chromadb_collection_name,
+            persist_directory=settings.rag.chromadb_persist_directory,
+            embedding_model=settings.models.embedding_model_name,
+            reranker_model=settings.models.reranker_model_name,
+            chunk_size=settings.rag.chunk_size,
+            chunk_overlap=settings.rag.chunk_overlap,
             llm_service=llm_service,
-            use_reranking=settings.use_reranking,
-            use_hybrid_search=settings.use_hybrid_search,
+            use_reranking=settings.rag.use_reranking,
+            use_hybrid_search=settings.rag.use_hybrid_search,
         )
 
         # Check if collection is empty and load documents if needed
         if rag_service.collection.count() == 0:
             logger.info("Loading documents into RAG service...")
-            docs_loaded = rag_service.load_documents(settings.speeches_directory)
+            docs_loaded = rag_service.load_documents(settings.paths.speeches_directory)
             logger.info(f"✓ Loaded {docs_loaded} documents into RAG service")
         else:
             chunk_count = rag_service.collection.count()
@@ -188,7 +188,7 @@ if __name__ == "__main__":
 
     uvicorn.run(
         "src.main:app",
-        host=settings.api_host,
-        port=settings.api_port,
-        reload=settings.api_reload,
+        host=settings.api.host,
+        port=settings.api.port,
+        reload=settings.api.reload,
     )

@@ -1,0 +1,72 @@
+###############################################################################
+# Production Configuration (YAML)
+#
+# Opinionated defaults for cloud deployments (AWS, Azure, GCP, etc.).
+#
+# You can copy this file and create additional profiles, e.g.:
+#   - configs/staging.yaml
+#   - configs/demo.yaml
+# and select them via ENVIRONMENT=<name>.
+###############################################################################
+
+# ---------------------------------------------------------------------------
+# Core application metadata
+# ---------------------------------------------------------------------------
+environment: production           # Used to pick this file (ENVIRONMENT=production)
+log_level: INFO                   # Recommended for production
+app_name: "Trump Speeches NLP Chatbot API"
+app_version: "0.1.0"
+
+# ---------------------------------------------------------------------------
+# API settings
+# ---------------------------------------------------------------------------
+api:
+  host: "0.0.0.0"                 # Bind to all interfaces in container
+  port: 8003
+  reload: false                   # Disable reload in production
+  cors_origins:                   # Frontend origins allowed in prod
+    - "https://your-domain.com"  # Replace with your actual domains
+
+# ---------------------------------------------------------------------------
+# RAG (Retrieval-Augmented Generation) configuration
+# ---------------------------------------------------------------------------
+rag:
+  chromadb_persist_directory: "./data/chromadb"
+  chromadb_collection_name: "speeches"
+
+  chunk_size: 2048
+  chunk_overlap: 150
+
+  default_top_k: 5
+  use_reranking: true
+  use_hybrid_search: true
+
+# ---------------------------------------------------------------------------
+# ML model configuration
+# ---------------------------------------------------------------------------
+models:
+  sentiment_model_name: "ProsusAI/finbert"
+  embedding_model_name: "all-mpnet-base-v2"
+  reranker_model_name: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+  emotion_model_name: "j-hartmann/emotion-english-distilroberta-base"
+
+# ---------------------------------------------------------------------------
+# Data paths
+# ---------------------------------------------------------------------------
+paths:
+  data_root_directory: "./data"
+  speeches_directory: "./data/Donald Trump Rally Speeches"
+
+# ---------------------------------------------------------------------------
+# LLM configuration (non-sensitive defaults)
+# ---------------------------------------------------------------------------
+llm:
+  provider: "gemini"             # gemini | openai | anthropic | none
+  enabled: true
+  model_name: "gemini-2.5-flash" # Override via env if needed
+  temperature: 0.3
+  max_output_tokens: 1024
+
+  # NOTE: The API key is supplied via environment variables / secrets
+  # manager, not in this file. Use LLM_API_KEY in your deployment config.
+

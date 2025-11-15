@@ -8,7 +8,7 @@ based on configuration settings.
 import logging
 from typing import Optional
 
-from ...core.config import Settings
+from ...config.settings import Settings
 from .base import LLMProvider
 from .gemini import GeminiLLM
 
@@ -47,17 +47,17 @@ def create_llm_provider(settings: Settings) -> Optional[LLMProvider]:
         ValueError: If provider is specified but required configuration is missing
         ImportError: If required library for provider is not installed
     """
-    if not settings.llm_enabled:
+    if not settings.llm.enabled:
         logger.info("LLM disabled via configuration")
         return None
 
-    provider = settings.llm_provider.lower()
+    provider = settings.llm.provider.lower()
 
     # Get API key and model name using model-agnostic config
     api_key = settings.get_llm_api_key()
     model_name = settings.get_llm_model_name()
-    temperature = settings.llm_temperature
-    max_tokens = settings.llm_max_output_tokens
+    temperature = settings.llm.temperature
+    max_tokens = settings.llm.max_output_tokens
 
     if not api_key:
         logger.warning(

@@ -165,10 +165,10 @@ LOG_LEVEL="ERROR"  # Show errors only
 ### Via Code
 
 ```python
-from src.config import get_settings
+from src.config.settings import get_settings
 
 settings = get_settings()
-settings.setup_logging()  # Configures logging based on LOG_LEVEL
+settings.setup_logging()  # Configures logging based on LOG_LEVEL / ENVIRONMENT
 ```
 
 ### Custom Configuration
@@ -271,21 +271,21 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("transformers").setLevel(logging.ERROR)
 ```
 
-This is already configured in `src/config.py`:
+This is already configured in `src/core/logging_config.py` and wired via
+`Settings.setup_logging()` in `src/config/settings.py`:
 
 ```python
 def setup_logging(self) -> None:
     """Configure application-wide logging based on settings."""
-    logging.basicConfig(
-        level=getattr(logging, self.log_level),
-        format="%(levelname)-8s %(name)-20s %(message)s",
-        force=True,
-    )
+    from src.core.logging_config import configure_logging
 
-    # Suppress noisy third-party loggers
-    logging.getLogger("chromadb.telemetry.product.posthog").setLevel(logging.ERROR)
-    logging.getLogger("httpx").setLevel(logging.WARNING)
-    logging.getLogger("httpcore").setLevel(logging.WARNING)
+    use_json = self.environment.lower() == "production"
+
+    configure_logging(
+        level=self.log_level,
+        use_json=use_json,
+        include_uvicorn=True,
+    )
 ```
 
 ## Production Logging

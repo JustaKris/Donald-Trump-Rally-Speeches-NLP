@@ -10,7 +10,7 @@ from typing import Optional
 
 from fastapi import Depends
 
-from ..core import Settings, get_settings
+from ..config.settings import Settings, get_settings
 from ..services import (
     EnhancedSentimentAnalyzer,
     LLMProvider,

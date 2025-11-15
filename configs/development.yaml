@@ -1,0 +1,79 @@
+###############################################################################
+# Development Configuration (YAML)
+#
+# This file defines human-friendly defaults for local development.
+# Sensitive values (API keys, secrets) should go into `.env` instead.
+#
+# Effective precedence at runtime:
+#   1. This YAML file (configs/development.yaml)
+#   2. Pydantic model defaults in `src/config/settings.py`
+#   3. Environment variables / `.env` overrides
+###############################################################################
+
+# ---------------------------------------------------------------------------
+# Core application metadata
+# ---------------------------------------------------------------------------
+environment: development          # Used to pick this file (ENVIRONMENT=development)
+log_level: DEBUG                  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+app_name: "Trump Speeches NLP Chatbot API (Development)"
+app_version: "0.1.0"
+
+# ---------------------------------------------------------------------------
+# API settings
+# ---------------------------------------------------------------------------
+api:
+  host: "0.0.0.0"                 # Bind to all interfaces in Docker/local
+  port: 8001
+  reload: true                    # Enable FastAPI reload in dev
+  cors_origins:                   # Allowed frontend origins
+    - "*"                        # Use specific origins in production
+
+# ---------------------------------------------------------------------------
+# RAG (Retrieval-Augmented Generation) configuration
+# ---------------------------------------------------------------------------
+rag:
+  # ChromaDB persistence
+  chromadb_persist_directory: "./data/chromadb"
+  chromadb_collection_name: "speeches"
+
+  # Text chunking
+  chunk_size: 2048               # Characters per chunk
+  chunk_overlap: 150             # Overlap between chunks
+
+  # Search behaviour
+  default_top_k: 5               # Default number of chunks to retrieve
+  use_reranking: true            # Cross-encoder re-ranking
+  use_hybrid_search: true        # Semantic + BM25 hybrid search
+
+# ---------------------------------------------------------------------------
+# ML model configuration
+# ---------------------------------------------------------------------------
+models:
+  # Sentiment Analysis
+  sentiment_model_name: "ProsusAI/finbert"
+  emotion_model_name: "j-hartmann/emotion-english-distilroberta-base"
+
+  # Embeddings & Re-ranking
+  embedding_model_name: "all-mpnet-base-v2"
+  reranker_model_name: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+
+# ---------------------------------------------------------------------------
+# Data paths
+# ---------------------------------------------------------------------------
+paths:
+  data_root_directory: "./data"
+  speeches_directory: "./data/Donald Trump Rally Speeches"
+
+# ---------------------------------------------------------------------------
+# LLM configuration (non-sensitive defaults)
+# ---------------------------------------------------------------------------
+llm:
+  provider: "gemini"             # gemini | openai | anthropic | none
+  # enabled: true                   # Set false to disable all LLM usage
+  model_name: "gemini-2.5-flash" # Default development model
+  temperature: 0.3                # 0.0 = deterministic, 1.0 = creative
+  max_output_tokens: 1024         # Max tokens per response
+
+  # NOTE: The LLM API key is NOT set here on purpose.
+  #       Configure it via `.env` or real env using the LLM_API_KEY variable.
+

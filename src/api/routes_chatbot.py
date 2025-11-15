@@ -10,7 +10,6 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from ..core import Settings
 from ..models import RAGAnswerResponse, RAGQueryRequest, RAGSearchRequest, RAGStatsResponse
 from ..services import RAGService
 from .dependencies import get_rag_service, get_settings_dep
@@ -115,7 +114,7 @@ async def get_rag_statistics(rag_service: Optional[RAGService] = Depends(get_rag
 async def index_documents(
     data_dir: str = "data/Donald Trump Rally Speeches",
     rag_service: Optional[RAGService] = Depends(get_rag_service),
-    settings: Settings = Depends(get_settings_dep),
+    settings=Depends(get_settings_dep),
 ):
     """
     Index or re-index documents into the RAG knowledge base.

@@ -11,6 +11,8 @@ Built with FastAPI, ChromaDB, Google Gemini, and state-of-the-art NLP models.
 __version__ = "0.2.0"
 __author__ = "JustaKris"
 
-from .main import app
+# Lazy import to avoid loading app and all ML models on import
+# Use: from src.main import app
 
-__all__ = ["app"]
+
+__all__ = []

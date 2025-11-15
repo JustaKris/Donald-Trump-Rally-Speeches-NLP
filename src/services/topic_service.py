@@ -17,7 +17,7 @@ from sentence_transformers import SentenceTransformer
 from sklearn.cluster import KMeans
 from sklearn.metrics.pairwise import cosine_similarity
 
-from ..core.config import get_settings
+from ..config.settings import get_settings
 from ..services.llm.base import LLMProvider
 from ..utils.text_preprocessing import clean_text, tokenize_text
 
