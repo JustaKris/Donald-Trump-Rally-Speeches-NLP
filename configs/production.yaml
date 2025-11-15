@@ -22,7 +22,7 @@ app_version: "0.1.0"
 # ---------------------------------------------------------------------------
 api:
   host: "0.0.0.0"                 # Bind to all interfaces in container
-  port: 8003
+  port: 8000
   reload: false                   # Disable reload in production
   cors_origins:                   # Frontend origins allowed in prod
     - "https://your-domain.com"  # Replace with your actual domains

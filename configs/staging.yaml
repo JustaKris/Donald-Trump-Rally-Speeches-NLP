@@ -18,7 +18,7 @@ app_version: "0.1.0"
 # ---------------------------------------------------------------------------
 api:
   host: "0.0.0.0"
-  port: 8002
+  port: 8000
   reload: false                    # No hot reload in staging
   cors_origins:
     - "https://staging.yourdomain.com"  # Replace with your staging domain
