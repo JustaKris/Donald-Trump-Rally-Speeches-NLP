@@ -1,9 +1,13 @@
 """
-Production-ready logging configuration for Azure/Docker deployment.
+Centralized logging configuration for both local development and
+production deployments (Docker, Azure, AWS, Kubernetes).
 
-Supports both JSON logging (for production/cloud) and human-readable format
-(for local development). Automatically detects environment and configures
-appropriate logging format.
+Features:
+- JSON logging for structured cloud logs
+- Colorized human-readable logs for local development
+- Unified formatting for app + uvicorn logs
+- Suppression of noisy 3rd-party libraries
+- Support for extra contextual fields (e.g., request_id)
 """
 
 import json
@@ -12,67 +16,97 @@ import sys
 from typing import Any, Dict
 
 
+# ===============================================================
+# JSON FORMATTER
+# ===============================================================
+
 class JsonFormatter(logging.Formatter):
     """
-    JSON formatter for structured logging in production environments.
+    Formatter that outputs logs as structured JSON.
 
-    Outputs logs as JSON with timestamp, level, logger name, and message.
-    Compatible with Azure Application Insights, CloudWatch, and other
-    cloud logging systems.
+    This is recommended for production because:
+    - JSON logs can be parsed by Azure Monitor, CloudWatch, Datadog, Loki, etc.
+    - They allow better querying, filtering, and alerting
+    - They enforce consistency in log structure
     """
 
     def format(self, record: logging.LogRecord) -> str:
-        """Format log record as JSON string."""
+        """Convert log record into a JSON object."""
         log_record: Dict[str, Any] = {
             "timestamp": self.formatTime(record, self.datefmt),
             "level": record.levelname,
-            "name": record.name,
+            "logger": record.name,
             "message": record.getMessage(),
+            "module": record.module,
+            "process": record.process,
+            "thread": record.thread,
         }
 
-        # Add exception info if present
+        # If the log includes exception info, serialize it as plain text
         if record.exc_info:
             log_record["exception"] = self.formatException(record.exc_info)
 
-        # Add extra fields if present
-        if hasattr(record, "extra_fields"):
-            log_record.update(getattr(record, "extra_fields"))
+        # Allow user-defined fields — e.g., request_id, correlation_id, user_id
+        extra_fields = getattr(record, "extra_fields", None)
+        if extra_fields:
+            log_record.update(extra_fields)
 
         return json.dumps(log_record)
 
 
+# ===============================================================
+# COLORIZED FORMATTER
+# ===============================================================
+
 class ColoredFormatter(logging.Formatter):
     """
-    Colored formatter for human-readable logs in local development.
+    Formatter that adds ANSI colors to log levels for readability.
 
-    Adds color coding based on log level for better readability in terminals.
+    This is ideal for local development:
+    - Easier to visually parse logs
+    - No need for JSON noise
     """
 
-    # ANSI color codes
     COLORS = {
-        "DEBUG": "\033[36m",  # Cyan
-        "INFO": "\033[32m",  # Green
-        "WARNING": "\033[33m",  # Yellow
-        "ERROR": "\033[31m",  # Red
+        "DEBUG": "\033[36m",     # Cyan
+        "INFO": "\033[32m",      # Green
+        "WARNING": "\033[33m",   # Yellow
+        "ERROR": "\033[31m",     # Red
         "CRITICAL": "\033[35m",  # Magenta
     }
     RESET = "\033[0m"
 
     def format(self, record: logging.LogRecord) -> str:
-        """Format log record with color coding."""
-        # Add color to level name
-        levelname = record.levelname
-        if levelname in self.COLORS:
-            record.levelname = f"{self.COLORS[levelname]}{levelname:8}{self.RESET}"
+        """Inject color codes into the level name without mutating the original record."""
+        original = record.levelname
+        color = self.COLORS.get(original, "")
+        record.levelname = f"{color}{original}{self.RESET}"
 
-        # Format the message
         formatted = super().format(record)
 
-        # Reset levelname for next use
-        record.levelname = levelname
-
+        # Restore original level name to avoid cross-handler contamination
+        record.levelname = original
         return formatted
 
+
+# ===============================================================
+# FILTERS
+# ===============================================================
+
+class ChromaDBTelemetryFilter(logging.Filter):
+    """
+    Suppresses extremely noisy messages from ChromaDB's telemetry subsystem.
+
+    These messages are not useful and pollute logs.
+    """
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return "Failed to send telemetry event" not in record.getMessage()
+
+
+# ===============================================================
+# CORE CONFIGURATION FUNCTION
+# ===============================================================
 
 def configure_logging(
     level: str = "INFO",
@@ -83,81 +117,65 @@ def configure_logging(
     Configure application-wide logging.
 
     Args:
-        level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-        use_json: Use JSON formatting (True for production, False for development)
-        include_uvicorn: Configure uvicorn loggers as well
+        level: Default logging level (INFO, DEBUG, WARNING, ...)
+        use_json: Enables JSON logs (recommended for production)
+        include_uvicorn: Also applies formatting to uvicorn logs
+
+    This function replaces any previous logging configuration and ensures
+    the entire application uses a consistent log format.
     """
-    # Determine format
-    formatter: logging.Formatter
+    level = level.upper()
+
+    # Choose the correct formatter depending on environment
     if use_json:
         formatter = JsonFormatter(datefmt="%Y-%m-%d %H:%M:%S")
     else:
-        # Human-readable format with timestamps and color
         fmt = "%(asctime)s | %(levelname)-8s | %(name)-20s | %(message)s"
         datefmt = "%Y-%m-%d %H:%M:%S"
         formatter = ColoredFormatter(fmt=fmt, datefmt=datefmt)
 
-    # Configure root logger
-    root_logger = logging.getLogger()
-    root_logger.setLevel(level)
+    # Configure root logger (the parent of all loggers)
+    root = logging.getLogger()
+    root.setLevel(level)
+    root.handlers.clear()
 
-    # Remove existing handlers
-    root_logger.handlers.clear()
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(formatter)
+    root.addHandler(handler)
 
-    # Add console handler
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setFormatter(formatter)
-    root_logger.addHandler(console_handler)
-
-    # Configure uvicorn loggers if requested
-    if include_uvicorn:
-        # Uvicorn access logs
-        uvicorn_access = logging.getLogger("uvicorn.access")
-        uvicorn_access.handlers.clear()
-        uvicorn_access.addHandler(console_handler)
-        uvicorn_access.propagate = False
-
-        # Uvicorn error logs
-        uvicorn_error = logging.getLogger("uvicorn.error")
-        uvicorn_error.handlers.clear()
-        uvicorn_error.addHandler(console_handler)
-        uvicorn_error.propagate = False
-
-        # Keep uvicorn at INFO level regardless of global level
-        uvicorn_access.setLevel(logging.INFO)
-        uvicorn_error.setLevel(logging.INFO)
-
-    # Suppress noisy third-party loggers
+    # Suppress known noisy loggers
     logging.getLogger("chromadb").setLevel(logging.ERROR)
-    logging.getLogger("chromadb.telemetry").setLevel(logging.CRITICAL)  # Suppress telemetry errors
+    logging.getLogger("chromadb").addFilter(ChromaDBTelemetryFilter())
+
     logging.getLogger("sentence_transformers").setLevel(logging.WARNING)
     logging.getLogger("transformers").setLevel(logging.WARNING)
     logging.getLogger("httpx").setLevel(logging.WARNING)
-    logging.getLogger("httpcore").setLevel(logging.WARNING)
 
-    # Add filter to suppress ChromaDB telemetry errors
-    class ChromaDBTelemetryFilter(logging.Filter):
-        def filter(self, record: logging.LogRecord) -> bool:
-            return "Failed to send telemetry event" not in record.getMessage()
+    # Apply formatting to uvicorn loggers as well
+    if include_uvicorn:
+        for name in ("uvicorn.error", "uvicorn.access"):
+            uv = logging.getLogger(name)
+            uv.handlers.clear()
+            uv.addHandler(handler)
+            uv.propagate = False  # Prevent duplicate logs
+            uv.setLevel(logging.INFO)
 
-    chromadb_logger = logging.getLogger("chromadb")
-    chromadb_logger.addFilter(ChromaDBTelemetryFilter())
+    # Confirm setup
+    logging.getLogger(__name__).info(
+        f"Logging configured: level={level}, format={'JSON' if use_json else 'colored'}"
+    )
 
-    # Log configuration
-    logger = logging.getLogger(__name__)
-    logger.info(f"Logging configured: level={level}, format={'JSON' if use_json else 'colored'}")
 
+# ===============================================================
+# LOGGER RETRIEVAL
+# ===============================================================
 
 def get_logger(name: str) -> logging.Logger:
     """
-    Get a logger instance with the given name.
+    Retrieve a logger by name.
 
-    This is a convenience function that ensures consistent logger retrieval.
-
-    Args:
-        name: Logger name (typically __name__)
-
-    Returns:
-        Logger instance
+    Preferred over calling logging.getLogger() directly because:
+    - It enforces consistent usage across the project
+    - Makes future enhancements (like adding context managers) easier
     """
     return logging.getLogger(name)
